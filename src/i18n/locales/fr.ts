@@ -37,7 +37,8 @@ export const fr: LanguageTranslation = {
                 backup: 'Sauvegarde',
                 export_diagram: 'Exporter le diagramme',
                 restore_diagram: 'Restaurer le diagramme',
-                save_to_minio: 'Enregistrer dans Minio',
+                save_to_minio: 'Sauvegarder dans Minio',
+                import_from_minio: 'Importer depuis Minio',
             },
             help: {
                 help: 'Aide',
@@ -431,6 +432,26 @@ export const fr: LanguageTranslation = {
                     "Le diagramme JSON n'est pas valide. Veuillez vérifier le JSON et réessayer. Besoin d'aide ? support@chartdb.io",
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Importer depuis Minio',
+            description:
+                'Sélectionnez un fichier de diagramme à importer depuis le stockage Minio.',
+            table_columns: {
+                name: 'Nom',
+                last_modified: 'Dernière modification',
+                size: 'Taille',
+            },
+            import: 'Importer',
+            cancel: 'Annuler',
+            no_files: 'Aucun fichier trouvé dans le stockage Minio',
+            error: {
+                title: 'Erreur',
+                description:
+                    'Échec du chargement des fichiers depuis le stockage Minio',
+            },
+        },
+
         import_dbml_dialog: {
             example_title: "Exemple d'importation DBML",
             title: 'Import DBML',

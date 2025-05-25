@@ -39,6 +39,8 @@ export const bn: LanguageTranslation = {
                 backup: 'ব্যাকআপ',
                 export_diagram: 'ডায়াগ্রাম রপ্তানি করুন',
                 restore_diagram: 'ডায়াগ্রাম পুনরুদ্ধার করুন',
+                save_to_minio: 'Minio তে সংরক্ষণ করুন',
+                import_from_minio: 'Minio থেকে আমদানি করুন',
             },
             help: {
                 help: 'সাহায্য',
@@ -433,6 +435,24 @@ export const bn: LanguageTranslation = {
                     'ডায়াগ্রাম JSON অবৈধ। অনুগ্রহ করে JSON পরীক্ষা করুন এবং আবার চেষ্টা করুন। সাহায্যের প্রয়োজন? support@chartdb.io-এ যোগাযোগ করুন।',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Minio থেকে আমদানি করুন',
+            description: 'Minio থেকে একটি চিত্র ফাইল নির্বাচন করুন:',
+            table_columns: {
+                name: 'নাম',
+                last_modified: 'সর্বশেষ পরিবর্তন',
+                size: 'আকার',
+            },
+            import: 'আমদানি করুন',
+            cancel: 'বাতিল করুন',
+            no_files: 'Minio স্টোরেজে ফাইল পাওয়া যায়নি',
+            error: {
+                title: 'ত্রুটি',
+                description: 'Minio থেকে ফাইল লোড করার সমস্যা',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

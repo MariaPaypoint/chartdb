@@ -39,6 +39,7 @@ export const vi: LanguageTranslation = {
                 export_diagram: 'Xuất sơ đồ',
                 restore_diagram: 'Khôi phục sơ đồ',
                 save_to_minio: 'Lưu vào Minio',
+                import_from_minio: 'Nhập từ Minio',
             },
             help: {
                 help: 'Trợ giúp',
@@ -431,6 +432,24 @@ export const vi: LanguageTranslation = {
                     'Sơ đồ ở dạng JSON không hợp lệ. Vui lòng kiểm tra JSON và thử lại. Bạn cần trợ giúp? support@chartdb.io',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Nhập từ Minio',
+            description: 'Chọn một tệp sơ đồ để nhập từ Minio.',
+            table_columns: {
+                name: 'Tên',
+                last_modified: 'Lần cuối chỉnh sửa',
+                size: 'Kích thước',
+            },
+            import: 'Nhập',
+            cancel: 'Hủy',
+            no_files: 'Không tìm thấy tệp trong Minio',
+            error: {
+                title: 'Lỗi',
+                description: 'Không thể tải tệp từ Minio',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

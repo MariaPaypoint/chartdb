@@ -48,6 +48,7 @@ export const Menu: React.FC<MenuProps> = () => {
         openExportDiagramDialog,
         openImportDiagramDialog,
         openImportDBMLDialog,
+        openImportFromMinioDialog,
     } = useDialog();
 
     const { showAlert } = useAlert();
@@ -514,6 +515,9 @@ export const Menu: React.FC<MenuProps> = () => {
                         }
                     >
                         {t('menu.backup.save_to_minio')}
+                    </MenubarItem>
+                    <MenubarItem onClick={() => openImportFromMinioDialog()}>
+                        {t('menu.backup.import_from_minio')}
                     </MenubarItem>
                 </MenubarContent>
             </MenubarMenu>

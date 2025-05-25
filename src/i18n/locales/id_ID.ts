@@ -39,6 +39,7 @@ export const id_ID: LanguageTranslation = {
                 export_diagram: 'Ekspor Diagram',
                 restore_diagram: 'Pulihkan Diagram',
                 save_to_minio: 'Simpan ke Minio',
+                import_from_minio: 'Impor dari Minio',
             },
             help: {
                 help: 'Bantuan',
@@ -432,6 +433,24 @@ export const id_ID: LanguageTranslation = {
                     'Diagram JSON tidak valid. Silakan cek JSON dan coba lagi. Butuh bantuan? support@chartdb.io',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Minio dari impor',
+            description: 'Pilih file diagram untuk diimpor dari Minio storage.',
+            table_columns: {
+                name: 'Nama',
+                last_modified: 'Terakhir diubah',
+                size: 'Ukuran',
+            },
+            import: 'Impor',
+            cancel: 'Batal',
+            no_files: 'Tidak ada file ditemukan di Minio storage',
+            error: {
+                title: 'Error',
+                description: 'Gagal memuat file dari Minio storage',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

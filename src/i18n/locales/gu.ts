@@ -39,6 +39,8 @@ export const gu: LanguageTranslation = {
                 backup: 'બેકઅપ',
                 export_diagram: 'ડાયાગ્રામ નિકાસ કરો',
                 restore_diagram: 'ડાયાગ્રામ પુનઃસ્થાપિત કરો',
+                save_to_minio: 'Minio માં સંભાળો',
+                import_from_minio: 'Minio માંથી આયાત કરો',
             },
             help: {
                 help: 'મદદ',
@@ -433,6 +435,24 @@ export const gu: LanguageTranslation = {
                     'ડાયાગ્રામ JSON અમાન્ય છે. કૃપા કરીને JSON તપાસો અને ફરી પ્રયાસ કરો. મદદ જોઈએ? support@chartdb.io પર સંપર્ક કરો.',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Minio થી આયાત કરો',
+            description: 'Minio સ્ટોરેજમાંથી ડાયાગ્રામ ફાઇલ પસંદ કરો.',
+            table_columns: {
+                name: 'નામ',
+                last_modified: 'અંતીમ મુખ્ય મેટેડ',
+                size: 'સાધારણ મુખ્ય મેટેડ',
+            },
+            import: 'આયાત કરો',
+            cancel: 'રદ કરો',
+            no_files: 'Minio માં કોઈ ફાઇલ મળ્યા નથી',
+            error: {
+                title: 'ભૂલ',
+                description: 'Minio માં ફાઇલો લોડ કરવામાં ભૂલ',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

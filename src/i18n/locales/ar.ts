@@ -38,6 +38,8 @@ export const ar: LanguageTranslation = {
                 backup: 'النسخ الاحتياطي',
                 export_diagram: 'تصدير المخطط',
                 restore_diagram: 'استعادة المخطط',
+                save_to_minio: 'حفظ في Minio',
+                import_from_minio: 'استيراد من Minio',
             },
             help: {
                 help: 'مساعدة',
@@ -430,6 +432,24 @@ export const ar: LanguageTranslation = {
                     'support@chartdb.io و المحاولة مرة اخرى. هل تحتاج إلى المساعدة؟ JSON غير صالح. يرجى التحقق من JSON الرسم البياني',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'استيراد من Minio',
+            description: 'اختر ملف الرسم البياني لاستيراده من Minio.',
+            table_columns: {
+                name: 'الاسم',
+                last_modified: 'آخر تعديل',
+                size: 'الحجم',
+            },
+            import: 'استيراد',
+            cancel: 'إلغاء',
+            no_files: 'لا يوجد ملفات في Minio',
+            error: {
+                title: 'خطأ',
+                description: 'فشل في تحميل الملفات من Minio',
+            },
+        },
+
         import_dbml_dialog: {
             // TODO: Translate
             title: 'Import DBML',

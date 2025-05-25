@@ -39,7 +39,8 @@ export const ne: LanguageTranslation = {
                 backup: 'Backup',
                 export_diagram: 'Export Diagram',
                 restore_diagram: 'Restore Diagram',
-                save_to_minio: 'Minio मा सुरक्षित गर्नुहोस्',
+                save_to_minio: 'Minio मा संरक्षण गर्नुहोस्',
+                import_from_minio: 'Minio बाट आयात गर्नुहोस्',
             },
             help: {
                 help: 'मद्दत',
@@ -436,6 +437,25 @@ export const ne: LanguageTranslation = {
                     'डायाग्राम JSON अमान्य छ। कृपया JSON जाँच गर्नुहोस् र पुन: प्रयास गर्नुहोस्। मद्दत चाहिन्छ? support@chartdb.io मा सम्पर्क गर्नुहोस्',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Minioमा आयात गर्नुहोस्',
+            description:
+                'Minio storageमा आयात गर्नका लागि एकाधिक आरेखाची फाइल निवडा.',
+            table_columns: {
+                name: 'नाव',
+                last_modified: 'मोठ्या बदलावीचे दिनांक',
+                size: 'आकार',
+            },
+            import: 'आयात गर्नुहोस्',
+            cancel: 'रद्द गर्नुहोस्',
+            no_files: 'Minio storageमधून फाइल नाहीत',
+            error: {
+                title: 'एरर',
+                description: 'Minio storageमधून फाइल लोड गर्न्यात असला असला',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

@@ -10,6 +10,7 @@ import type { CreateRelationshipDialogProps } from '@/dialogs/create-relationshi
 import type { ImportDBMLDialogProps } from '@/dialogs/import-dbml-dialog/import-dbml-dialog';
 import type { OpenDiagramDialogProps } from '@/dialogs/open-diagram-dialog/open-diagram-dialog';
 import type { CreateDiagramDialogProps } from '@/dialogs/create-diagram-dialog/create-diagram-dialog';
+//import type { ImportFromMinioDialogProps } from '@/dialogs/import-from-minio-dialog/import-from-minio-dialog';
 
 export interface DialogContext {
     // Create diagram dialog
@@ -73,6 +74,10 @@ export interface DialogContext {
         params?: Omit<ImportDBMLDialogProps, 'dialog'>
     ) => void;
     closeImportDBMLDialog: () => void;
+
+    // Import from Minio dialog
+    openImportFromMinioDialog: () => void;
+    closeImportFromMinioDialog: () => void;
 }
 
 export const dialogContext = createContext<DialogContext>({
@@ -98,4 +103,6 @@ export const dialogContext = createContext<DialogContext>({
     closeImportDiagramDialog: emptyFn,
     openImportDBMLDialog: emptyFn,
     closeImportDBMLDialog: emptyFn,
+    openImportFromMinioDialog: emptyFn,
+    closeImportFromMinioDialog: emptyFn,
 });

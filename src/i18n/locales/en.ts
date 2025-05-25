@@ -38,6 +38,7 @@ export const en = {
                 export_diagram: 'Export Diagram',
                 restore_diagram: 'Restore Diagram',
                 save_to_minio: 'Save to Minio',
+                import_from_minio: 'Import from Minio',
             },
             help: {
                 help: 'Help',
@@ -424,6 +425,23 @@ export const en = {
                 title: 'Error importing diagram',
                 description:
                     'The diagram JSON is invalid. Please check the JSON and try again. Need help? support@chartdb.io',
+            },
+        },
+
+        import_from_minio_dialog: {
+            title: 'Import from Minio',
+            description: 'Select a diagram file to import from Minio storage.',
+            table_columns: {
+                name: 'Name',
+                last_modified: 'Last Modified',
+                size: 'Size',
+            },
+            import: 'Import',
+            cancel: 'Cancel',
+            no_files: 'No files found in Minio storage',
+            error: {
+                title: 'Error',
+                description: 'Failed to load files from Minio storage',
             },
         },
 

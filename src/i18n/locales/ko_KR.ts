@@ -39,6 +39,7 @@ export const ko_KR: LanguageTranslation = {
                 export_diagram: '다이어그램 내보내기',
                 restore_diagram: '다이어그램 복구',
                 save_to_minio: 'Minio에 저장',
+                import_from_minio: 'Minio에서 가져오기',
             },
             help: {
                 help: '도움말',
@@ -430,6 +431,25 @@ export const ko_KR: LanguageTranslation = {
                     '다이어그램 JSON이 유효하지 않습니다. JSON이 올바른 형식인지 확인해주세요. 도움이 필요하신 경우 support@chartdb.io으로 연락해주세요.',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Minio에서 가져오기',
+            description:
+                'Minio storage에서 가져올 다이어그램 파일을 선택해주세요.',
+            table_columns: {
+                name: '이름',
+                last_modified: '마지막 수정일',
+                size: '크기',
+            },
+            import: '가져오기',
+            cancel: '취소',
+            no_files: 'Minio storage에 파일이 없습니다',
+            error: {
+                title: '에러',
+                description: 'Minio storage에서 파일을 불러오는데 실패했습니다',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

@@ -38,6 +38,7 @@ export const ru: LanguageTranslation = {
                 export_diagram: 'Экспорт диаграммы',
                 restore_diagram: 'Восстановить диаграмму',
                 save_to_minio: 'Сохранить в Minio',
+                import_from_minio: 'Импорт из Minio',
             },
             help: {
                 help: 'Помощь',
@@ -430,6 +431,25 @@ export const ru: LanguageTranslation = {
                     'Код JSON диаграммы некорректен. Проверьте, пожалуйста, код и попробуйте снова. Проблема не решается? Напишите нам: support@chartdb.io',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Импорт из Minio',
+            description:
+                'Выберите файл диаграммы для импорта из хранилища Minio.',
+            table_columns: {
+                name: 'Имя',
+                last_modified: 'Последнее изменение',
+                size: 'Размер',
+            },
+            import: 'Импортировать',
+            cancel: 'Отменить',
+            no_files: 'Файлы не найдены в хранилище Minio',
+            error: {
+                title: 'Ошибка',
+                description: 'Не удалось загрузить файлы из хранилища Minio',
+            },
+        },
+
         import_dbml_dialog: {
             example_title: 'Импорт DBML',
             title: 'Импортировать DBML',

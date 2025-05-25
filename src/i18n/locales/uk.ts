@@ -38,6 +38,7 @@ export const uk: LanguageTranslation = {
                 export_diagram: 'Експорт діаграми',
                 restore_diagram: 'Відновити діаграму',
                 save_to_minio: 'Зберегти в Minio',
+                import_from_minio: 'Імпортувати з Minio',
             },
             help: {
                 help: 'Довідка',
@@ -430,6 +431,24 @@ export const uk: LanguageTranslation = {
                     'JSON діаграми є неправильним. Будь ласка, перевірте JSON і спробуйте ще раз. Потрібна допомога? support@chartdb.io',
             },
         },
+
+        import_from_minio_dialog: {
+            title: 'Завантажити з Minio',
+            description: 'Виберіть файл для імпорту з Minio.',
+            table_columns: {
+                name: 'Назва',
+                last_modified: 'Остання зміна',
+                size: 'Розмір',
+            },
+            import: 'Імпортувати',
+            cancel: 'Скасувати',
+            no_files: 'Файли не знайдено в Minio',
+            error: {
+                title: 'Помилка',
+                description: 'Не вдалося завантажити файли з Minio',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

@@ -39,6 +39,7 @@ export const zh_CN: LanguageTranslation = {
                 export_diagram: '导出关系图',
                 restore_diagram: '还原图表',
                 save_to_minio: '保存到 Minio',
+                import_from_minio: '从 Minio 导入',
             },
             help: {
                 help: '帮助',
@@ -427,6 +428,24 @@ export const zh_CN: LanguageTranslation = {
                     '关系图 JSON 无效，请检查 JSON 后重试。需要帮助？ 联系 support@chartdb.io',
             },
         },
+
+        import_from_minio_dialog: {
+            title: '从 Minio 导入',
+            description: '从 Minio 存储中选择一个图表文件导入。',
+            table_columns: {
+                name: '名称',
+                last_modified: '最后修改',
+                size: '大小',
+            },
+            import: '导入',
+            cancel: '取消',
+            no_files: 'Minio 存储中未找到文件',
+            error: {
+                title: '错误',
+                description: '无法从 Minio 存储加载文件',
+            },
+        },
+
         // TODO: Translate
         import_dbml_dialog: {
             example_title: 'Import Example DBML',

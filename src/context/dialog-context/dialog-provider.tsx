@@ -22,6 +22,7 @@ import { ExportDiagramDialog } from '@/dialogs/export-diagram-dialog/export-diag
 import { ImportDiagramDialog } from '@/dialogs/import-diagram-dialog/import-diagram-dialog';
 import type { ImportDBMLDialogProps } from '@/dialogs/import-dbml-dialog/import-dbml-dialog';
 import { ImportDBMLDialog } from '@/dialogs/import-dbml-dialog/import-dbml-dialog';
+import { ImportFromMinioDialog } from '@/dialogs/import-from-minio-dialog/import-from-minio-dialog';
 
 export const DialogProvider: React.FC<React.PropsWithChildren> = ({
     children,
@@ -150,6 +151,10 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
     const [importDBMLDialogParams, setImportDBMLDialogParams] =
         useState<Omit<ImportDBMLDialogProps, 'dialog'>>();
 
+    // Import from Minio dialog
+    const [openImportFromMinioDialog, setOpenImportFromMinioDialog] =
+        useState(false);
+
     return (
         <dialogContext.Provider
             value={{
@@ -182,6 +187,10 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
                     setOpenImportDBMLDialog(true);
                 },
                 closeImportDBMLDialog: () => setOpenImportDBMLDialog(false),
+                openImportFromMinioDialog: () =>
+                    setOpenImportFromMinioDialog(true),
+                closeImportFromMinioDialog: () =>
+                    setOpenImportFromMinioDialog(false),
             }}
         >
             {children}
@@ -222,6 +231,9 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
             <ImportDBMLDialog
                 dialog={{ open: openImportDBMLDialog }}
                 {...importDBMLDialogParams}
+            />
+            <ImportFromMinioDialog
+                dialog={{ open: openImportFromMinioDialog }}
             />
         </dialogContext.Provider>
     );
