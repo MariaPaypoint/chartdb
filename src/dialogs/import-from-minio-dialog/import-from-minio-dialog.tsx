@@ -24,8 +24,15 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/table/table';
-import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import {
+    S3Client,
+    ListObjectsV2Command,
+    GetObjectCommand,
+} from '@aws-sdk/client-s3';
 import { useDebounce } from '@/hooks/use-debounce';
+import { diagramFromJSONInput } from '@/lib/export-import-utils';
+import { useStorage } from '@/hooks/use-storage';
+import { useNavigate } from 'react-router-dom';
 
 export interface ImportFromMinioDialogProps extends BaseDialogProps {}
 
@@ -37,15 +44,19 @@ interface MinioFile {
 
 export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
     dialog,
-}) => {
+}: ImportFromMinioDialogProps) => {
     const { t } = useTranslation();
-    const { closeImportFromMinioDialog } = useDialog();
+    const { closeImportFromMinioDialog, closeCreateDiagramDialog } =
+        useDialog();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(false);
+    const [importError, setImportError] = useState(false);
     const [files, setFiles] = useState<MinioFile[]>([]);
     const [selectedFileKey, setSelectedFileKey] = useState<
         string | undefined
     >();
+    const { addDiagram } = useStorage();
+    const navigate = useNavigate();
 
     const loadFiles = useCallback(async () => {
         setIsLoading(true);
@@ -167,6 +178,65 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
         return parts[parts.length - 1];
     };
 
+    const handleImport = useCallback(async () => {
+        if (!selectedFileKey) return;
+
+        try {
+            setIsLoading(true);
+            setImportError(false);
+
+            // Создаем клиент S3 для работы с MinIO
+            const s3Client = new S3Client({
+                region: 'us-east-1',
+                endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
+                credentials: {
+                    accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
+                    secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
+                },
+                forcePathStyle: true,
+            });
+
+            const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
+
+            // Получаем объект из MinIO
+            const getCommand = new GetObjectCommand({
+                Bucket: bucketName,
+                Key: selectedFileKey,
+            });
+
+            const response = await s3Client.send(getCommand);
+
+            if (!response.Body) {
+                throw new Error('Не удалось получить содержимое файла');
+            }
+
+            // Чтение данных из потока
+            const jsonData = await response.Body.transformToString();
+
+            // Преобразуем JSON в объект диаграммы
+            const diagram = diagramFromJSONInput(jsonData);
+
+            // Добавляем диаграмму в хранилище
+            await addDiagram({ diagram });
+
+            // Закрываем диалоги и переходим на страницу диаграммы
+            closeImportFromMinioDialog();
+            closeCreateDiagramDialog();
+            navigate(`/diagrams/${diagram.id}`);
+        } catch (e) {
+            console.error('Ошибка при импорте диаграммы из MinIO:', e);
+            setImportError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [
+        selectedFileKey,
+        addDiagram,
+        navigate,
+        closeImportFromMinioDialog,
+        closeCreateDiagramDialog,
+    ]);
+
     return (
         <Dialog
             {...dialog}
@@ -206,7 +276,21 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
                                 )}
                             </AlertDescription>
                         </Alert>
-                    ) : files.length === 0 ? (
+                    ) : null}
+
+                    {importError ? (
+                        <Alert variant="destructive">
+                            <AlertCircle className="size-4" />
+                            <AlertTitle>
+                                {t('import_diagram_dialog.error.title')}
+                            </AlertTitle>
+                            <AlertDescription>
+                                {t('import_diagram_dialog.error.description')}
+                            </AlertDescription>
+                        </Alert>
+                    ) : null}
+
+                    {files.length === 0 ? (
                         <div className="flex h-40 items-center justify-center text-muted-foreground">
                             {t('import_from_minio_dialog.no_files')}
                         </div>
@@ -286,7 +370,11 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
                         </Button>
                     </DialogClose>
                     <DialogClose asChild>
-                        <Button type="submit" disabled={!selectedFileKey}>
+                        <Button
+                            type="submit"
+                            disabled={!selectedFileKey}
+                            onClick={handleImport}
+                        >
                             {t('import_from_minio_dialog.import')}
                         </Button>
                     </DialogClose>

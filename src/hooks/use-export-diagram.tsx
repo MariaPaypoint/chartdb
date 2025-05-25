@@ -40,7 +40,7 @@ export const useExportDiagram = () => {
             });
 
             const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
-            const fileName = `ChartDB (${name}).json`;
+            const fileName = `${name}.json`;
 
             // Проверяем, существует ли уже файл с таким именем
             let fileExists = false;
@@ -74,7 +74,7 @@ export const useExportDiagram = () => {
                 //    // Добавляем текущую дату и время к имени файла
                 //    const now = new Date();
                 //    const timestamp = now.toISOString().replace(/[:.]/g, '-');
-                //    finalFileName = `ChartDB (${name})_${timestamp}.json`;
+                //    finalFileName = `${name}_${timestamp}.json`;
                 //    console.log(`Создаем новую версию файла: ${finalFileName}`);
             }
 
