@@ -28,38 +28,6 @@ export const useExportDiagram = () => {
         a.click();
     }, []);
 
-    // Function to get SVG as a string from exportImage
-    const getSvgDataUrl = useCallback(() => {
-        return new Promise<string>((resolve, reject) => {
-            try {
-                // Create a handler to intercept loading via a.click()
-                const originalClick = HTMLAnchorElement.prototype.click;
-
-                // Intercept the default link click behavior
-                HTMLAnchorElement.prototype.click = function () {
-                    // Get the SVG URL and restore the original function
-                    const svgUrl = this.getAttribute('href');
-                    HTMLAnchorElement.prototype.click = originalClick;
-
-                    if (svgUrl) {
-                        resolve(svgUrl);
-                    } else {
-                        reject('Не удалось получить URL SVG');
-                    }
-                };
-
-                // Вызываем экспорт SVG, который запустит наш перехватчик
-                exportImage('svg', {
-                    scale: 1,
-                    transparent: true,
-                    includePatternBG: false,
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }, [exportImage]);
-
     // Function to copy SVG to clipboard
     const copyImageToClipboard = useCallback(async () => {
         try {
@@ -93,113 +61,73 @@ export const useExportDiagram = () => {
         }
     }, [exportImage]);
 
-    const uploadToMinio = useCallback(
-        async (name: string, blob: Blob) => {
+    const uploadToMinio = useCallback(async (name: string, blob: Blob) => {
+        try {
+            // Create S3 client for working with MinIO
+            const s3Client = new S3Client({
+                region: 'us-east-1', // MinIO doesn't use regions, but it's required to specify
+                endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
+                credentials: {
+                    accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
+                    secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
+                },
+                forcePathStyle: true, // Required for MinIO
+            });
+
+            const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
+            const fileName = `${name}.json`;
+
+            // Check if file with this name already exists
+            let fileExists = false;
             try {
-                // Create S3 client for working with MinIO
-                const s3Client = new S3Client({
-                    region: 'us-east-1', // MinIO doesn't use regions, but it's required to specify
-                    endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
-                    credentials: {
-                        accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
-                        secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
-                    },
-                    forcePathStyle: true, // Required for MinIO
-                });
-
-                const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
-                const fileName = `${name}.json`;
-
-                // Check if file with this name already exists
-                let fileExists = false;
-                try {
-                    const headCommand = new HeadObjectCommand({
-                        Bucket: bucketName,
-                        Key: fileName,
-                    });
-                    await s3Client.send(headCommand);
-                    fileExists = true;
-                    console.log(`File ${fileName} already exists in MinIO`);
-                } catch (headError) {
-                    // If file is not found, we'll get a NotFound error
-                    if (headError instanceof NotFound) {
-                        fileExists = false;
-                        console.log(
-                            `File ${fileName} not found in MinIO, creating new one`
-                        );
-                    } else {
-                        // If another error occurred during check, continue with upload
-                        console.warn(
-                            'Error checking if file exists:',
-                            headError
-                        );
-                    }
-                }
-
-                // If file exists, generate a unique name
-                const finalFileName = fileName;
-                if (fileExists) {
-                    //    // Add current date and time to the file name
-                    //    const now = new Date();
-                    //    const timestamp = now.toISOString().replace(/[:.]/g, '-');
-                    //    finalFileName = `${name}_${timestamp}.json`;
-                    //    console.log(`Creating new file version: ${finalFileName}`);
-                }
-
-                // Convert Blob to ArrayBuffer for upload
-                const arrayBuffer = await blob.arrayBuffer();
-
-                // Upload file to MinIO
-                const putCommand = new PutObjectCommand({
+                const headCommand = new HeadObjectCommand({
                     Bucket: bucketName,
-                    Key: finalFileName,
-                    Body: new Uint8Array(arrayBuffer),
-                    ContentType: 'application/json',
+                    Key: fileName,
                 });
-
-                await s3Client.send(putCommand);
-                console.log(`Файл ${finalFileName} успешно загружен в MinIO`);
-
-                // Additionally save the SVG file
-                try {
-                    // Get SVG data
-                    const svgDataUrl = await getSvgDataUrl();
-
-                    // Convert data URL to Blob
-                    const svgBlob = await fetch(svgDataUrl).then((r) =>
-                        r.blob()
-                    );
-                    const svgArrayBuffer = await svgBlob.arrayBuffer();
-
-                    // Form the SVG filename
-                    const svgFileName = `${name}.svg`;
-
-                    // Upload SVG to MinIO
-                    const svgPutCommand = new PutObjectCommand({
-                        Bucket: bucketName,
-                        Key: svgFileName,
-                        Body: new Uint8Array(svgArrayBuffer),
-                        ContentType: 'image/svg+xml',
-                    });
-
-                    await s3Client.send(svgPutCommand);
+                await s3Client.send(headCommand);
+                fileExists = true;
+                console.log(`File ${fileName} already exists in MinIO`);
+            } catch (headError) {
+                // If file is not found, we'll get a NotFound error
+                if (headError instanceof NotFound) {
+                    fileExists = false;
                     console.log(
-                        `SVG файл ${svgFileName} успешно загружен в MinIO`
+                        `File ${fileName} not found in MinIO, creating new one`
                     );
-                } catch (svgError) {
-                    console.warn(
-                        'Ошибка при сохранении SVG в MinIO:',
-                        svgError
-                    );
-                    // Don't interrupt the main process if something goes wrong with SVG
+                } else {
+                    // If another error occurred during check, continue with upload
+                    console.warn('Error checking if file exists:', headError);
                 }
-            } catch (error) {
-                console.error('Ошибка при загрузке файла в MinIO:', error);
-                throw error;
             }
-        },
-        [getSvgDataUrl]
-    );
+
+            // If file exists, generate a unique name
+            const finalFileName = fileName;
+            if (fileExists) {
+                //    // Add current date and time to the file name
+                //    const now = new Date();
+                //    const timestamp = now.toISOString().replace(/[:.]/g, '-');
+                //    finalFileName = `${name}_${timestamp}.json`;
+                //    console.log(`Creating new file version: ${finalFileName}`);
+            }
+
+            // Convert Blob to ArrayBuffer for upload
+            const arrayBuffer = await blob.arrayBuffer();
+
+            // Upload file to MinIO
+            const putCommand = new PutObjectCommand({
+                Bucket: bucketName,
+                Key: finalFileName,
+                Body: new Uint8Array(arrayBuffer),
+                ContentType: 'application/json',
+            });
+
+            await s3Client.send(putCommand);
+            console.log(`File ${finalFileName} successfully uploaded to MinIO`);
+        } catch (error) {
+            console.error('Error uploading file to MinIO:', error);
+            throw error;
+        }
+    }, []);
 
     const handleExport = useCallback(
         async ({ diagram, destination = 'local' }: ExportOptions) => {

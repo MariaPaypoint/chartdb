@@ -10,7 +10,7 @@ import { LastSaved } from './last-saved';
 import { LanguageNav } from './language-nav/language-nav';
 import { Menu } from './menu/menu';
 import { Badge } from '@/components/badge/badge';
-import { CloudUpload, Clipboard } from 'lucide-react';
+import { CloudUpload, Clipboard, Link } from 'lucide-react';
 import { useExportDiagram } from '@/hooks/use-export-diagram';
 import {
     Tooltip,
@@ -140,6 +140,67 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                         {t(
                             'menu.backup.copy_to_clipboard_tooltip',
                             'Copy diagram as PNG with transparent background'
+                        )}
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Badge
+                            variant="secondary"
+                            className="flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-300 ease-in-out"
+                            onClick={async () => {
+                                try {
+                                    // Get the current URL
+                                    const url = new URL(window.location.href);
+
+                                    // Set the path to root
+                                    url.pathname = '/';
+
+                                    // Add minio parameter with current diagram name
+                                    url.searchParams.set(
+                                        'minio',
+                                        currentDiagram.name
+                                    );
+
+                                    // Copy URL to clipboard
+                                    await navigator.clipboard.writeText(
+                                        url.toString()
+                                    );
+
+                                    // Visual feedback
+                                    const badge =
+                                        document.getElementById(
+                                            'copy-url-badge'
+                                        );
+                                    if (badge) {
+                                        badge.classList.add(
+                                            'bg-green-500',
+                                            'text-white'
+                                        );
+                                        setTimeout(() => {
+                                            badge.classList.remove(
+                                                'bg-green-500',
+                                                'text-white'
+                                            );
+                                        }, 1000);
+                                    }
+                                } catch (error) {
+                                    console.error(
+                                        'Error copying URL to clipboard:',
+                                        error
+                                    );
+                                }
+                            }}
+                            id="copy-url-badge"
+                        >
+                            <Link size={16} />
+                            <span>{t('menu.backup.copy_url', 'Copy URL')}</span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t(
+                            'menu.backup.copy_url_tooltip',
+                            'Copy link to this diagram with minio parameter'
                         )}
                     </TooltipContent>
                 </Tooltip>
