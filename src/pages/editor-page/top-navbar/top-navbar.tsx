@@ -81,6 +81,116 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                     <TooltipTrigger>
                         <Badge
                             variant="secondary"
+                            className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isSaving ? 'bg-red-700 text-white hover:bg-red-700' : ''} ${isSavingSuccess ? '!bg-green-500 text-white hover:!bg-green-500' : ''} ${!isSaving && !isSavingSuccess && hasUnsavedChanges ? 'bg-red-500 text-white hover:bg-red-600' : ''}`}
+                            onClick={async () => {
+                                setIsSaving(true);
+                                try {
+                                    await exportDiagram({
+                                        diagram: currentDiagram,
+                                        destination: 'minio',
+                                    });
+                                    setHasUnsavedChanges(false);
+                                    setIsSaving(false);
+                                    setIsSavingSuccess(true);
+                                    setLastSavedDiagram(
+                                        JSON.stringify(currentDiagram)
+                                    );
+
+                                    // Remove green color after 3 seconds
+                                    setTimeout(() => {
+                                        setIsSavingSuccess(false);
+                                    }, 3000);
+                                    // Successful save, don't show notification
+                                } catch (error) {
+                                    console.error(
+                                        'Error saving to MinIO:',
+                                        error
+                                    );
+                                    setIsSaving(false);
+                                    // Don't show notification on error
+                                }
+                            }}
+                        >
+                            <CloudUpload size={16} />
+                            <span>
+                                {isSaving
+                                    ? t('menu.backup.saving', 'Saving...')
+                                    : isSavingSuccess
+                                      ? t('menu.backup.saved', 'Saved')
+                                      : t(
+                                            'menu.backup.save_to_minio',
+                                            'Save to MinIO'
+                                        )}
+                            </span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t(
+                            'menu.backup.save_to_minio_tooltip',
+                            'Save current diagram to MinIO'
+                        )}
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Badge
+                            variant="secondary"
+                            className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isUrlCopied ? 'bg-green-500 text-white' : ''}`}
+                            onClick={async () => {
+                                try {
+                                    // Get the current URL
+                                    const url = new URL(window.location.href);
+
+                                    // Set the path to root
+                                    url.pathname = '/';
+
+                                    // Add minio parameter with current diagram name
+                                    url.searchParams.set(
+                                        'minio',
+                                        currentDiagram.name
+                                    );
+
+                                    // Copy URL to clipboard
+                                    await navigator.clipboard.writeText(
+                                        url.toString()
+                                    );
+
+                                    // Visual feedback with text change
+                                    setIsUrlCopied(true);
+
+                                    // Reset state after 2 seconds
+                                    setTimeout(() => {
+                                        setIsUrlCopied(false);
+                                    }, 2000);
+                                } catch (error) {
+                                    console.error(
+                                        'Error copying URL to clipboard:',
+                                        error
+                                    );
+                                }
+                            }}
+                            id="copy-url-badge"
+                        >
+                            <Link size={16} />
+                            <span>
+                                {isUrlCopied
+                                    ? t('menu.backup.copied', 'Скопировано')
+                                    : t('menu.backup.copy_url', 'Copy URL')}
+                            </span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t(
+                            'menu.backup.copy_url_tooltip',
+                            'Copy link to this diagram with minio parameter'
+                        )}
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Badge
+                            variant="secondary"
                             className="flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-300 ease-in-out"
                             onClick={async () => {
                                 try {
@@ -141,115 +251,6 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                         {t(
                             'menu.backup.copy_to_clipboard_tooltip',
                             'Copy diagram as PNG with transparent background'
-                        )}
-                    </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Badge
-                            variant="secondary"
-                            className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isUrlCopied ? 'bg-green-500 text-white' : ''}`}
-                            onClick={async () => {
-                                try {
-                                    // Get the current URL
-                                    const url = new URL(window.location.href);
-
-                                    // Set the path to root
-                                    url.pathname = '/';
-
-                                    // Add minio parameter with current diagram name
-                                    url.searchParams.set(
-                                        'minio',
-                                        currentDiagram.name
-                                    );
-
-                                    // Copy URL to clipboard
-                                    await navigator.clipboard.writeText(
-                                        url.toString()
-                                    );
-
-                                    // Visual feedback with text change
-                                    setIsUrlCopied(true);
-
-                                    // Reset state after 2 seconds
-                                    setTimeout(() => {
-                                        setIsUrlCopied(false);
-                                    }, 2000);
-                                } catch (error) {
-                                    console.error(
-                                        'Error copying URL to clipboard:',
-                                        error
-                                    );
-                                }
-                            }}
-                            id="copy-url-badge"
-                        >
-                            <Link size={16} />
-                            <span>
-                                {isUrlCopied
-                                    ? t('menu.backup.copied', 'Copied')
-                                    : t('menu.backup.copy_url', 'Copy URL')}
-                            </span>
-                        </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        {t(
-                            'menu.backup.copy_url_tooltip',
-                            'Copy link with minio GET parameter, which opens diagram from MinIO for editing'
-                        )}
-                    </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Badge
-                            variant="secondary"
-                            className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isSaving ? 'bg-red-700 text-white hover:bg-red-700' : ''} ${isSavingSuccess ? '!bg-green-500 text-white hover:!bg-green-500' : ''} ${!isSaving && !isSavingSuccess && hasUnsavedChanges ? 'bg-red-500 text-white hover:bg-red-600' : ''}`}
-                            onClick={async () => {
-                                setIsSaving(true);
-                                try {
-                                    await exportDiagram({
-                                        diagram: currentDiagram,
-                                        destination: 'minio',
-                                    });
-                                    setHasUnsavedChanges(false);
-                                    setIsSaving(false);
-                                    setIsSavingSuccess(true);
-                                    setLastSavedDiagram(
-                                        JSON.stringify(currentDiagram)
-                                    );
-
-                                    // Remove green color after 3 seconds
-                                    setTimeout(() => {
-                                        setIsSavingSuccess(false);
-                                    }, 3000);
-                                    // Successful save, don't show notification
-                                } catch (error) {
-                                    console.error(
-                                        'Error saving to MinIO:',
-                                        error
-                                    );
-                                    setIsSaving(false);
-                                    // Don't show notification on error
-                                }
-                            }}
-                        >
-                            <CloudUpload size={16} />
-                            <span>
-                                {isSaving
-                                    ? t('menu.backup.saving', 'Saving...')
-                                    : isSavingSuccess
-                                      ? t('menu.backup.saved', 'Saved')
-                                      : t(
-                                            'menu.backup.save_to_minio',
-                                            'Save to MinIO'
-                                        )}
-                            </span>
-                        </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        {t(
-                            'menu.backup.save_to_minio_tooltip',
-                            'Save current diagram to MinIO'
                         )}
                     </TooltipContent>
                 </Tooltip>
