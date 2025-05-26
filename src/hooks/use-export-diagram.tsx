@@ -28,16 +28,16 @@ export const useExportDiagram = () => {
         a.click();
     }, []);
 
-    // Функция для получения SVG в виде строки из exportImage
+    // Function to get SVG as a string from exportImage
     const getSvgDataUrl = useCallback(() => {
         return new Promise<string>((resolve, reject) => {
             try {
-                // Создаем обработчик для перехвата загрузки через a.click()
+                // Create a handler to intercept loading via a.click()
                 const originalClick = HTMLAnchorElement.prototype.click;
 
-                // Перехватываем стандартное поведение клика на ссылке
+                // Intercept the default link click behavior
                 HTMLAnchorElement.prototype.click = function () {
-                    // Получаем URL SVG и восстанавливаем оригинальную функцию
+                    // Get the SVG URL and restore the original function
                     const svgUrl = this.getAttribute('href');
                     HTMLAnchorElement.prototype.click = originalClick;
 
@@ -60,24 +60,57 @@ export const useExportDiagram = () => {
         });
     }, [exportImage]);
 
+    // Function to copy SVG to clipboard
+    const copyImageToClipboard = useCallback(async () => {
+        try {
+            // Get PNG with transparent background
+            const pngUrl = await exportImage('png', {
+                scale: 2, // Increase scale for better quality
+                transparent: true, // Transparent background
+                includePatternBG: false, // Without background pattern
+            });
+
+            if (!pngUrl) {
+                throw new Error('Failed to get image URL');
+            }
+
+            // Get Blob from URL
+            const response = await fetch(pngUrl);
+            const blob = await response.blob();
+
+            // Copy to clipboard
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob,
+                }),
+            ]);
+
+            console.log('Diagram copied to clipboard as PNG');
+            return true;
+        } catch (error) {
+            console.error('Error copying PNG to clipboard:', error);
+            return false;
+        }
+    }, [exportImage]);
+
     const uploadToMinio = useCallback(
         async (name: string, blob: Blob) => {
             try {
-                // Создаем клиент S3 для работы с MinIO
+                // Create S3 client for working with MinIO
                 const s3Client = new S3Client({
-                    region: 'us-east-1', // MinIO не использует регионы, но требуется указать
+                    region: 'us-east-1', // MinIO doesn't use regions, but it's required to specify
                     endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
                     credentials: {
                         accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
                         secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
                     },
-                    forcePathStyle: true, // Необходимо для MinIO
+                    forcePathStyle: true, // Required for MinIO
                 });
 
                 const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
                 const fileName = `${name}.json`;
 
-                // Проверяем, существует ли уже файл с таким именем
+                // Check if file with this name already exists
                 let fileExists = false;
                 try {
                     const headCommand = new HeadObjectCommand({
@@ -86,37 +119,37 @@ export const useExportDiagram = () => {
                     });
                     await s3Client.send(headCommand);
                     fileExists = true;
-                    console.log(`Файл ${fileName} уже существует в MinIO`);
+                    console.log(`File ${fileName} already exists in MinIO`);
                 } catch (headError) {
-                    // Если файл не найден, получим ошибку NotFound
+                    // If file is not found, we'll get a NotFound error
                     if (headError instanceof NotFound) {
                         fileExists = false;
                         console.log(
-                            `Файл ${fileName} не найден в MinIO, создаем новый`
+                            `File ${fileName} not found in MinIO, creating new one`
                         );
                     } else {
-                        // Если произошла другая ошибка при проверке, продолжаем загрузку
+                        // If another error occurred during check, continue with upload
                         console.warn(
-                            'Ошибка при проверке существования файла:',
+                            'Error checking if file exists:',
                             headError
                         );
                     }
                 }
 
-                // Если файл существует, генерируем уникальное имя
+                // If file exists, generate a unique name
                 const finalFileName = fileName;
                 if (fileExists) {
-                    //    // Добавляем текущую дату и время к имени файла
+                    //    // Add current date and time to the file name
                     //    const now = new Date();
                     //    const timestamp = now.toISOString().replace(/[:.]/g, '-');
                     //    finalFileName = `${name}_${timestamp}.json`;
-                    //    console.log(`Создаем новую версию файла: ${finalFileName}`);
+                    //    console.log(`Creating new file version: ${finalFileName}`);
                 }
 
-                // Преобразуем Blob в ArrayBuffer для загрузки
+                // Convert Blob to ArrayBuffer for upload
                 const arrayBuffer = await blob.arrayBuffer();
 
-                // Загружаем файл в MinIO
+                // Upload file to MinIO
                 const putCommand = new PutObjectCommand({
                     Bucket: bucketName,
                     Key: finalFileName,
@@ -127,21 +160,21 @@ export const useExportDiagram = () => {
                 await s3Client.send(putCommand);
                 console.log(`Файл ${finalFileName} успешно загружен в MinIO`);
 
-                // Дополнительно сохраняем SVG файл
+                // Additionally save the SVG file
                 try {
-                    // Получаем SVG данные
+                    // Get SVG data
                     const svgDataUrl = await getSvgDataUrl();
 
-                    // Конвертируем data URL в Blob
+                    // Convert data URL to Blob
                     const svgBlob = await fetch(svgDataUrl).then((r) =>
                         r.blob()
                     );
                     const svgArrayBuffer = await svgBlob.arrayBuffer();
 
-                    // Формируем имя SVG файла
+                    // Form the SVG filename
                     const svgFileName = `${name}.svg`;
 
-                    // Загружаем SVG в MinIO
+                    // Upload SVG to MinIO
                     const svgPutCommand = new PutObjectCommand({
                         Bucket: bucketName,
                         Key: svgFileName,
@@ -158,7 +191,7 @@ export const useExportDiagram = () => {
                         'Ошибка при сохранении SVG в MinIO:',
                         svgError
                     );
-                    // Не прерываем основной процесс, если с SVG что-то пошло не так
+                    // Don't interrupt the main process if something goes wrong with SVG
                 }
             } catch (error) {
                 console.error('Ошибка при загрузке файла в MinIO:', error);
@@ -186,7 +219,7 @@ export const useExportDiagram = () => {
                 setIsLoading(false);
                 closeExportDiagramDialog();
             } catch (error) {
-                console.error('Ошибка при экспорте диаграммы:', error);
+                console.error('Error exporting diagram:', error);
                 throw error;
             } finally {
                 setIsLoading(false);
@@ -198,5 +231,6 @@ export const useExportDiagram = () => {
     return {
         exportDiagram: handleExport,
         isExporting: isLoading,
+        copyImageToClipboard,
     };
 };

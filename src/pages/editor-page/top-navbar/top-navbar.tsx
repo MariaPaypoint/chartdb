@@ -1,17 +1,17 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import ChartDBLogo from '@/assets/logo-light.png';
 import ChartDBDarkLogo from '@/assets/logo-dark.png';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/hooks/use-theme';
+import { useChartDB } from '@/hooks/use-chartdb';
+import { useExportImage } from '@/hooks/use-export-image';
 import { DiagramName } from './diagram-name';
 import { LastSaved } from './last-saved';
 import { LanguageNav } from './language-nav/language-nav';
 import { Menu } from './menu/menu';
 import { Badge } from '@/components/badge/badge';
-import { CloudUpload } from 'lucide-react';
+import { CloudUpload, Clipboard } from 'lucide-react';
 import { useExportDiagram } from '@/hooks/use-export-diagram';
-import { useChartDB } from '@/hooks/use-chartdb';
-// Удаляем неиспользуемый импорт useToast
-import { useTranslation } from 'react-i18next';
 import {
     Tooltip,
     TooltipContent,
@@ -24,14 +24,15 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
     const { effectiveTheme } = useTheme();
     const { exportDiagram } = useExportDiagram();
     const { currentDiagram } = useChartDB();
+    const { exportImage } = useExportImage();
     const { t } = useTranslation();
-    // Состояния для управления видом кнопки
+    // States for button appearance management
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [lastSavedDiagram, setLastSavedDiagram] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
     const [isSavingSuccess, setIsSavingSuccess] = useState(false);
 
-    // Отслеживаем изменения в диаграмме
+    // Track changes in the diagram
     useEffect(() => {
         const currentDiagramString = JSON.stringify(currentDiagram);
         if (lastSavedDiagram && lastSavedDiagram !== currentDiagramString) {
@@ -79,6 +80,73 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                     <TooltipTrigger>
                         <Badge
                             variant="secondary"
+                            className="flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-300 ease-in-out"
+                            onClick={async () => {
+                                try {
+                                    // Get PNG with transparent background
+                                    const pngUrl = await exportImage('png', {
+                                        scale: 2,
+                                        transparent: true,
+                                        includePatternBG: false,
+                                    });
+
+                                    // Get Blob from URL
+                                    const response = await fetch(pngUrl);
+                                    const blob = await response.blob();
+
+                                    // Copy to clipboard
+                                    await navigator.clipboard.write([
+                                        new ClipboardItem({
+                                            'image/png': blob,
+                                        }),
+                                    ]);
+
+                                    // Visual feedback
+                                    const badge =
+                                        document.getElementById(
+                                            'copy-svg-badge'
+                                        );
+                                    if (badge) {
+                                        badge.classList.add(
+                                            'bg-green-500',
+                                            'text-white'
+                                        );
+                                        setTimeout(() => {
+                                            badge.classList.remove(
+                                                'bg-green-500',
+                                                'text-white'
+                                            );
+                                        }, 1000);
+                                    }
+                                } catch (error) {
+                                    console.error(
+                                        'Error copying to clipboard:',
+                                        error
+                                    );
+                                }
+                            }}
+                            id="copy-svg-badge"
+                        >
+                            <Clipboard size={16} />
+                            <span>
+                                {t(
+                                    'menu.backup.copy_to_clipboard',
+                                    'Copy as PNG'
+                                )}
+                            </span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {t(
+                            'menu.backup.copy_to_clipboard_tooltip',
+                            'Copy diagram as PNG with transparent background'
+                        )}
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Badge
+                            variant="secondary"
                             className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isSaving ? 'bg-red-700 text-white hover:bg-red-700' : ''} ${isSavingSuccess ? '!bg-green-500 text-white hover:!bg-green-500' : ''} ${!isSaving && !isSavingSuccess && hasUnsavedChanges ? 'bg-red-500 text-white hover:bg-red-600' : ''}`}
                             onClick={async () => {
                                 setIsSaving(true);
@@ -94,30 +162,30 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                                         JSON.stringify(currentDiagram)
                                     );
 
-                                    // Через 3 секунды убираем зеленый цвет
+                                    // Remove green color after 3 seconds
                                     setTimeout(() => {
                                         setIsSavingSuccess(false);
                                     }, 3000);
-                                    // Успешное сохранение, уведомление не показываем
+                                    // Successful save, don't show notification
                                 } catch (error) {
                                     console.error(
-                                        'Ошибка при сохранении в MinIO:',
+                                        'Error saving to MinIO:',
                                         error
                                     );
                                     setIsSaving(false);
-                                    // При ошибке уведомление не показываем
+                                    // Don't show notification on error
                                 }
                             }}
                         >
                             <CloudUpload size={16} />
                             <span>
                                 {isSaving
-                                    ? t('menu.backup.saving', 'Сохранение...')
+                                    ? t('menu.backup.saving', 'Saving...')
                                     : isSavingSuccess
-                                      ? t('menu.backup.saved', 'Сохранено')
+                                      ? t('menu.backup.saved', 'Saved')
                                       : t(
                                             'menu.backup.save_to_minio',
-                                            'Сохранить в MinIO'
+                                            'Save to MinIO'
                                         )}
                             </span>
                         </Badge>
@@ -125,7 +193,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                     <TooltipContent>
                         {t(
                             'menu.backup.save_to_minio_tooltip',
-                            'Сохранить текущую диаграмму в MinIO'
+                            'Save current diagram to MinIO'
                         )}
                     </TooltipContent>
                 </Tooltip>

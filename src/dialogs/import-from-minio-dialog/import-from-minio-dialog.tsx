@@ -63,20 +63,20 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
         setError(false);
 
         try {
-            // Создаем клиент S3 для работы с MinIO
+            // Create S3 client for working with MinIO
             const s3Client = new S3Client({
-                region: 'us-east-1', // MinIO не использует регионы, но требуется указать
+                region: 'us-east-1', // MinIO doesn't use regions, but it's required to specify
                 endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
                 credentials: {
                     accessKeyId: import.meta.env.VITE_MINIO_ACCESS_KEY,
                     secretAccessKey: import.meta.env.VITE_MINIO_SECRET_KEY,
                 },
-                forcePathStyle: true, // Необходимо для MinIO
+                forcePathStyle: true, // Required for MinIO
             });
 
             const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
 
-            // Получаем список объектов в бакете
+            // Get the list of objects in the bucket
             const listCommand = new ListObjectsV2Command({
                 Bucket: bucketName,
             });
@@ -84,11 +84,11 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
             const response = await s3Client.send(listCommand);
 
             if (response.Contents) {
-                // Преобразуем список объектов в формат для отображения
+                // Convert the list of objects to display format
                 const minioFiles = response.Contents.filter(
                     (item) => item.Key && item.LastModified && item.Size
-                ) // Убеждаемся, что все поля есть
-                    .filter((item) => item.Key!.endsWith('.json')) // Фильтруем только JSON файлы
+                ) // Make sure all fields are present
+                    .filter((item) => item.Key!.endsWith('.json')) // Filter only JSON files
                     .map((item) => ({
                         key: item.Key!,
                         lastModified: item.LastModified!,
@@ -97,12 +97,12 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
                     .sort(
                         (a, b) =>
                             b.lastModified.getTime() - a.lastModified.getTime()
-                    ); // Сортируем по дате модификации
+                    ); // Sort by modification date
 
                 setFiles(minioFiles);
             }
         } catch (e) {
-            console.error('Ошибка при загрузке файлов из MinIO:', e);
+            console.error('Error loading files from MinIO:', e);
             setError(true);
         } finally {
             setIsLoading(false);
@@ -165,14 +165,14 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
         50
     );
 
-    // Функция для форматирования размера файла
+    // Function to format file size
     const formatFileSize = (bytes: number): string => {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     };
 
-    // Функция для получения имени файла из ключа
+    // Function to get file name from key
     const getFileName = (key: string): string => {
         const parts = key.split('/');
         return parts[parts.length - 1];
@@ -185,7 +185,7 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
             setIsLoading(true);
             setImportError(false);
 
-            // Создаем клиент S3 для работы с MinIO
+            // Create S3 client for working with MinIO
             const s3Client = new S3Client({
                 region: 'us-east-1',
                 endpoint: `${import.meta.env.VITE_MINIO_USE_SSL === 'true' ? 'https://' : 'http://'}${import.meta.env.VITE_MINIO_ENDPOINT}`,
@@ -198,7 +198,7 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
 
             const bucketName = import.meta.env.VITE_MINIO_BUCKET_NAME;
 
-            // Получаем объект из MinIO
+            // Get object from MinIO
             const getCommand = new GetObjectCommand({
                 Bucket: bucketName,
                 Key: selectedFileKey,
@@ -207,24 +207,24 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
             const response = await s3Client.send(getCommand);
 
             if (!response.Body) {
-                throw new Error('Не удалось получить содержимое файла');
+                throw new Error('Failed to get file content');
             }
 
-            // Чтение данных из потока
+            // Read data from stream
             const jsonData = await response.Body.transformToString();
 
-            // Преобразуем JSON в объект диаграммы
+            // Convert JSON to diagram object
             const diagram = diagramFromJSONInput(jsonData);
 
-            // Добавляем диаграмму в хранилище
+            // Add diagram to storage
             await addDiagram({ diagram });
 
-            // Закрываем диалоги и переходим на страницу диаграммы
+            // Close dialogs and navigate to diagram page
             closeImportFromMinioDialog();
             closeCreateDiagramDialog();
             navigate(`/diagrams/${diagram.id}`);
         } catch (e) {
-            console.error('Ошибка при импорте диаграммы из MinIO:', e);
+            console.error('Error importing diagram from MinIO:', e);
             setImportError(true);
         } finally {
             setIsLoading(false);
@@ -336,7 +336,7 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
                                                         );
                                                         break;
                                                     case 2:
-                                                        // Двойной клик - пока ничего не делаем
+                                                        // Double click - do nothing for now
                                                         break;
                                                     default:
                                                         setSelectedFileKey(
