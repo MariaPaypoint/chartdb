@@ -53,7 +53,7 @@ export const useExportDiagram = () => {
                 }),
             ]);
 
-            console.log('Diagram copied to clipboard as PNG');
+            //console.log('Diagram copied to clipboard as PNG');
             return true;
         } catch (error) {
             console.error('Error copying PNG to clipboard:', error);
@@ -86,14 +86,12 @@ export const useExportDiagram = () => {
                 });
                 await s3Client.send(headCommand);
                 fileExists = true;
-                console.log(`File ${fileName} already exists in MinIO`);
+                // console.log(`File ${fileName} already exists in MinIO`);
             } catch (headError) {
                 // If file is not found, we'll get a NotFound error
                 if (headError instanceof NotFound) {
                     fileExists = false;
-                    console.log(
-                        `File ${fileName} not found in MinIO, creating new one`
-                    );
+                    // console.log(`File ${fileName} not found in MinIO, creating new one`);
                 } else {
                     // If another error occurred during check, continue with upload
                     console.warn('Error checking if file exists:', headError);
@@ -122,7 +120,7 @@ export const useExportDiagram = () => {
             });
 
             await s3Client.send(putCommand);
-            console.log(`File ${finalFileName} successfully uploaded to MinIO`);
+            //console.log(`File ${finalFileName} successfully uploaded to MinIO`);
         } catch (error) {
             console.error('Error uploading file to MinIO:', error);
             throw error;

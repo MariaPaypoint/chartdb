@@ -31,6 +31,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
     const [lastSavedDiagram, setLastSavedDiagram] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
     const [isSavingSuccess, setIsSavingSuccess] = useState(false);
+    const [isUrlCopied, setIsUrlCopied] = useState(false);
 
     // Track changes in the diagram
     useEffect(() => {
@@ -147,7 +148,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                     <TooltipTrigger>
                         <Badge
                             variant="secondary"
-                            className="flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-300 ease-in-out"
+                            className={`flex cursor-pointer gap-1.5 whitespace-nowrap transition-all duration-500 ease-in-out ${isUrlCopied ? 'bg-green-500 text-white' : ''}`}
                             onClick={async () => {
                                 try {
                                     // Get the current URL
@@ -167,23 +168,13 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                                         url.toString()
                                     );
 
-                                    // Visual feedback
-                                    const badge =
-                                        document.getElementById(
-                                            'copy-url-badge'
-                                        );
-                                    if (badge) {
-                                        badge.classList.add(
-                                            'bg-green-500',
-                                            'text-white'
-                                        );
-                                        setTimeout(() => {
-                                            badge.classList.remove(
-                                                'bg-green-500',
-                                                'text-white'
-                                            );
-                                        }, 1000);
-                                    }
+                                    // Visual feedback with text change
+                                    setIsUrlCopied(true);
+
+                                    // Reset state after 2 seconds
+                                    setTimeout(() => {
+                                        setIsUrlCopied(false);
+                                    }, 2000);
                                 } catch (error) {
                                     console.error(
                                         'Error copying URL to clipboard:',
@@ -194,13 +185,17 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                             id="copy-url-badge"
                         >
                             <Link size={16} />
-                            <span>{t('menu.backup.copy_url', 'Copy URL')}</span>
+                            <span>
+                                {isUrlCopied
+                                    ? t('menu.backup.copied', 'Copied')
+                                    : t('menu.backup.copy_url', 'Copy URL')}
+                            </span>
                         </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
                         {t(
                             'menu.backup.copy_url_tooltip',
-                            'Copy link to this diagram with minio parameter'
+                            'Copy link with minio GET parameter, which opens diagram from MinIO for editing'
                         )}
                     </TooltipContent>
                 </Tooltip>
