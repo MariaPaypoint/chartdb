@@ -127,6 +127,28 @@ docker run \
 
 > **Note:** You must configure either Option 1 (OpenAI API key) OR Option 2 (Custom endpoint and model name) for AI capabilities to work. Do not mix the two options.
 
+#### Environment Variables
+
+```bash
+# OpenAI API configuration
+VITE_OPENAI_API_KEY=         # Your OpenAI API key
+VITE_OPENAI_API_ENDPOINT=    # Default: https://api.openai.com/v1
+VITE_LLM_MODEL_NAME=         # Default: gpt-4
+
+# UI configuration
+VITE_HIDE_BUCKLE_DOT_DEV=    # Default: false
+
+# MinIO configuration for importing/exporting diagrams
+VITE_MINIO_ENDPOINT=         # MinIO server endpoint (e.g., localhost:9000)
+VITE_MINIO_PORT=             # MinIO server port (e.g., 9000)
+VITE_MINIO_USE_SSL=          # Whether to use SSL (true/false)
+VITE_MINIO_ACCESS_KEY=       # MinIO access key
+VITE_MINIO_SECRET_KEY=       # MinIO secret key
+VITE_MINIO_BUCKET_NAME=      # MinIO bucket name (default: chartdb)
+```
+
+For local development, copy `.env.example` to `.env` and fill in the required values.
+
 Open your browser and navigate to `http://localhost:8080`.
 
 Example configuration for a local vLLM server:
