@@ -37,11 +37,20 @@ export const ja: LanguageTranslation = {
             },
             // TODO: Translate
             backup: {
-                backup: 'Backup',
-                export_diagram: 'Export Diagram',
-                restore_diagram: 'Restore Diagram',
+                backup: 'バックアップ',
+                export_diagram: 'Diagramをエクスポート',
+                restore_diagram: 'Diagramを復元',
                 save_to_minio: 'Minioに保存',
                 import_from_minio: 'Minioからインポート',
+                copied: 'コピー',
+                copy_url: 'コピーURL',
+                copy_url_tooltip:
+                    'Minioパラメータ付きのこのDiagramのリンクをコピー',
+                saving: '保存中...',
+                saved: '保存しました',
+                copy_to_clipboard: 'コピー',
+                copy_to_clipboard_tooltip: 'Diagramを透明背景のPNGでコピー',
+                save_to_minio_tooltip: 'MinIOに保存',
             },
             help: {
                 help: 'ヘルプ',
@@ -420,6 +429,8 @@ export const ja: LanguageTranslation = {
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -455,6 +466,12 @@ export const ja: LanguageTranslation = {
             import: 'インポート',
             cancel: 'キャンセル',
             no_files: 'Minio storageにファイルが見つかりません',
+            file_size: {
+                bytes: 'バイト',
+                kilobytes: 'キロバイト',
+                megabytes: 'メガバイト',
+            },
+            fetch_error: 'ファイルの内容を取得できませんでした',
             error: {
                 title: 'Error',
                 description:

@@ -30,17 +30,26 @@ export const tr: LanguageTranslation = {
                 theme: 'Tema',
                 show_dependencies: 'Bağımlılıkları Göster',
                 hide_dependencies: 'Bağımlılıkları Gizle',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'Mini Haritayı Göster',
+                hide_minimap: 'Mini Haritayı Gizle',
             },
             // TODO: Translate
             backup: {
-                backup: 'Backup',
-                export_diagram: 'Export Diagram',
-                restore_diagram: 'Restore Diagram',
+                backup: 'Yedekle',
+                export_diagram: 'Diyagramı Dışa Aktar',
+                restore_diagram: 'Diyagramı Geri Yükle',
                 save_to_minio: "Minio'ya Kaydet",
                 import_from_minio: "Minio'dan İçe Aktar",
+                copied: 'Kopyalandı',
+                copy_url: 'URL’yi Kopyala',
+                copy_url_tooltip:
+                    'Bu diyagramın minio parametresiyle bağlantısını kopyala',
+                saving: 'Kaydediliyor...',
+                saved: 'Kaydedildi',
+                copy_to_clipboard: 'PNG Olarak Kopyala',
+                copy_to_clipboard_tooltip:
+                    'Diyagramı şeffaf arka planla PNG olarak kopyala',
+                save_to_minio_tooltip: 'Geçerli diyagramı MinIO’ya kaydet',
             },
             help: {
                 help: 'Yardım',
@@ -404,6 +413,8 @@ export const tr: LanguageTranslation = {
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -439,6 +450,12 @@ export const tr: LanguageTranslation = {
             import: 'İçe Aktar',
             cancel: 'İptal',
             no_files: 'Minio depolama alanında dosya bulunamadı',
+            file_size: {
+                bytes: 'bayt',
+                kilobytes: 'KB',
+                megabytes: 'MB',
+            },
+            fetch_error: 'Dosya içeriği alınamadı',
             error: {
                 title: 'Hata',
                 description: 'Minio depolama alanında dosya yüklenemedi',

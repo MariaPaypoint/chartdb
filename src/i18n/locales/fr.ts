@@ -39,6 +39,17 @@ export const fr: LanguageTranslation = {
                 restore_diagram: 'Restaurer le diagramme',
                 save_to_minio: 'Sauvegarder dans Minio',
                 import_from_minio: 'Importer depuis Minio',
+                copied: 'Copié',
+                copy_url: 'Copier URL',
+                copy_url_tooltip:
+                    'Copier le lien vers ce diagramme avec le paramètre Minio',
+                saving: 'Sauvegarde...',
+                saved: 'Sauvegardé',
+                copy_to_clipboard: 'Copier comme PNG',
+                copy_to_clipboard_tooltip:
+                    'Copier le diagramme comme PNG avec fond transparent',
+                save_to_minio_tooltip:
+                    'Sauvegarder le diagramme actuel dans MinIO',
             },
             help: {
                 help: 'Aide',
@@ -411,6 +422,8 @@ export const fr: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'Exporter le Diagramme',
+            title_minio: 'Exporter le Diagramme vers MinIO',
+            title_local: 'Exporter le Diagramme Localement',
             description: "Sélectionner le format d'exportation :",
             format_json: 'JSON',
             cancel: 'Annuler',
@@ -445,6 +458,12 @@ export const fr: LanguageTranslation = {
             import: 'Importer',
             cancel: 'Annuler',
             no_files: 'Aucun fichier trouvé dans le stockage Minio',
+            file_size: {
+                bytes: 'o',
+                kilobytes: 'Ko',
+                megabytes: 'Mo',
+            },
+            fetch_error: 'Échec de la récupération du contenu du fichier',
             error: {
                 title: 'Erreur',
                 description:

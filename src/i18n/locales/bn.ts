@@ -41,6 +41,15 @@ export const bn: LanguageTranslation = {
                 restore_diagram: 'ডায়াগ্রাম পুনরুদ্ধার করুন',
                 save_to_minio: 'Minio তে সংরক্ষণ করুন',
                 import_from_minio: 'Minio থেকে আমদানি করুন',
+                copied: 'কপি বাটন',
+                copy_url: 'URL কপি',
+                copy_url_tooltip: 'Minio প্যারামিটার সহ ইন্টার লিংক কপি করুন',
+                saving: 'সংরক্ষণ চলছে...',
+                saved: 'সংরক্ষিত',
+                copy_to_clipboard: 'PNG হিসেবে কপি',
+                copy_to_clipboard_tooltip: 'PNG হিসেবে ডায়াগ্রাম কপি করুন',
+                save_to_minio_tooltip:
+                    'MinIO তে বর্তমান ডায়াগ্রাম সংরক্ষণ করুন',
             },
             help: {
                 help: 'সাহায্য',
@@ -413,6 +422,8 @@ export const bn: LanguageTranslation = {
 
         export_diagram_dialog: {
             title: 'চিত্র রপ্তানি করুন',
+            title_minio: 'চিত্র রপ্তানি করুন মিনিও',
+            title_local: 'চিত্র রপ্তানি করুন অন্তর্ভুক্ত',
             description: 'রপ্তানির জন্য ফরম্যাট নির্বাচন করুন:',
             format_json: 'JSON',
             cancel: 'বাতিল করুন',
@@ -447,6 +458,12 @@ export const bn: LanguageTranslation = {
             import: 'আমদানি করুন',
             cancel: 'বাতিল করুন',
             no_files: 'Minio স্টোরেজে ফাইল পাওয়া যায়নি',
+            file_size: {
+                bytes: 'বাইট',
+                kilobytes: 'কিলোবাইট',
+                megabytes: 'মেগাবাইট',
+            },
+            fetch_error: 'ফাইলের বিষয়বস্তু আনতে ব্যর্থ হয়েছে',
             error: {
                 title: 'ত্রুটি',
                 description: 'Minio থেকে ফাইল লোড করার সমস্যা',

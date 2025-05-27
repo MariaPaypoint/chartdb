@@ -174,7 +174,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                             <Link size={16} />
                             <span>
                                 {isUrlCopied
-                                    ? t('menu.backup.copied', 'Скопировано')
+                                    ? t('menu.backup.copied', 'Copied')
                                     : t('menu.backup.copy_url', 'Copy URL')}
                             </span>
                         </Badge>

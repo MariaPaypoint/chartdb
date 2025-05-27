@@ -167,9 +167,19 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
 
     // Function to format file size
     const formatFileSize = (bytes: number): string => {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        if (bytes < 1024)
+            return bytes + ' ' + t('import_from_minio_dialog.file_size.bytes');
+        if (bytes < 1024 * 1024)
+            return (
+                (bytes / 1024).toFixed(2) +
+                ' ' +
+                t('import_from_minio_dialog.file_size.kilobytes')
+            );
+        return (
+            (bytes / (1024 * 1024)).toFixed(2) +
+            ' ' +
+            t('import_from_minio_dialog.file_size.megabytes')
+        );
     };
 
     // Function to get file name from key
@@ -207,7 +217,7 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
             const response = await s3Client.send(getCommand);
 
             if (!response.Body) {
-                throw new Error('Failed to get file content');
+                throw new Error(t('import_from_minio_dialog.fetch_error'));
             }
 
             // Read data from stream
@@ -235,6 +245,7 @@ export const ImportFromMinioDialog: React.FC<ImportFromMinioDialogProps> = ({
         navigate,
         closeImportFromMinioDialog,
         closeCreateDiagramDialog,
+        t,
     ]);
 
     return (

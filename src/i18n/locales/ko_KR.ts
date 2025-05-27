@@ -40,6 +40,15 @@ export const ko_KR: LanguageTranslation = {
                 restore_diagram: '다이어그램 복구',
                 save_to_minio: 'Minio에 저장',
                 import_from_minio: 'Minio에서 가져오기',
+                copied: '복사',
+                copy_url: 'URL 복사',
+                copy_url_tooltip:
+                    'Minio 파라미터가 포함된 이 다이어그램의 링크를 복사',
+                saving: '저장 중...',
+                saved: '저장됨',
+                copy_to_clipboard: '복사',
+                copy_to_clipboard_tooltip: '다이어그램을 투명한 배경으로 복사',
+                save_to_minio_tooltip: '현재 다이어그램을 MinIO에 저장',
             },
             help: {
                 help: '도움말',
@@ -410,6 +419,8 @@ export const ko_KR: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: '다이어그램 내보내기',
+            title_minio: '다이어그램을 MinIO로 내보내기',
+            title_local: '다이어그램을 로컬로 내보내기',
             description: '내보낼 형식을 선택해주세요:',
             format_json: 'JSON',
             cancel: '취소',
@@ -444,6 +455,12 @@ export const ko_KR: LanguageTranslation = {
             import: '가져오기',
             cancel: '취소',
             no_files: 'Minio storage에 파일이 없습니다',
+            file_size: {
+                bytes: '바이트',
+                kilobytes: '킬로바이트',
+                megabytes: '메가바이트',
+            },
+            fetch_error: '파일 내용을 가져오지 못했습니다',
             error: {
                 title: '에러',
                 description: 'Minio storage에서 파일을 불러오는데 실패했습니다',

@@ -40,6 +40,14 @@ export const zh_CN: LanguageTranslation = {
                 restore_diagram: '还原图表',
                 save_to_minio: '保存到 Minio',
                 import_from_minio: '从 Minio 导入',
+                copied: '已复制',
+                copy_url: '复制 URL',
+                copy_url_tooltip: '复制带有 minio 参数的此图表链接',
+                saving: '正在保存...',
+                saved: '已保存',
+                copy_to_clipboard: '复制为 PNG',
+                copy_to_clipboard_tooltip: '以透明背景将图表复制为 PNG',
+                save_to_minio_tooltip: '将当前图表保存到 MinIO',
             },
             help: {
                 help: '帮助',
@@ -405,6 +413,8 @@ export const zh_CN: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: '导出关系图',
+            title_minio: '导出关系图到 MinIO',
+            title_local: '本地导出关系图',
             description: '选择导出格式：',
             format_json: 'JSON',
             cancel: '取消',
@@ -440,6 +450,12 @@ export const zh_CN: LanguageTranslation = {
             import: '导入',
             cancel: '取消',
             no_files: 'Minio 存储中未找到文件',
+            file_size: {
+                bytes: '字节',
+                kilobytes: '千字节',
+                megabytes: '兆字节',
+            },
+            fetch_error: '获取文件内容失败',
             error: {
                 title: '错误',
                 description: '无法从 Minio 存储加载文件',

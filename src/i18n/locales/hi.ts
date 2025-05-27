@@ -40,11 +40,19 @@ export const hi: LanguageTranslation = {
                 restore_diagram: 'आरेख पुनर्स्थापित करें',
                 save_to_minio: 'Minio में संरक्षण करें',
                 import_from_minio: 'Minio से आयात करें',
+                copied: 'नकल',
+                copy_url: 'URL नकल',
+                copy_url_tooltip: 'Minio',
+                saving: 'संरक्षित',
+                saved: 'संरक्षित',
+                copy_to_clipboard: 'क्लिपबोर्ड',
+                copy_to_clipboard_tooltip: 'डायग्राम',
+                save_to_minio_tooltip: 'MinIO',
             },
             help: {
                 help: 'मदद',
                 docs_website: 'દસ્તાવેજીકરણ',
-                join_discord: 'हमसे Discord पर जुड़ें',
+                join_discord: 'हમसे Discord पर जुड़ें',
             },
         },
 
@@ -416,6 +424,8 @@ export const hi: LanguageTranslation = {
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -450,6 +460,12 @@ export const hi: LanguageTranslation = {
             import: 'आयात करें',
             cancel: 'रद्द करें',
             no_files: 'Minio स्टोरेज में कोई फाइल नहीं मिली',
+            file_size: {
+                bytes: 'बाइट',
+                kilobytes: 'किलोबाइट',
+                megabytes: 'मेगाबाइट',
+            },
+            fetch_error: 'फ़ाइल सामग्री प्राप्त करने में विफल',
             error: {
                 title: 'Error',
                 description: 'Minio स्टोरेज से फाइल्स लोड करने में भूल',

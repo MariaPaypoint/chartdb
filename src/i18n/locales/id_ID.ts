@@ -40,6 +40,16 @@ export const id_ID: LanguageTranslation = {
                 restore_diagram: 'Pulihkan Diagram',
                 save_to_minio: 'Simpan ke Minio',
                 import_from_minio: 'Impor dari Minio',
+                copied: 'Disalin',
+                copy_url: 'Salin URL',
+                copy_url_tooltip:
+                    'Salin tautan ke diagram ini dengan parameter minio',
+                saving: 'Menyimpan...',
+                saved: 'Tersimpan',
+                copy_to_clipboard: 'Salin sebagai PNG',
+                copy_to_clipboard_tooltip:
+                    'Salin diagram sebagai PNG dengan latar belakang transparan',
+                save_to_minio_tooltip: 'Simpan diagram saat ini ke MinIO',
             },
             help: {
                 help: 'Bantuan',
@@ -411,6 +421,8 @@ export const id_ID: LanguageTranslation = {
 
         export_diagram_dialog: {
             title: 'Ekspor Diagram',
+            title_minio: 'Ekspor Diagram ke MinIO',
+            title_local: 'Ekspor Diagram Lokal',
             description: 'Pilih format untuk ekspor:',
             format_json: 'JSON',
             cancel: 'Batal',
@@ -445,6 +457,12 @@ export const id_ID: LanguageTranslation = {
             import: 'Impor',
             cancel: 'Batal',
             no_files: 'Tidak ada file ditemukan di Minio storage',
+            file_size: {
+                bytes: 'B',
+                kilobytes: 'KB',
+                megabytes: 'MB',
+            },
+            fetch_error: 'Gagal mendapatkan konten file',
             error: {
                 title: 'Error',
                 description: 'Gagal memuat file dari Minio storage',

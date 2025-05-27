@@ -40,6 +40,14 @@ export const zh_TW: LanguageTranslation = {
                 restore_diagram: '恢復圖表',
                 save_to_minio: '儲存到 Minio',
                 import_from_minio: '從 Minio 匯入',
+                copied: '已複製',
+                copy_url: '複製 URL',
+                copy_url_tooltip: '複製帶有 minio 參數的此圖表連結',
+                saving: '正在儲存...',
+                saved: '已儲存',
+                copy_to_clipboard: '複製為 PNG',
+                copy_to_clipboard_tooltip: '以透明背景複製圖表為 PNG',
+                save_to_minio_tooltip: '將當前圖表儲存到 MinIO',
             },
             help: {
                 help: '幫助',
@@ -404,6 +412,8 @@ export const zh_TW: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: '匯出圖表',
+            title_minio: '匯出圖表到 MinIO',
+            title_local: '本地匯出圖表',
             description: '選擇匯出格式：',
             format_json: 'JSON',
             cancel: '取消',
@@ -439,6 +449,12 @@ export const zh_TW: LanguageTranslation = {
             import: '匯入',
             cancel: '取消',
             no_files: 'Minio 存儲中未找到文件',
+            file_size: {
+                bytes: '字節',
+                kilobytes: '千字節',
+                megabytes: '兆字節',
+            },
+            fetch_error: '獲取文件內容失敗',
             error: {
                 title: '錯誤',
                 description: '無法從 Minio 存儲加載文件',

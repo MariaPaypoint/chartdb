@@ -39,6 +39,16 @@ export const en = {
                 restore_diagram: 'Restore Diagram',
                 save_to_minio: 'Save to Minio',
                 import_from_minio: 'Import from Minio',
+                copied: 'Copied',
+                copy_url: 'Copy URL',
+                copy_url_tooltip:
+                    'Copy link to this diagram with minio parameter',
+                saving: 'Saving...',
+                saved: 'Saved',
+                copy_to_clipboard: 'Copy as PNG',
+                copy_to_clipboard_tooltip:
+                    'Copy diagram as PNG with transparent background',
+                save_to_minio_tooltip: 'Save current diagram to MinIO',
             },
             help: {
                 help: 'Help',
@@ -405,6 +415,8 @@ export const en = {
         },
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -439,6 +451,12 @@ export const en = {
             import: 'Import',
             cancel: 'Cancel',
             no_files: 'No files found in Minio storage',
+            file_size: {
+                bytes: 'B',
+                kilobytes: 'KB',
+                megabytes: 'MB',
+            },
+            fetch_error: 'Failed to get file content',
             error: {
                 title: 'Error',
                 description: 'Failed to load files from Minio storage',

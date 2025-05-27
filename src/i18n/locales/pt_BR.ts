@@ -30,17 +30,25 @@ export const pt_BR: LanguageTranslation = {
                 theme: 'Tema',
                 show_dependencies: 'Mostrar Dependências',
                 hide_dependencies: 'Ocultar Dependências',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'Mostrar Mini Mapa',
+                hide_minimap: 'Ocultar Mini Mapa',
             },
-            // TODO: Translate
             backup: {
                 backup: 'Backup',
                 export_diagram: 'Exportar Diagrama',
                 restore_diagram: 'Restaurar Diagrama',
                 save_to_minio: 'Salvar no Minio',
                 import_from_minio: 'Importar do Minio',
+                copied: 'Copiado',
+                copy_url: 'Copiar URL',
+                copy_url_tooltip:
+                    'Copiar link para este diagrama com o parâmetro minio',
+                saving: 'Salvando...',
+                saved: 'Salvo',
+                copy_to_clipboard: 'Copiar como PNG',
+                copy_to_clipboard_tooltip:
+                    'Copiar diagrama como PNG com fundo transparente',
+                save_to_minio_tooltip: 'Salvar diagrama atual no MinIO',
             },
             help: {
                 help: 'Ajuda',
@@ -414,6 +422,8 @@ export const pt_BR: LanguageTranslation = {
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -449,6 +459,12 @@ export const pt_BR: LanguageTranslation = {
             import: 'Importar',
             cancel: 'Cancelar',
             no_files: 'Nenhum arquivo encontrado no armazenamento Minio',
+            file_size: {
+                bytes: 'byte',
+                kilobytes: 'KB',
+                megabytes: 'MB',
+            },
+            fetch_error: 'Falha ao obter o conteúdo do arquivo',
             error: {
                 title: 'Erro',
                 description:

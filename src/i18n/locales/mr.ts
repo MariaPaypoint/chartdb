@@ -30,17 +30,24 @@ export const mr: LanguageTranslation = {
                 theme: 'थीम',
                 show_dependencies: 'डिपेंडेन्सि दाखवा',
                 hide_dependencies: 'डिपेंडेन्सि लपवा',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'मिनी मॅप दाखवा',
+                hide_minimap: 'मिनी मॅप लपवा',
             },
             backup: {
-                // TODO: Add translations
-                backup: 'Backup',
-                export_diagram: 'Export Diagram',
-                restore_diagram: 'Restore Diagram',
+                backup: 'बॅकअप',
+                export_diagram: 'आरेख निर्यात करा',
+                restore_diagram: 'आरेख पुनर्संचयित करा',
                 save_to_minio: 'Minio मध्ये संरक्षित करा',
                 import_from_minio: 'Minio मधून आयात करा',
+                copied: 'कॉपी केले',
+                copy_url: 'URL कॉपी करा',
+                copy_url_tooltip: 'minio पॅरामीटरसह या आरेखाची लिंक कॉपी करा',
+                saving: 'जतन करत आहे...',
+                saved: 'जतन केले',
+                copy_to_clipboard: 'PNG म्हणून कॉपी करा',
+                copy_to_clipboard_tooltip:
+                    'पारदर्शक पार्श्वभूमीसह आरेख PNG म्हणून कॉपी करा',
+                save_to_minio_tooltip: 'सध्याचा आरेख MinIO मध्ये जतन करा',
             },
             help: {
                 help: 'मदत',
@@ -420,6 +427,8 @@ export const mr: LanguageTranslation = {
         // TODO: Add translations
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -456,6 +465,12 @@ export const mr: LanguageTranslation = {
             import: 'आयात करा',
             cancel: 'रद्द करा',
             no_files: 'Minio storageमधून फाइल नाहीत',
+            file_size: {
+                bytes: 'बाइट',
+                kilobytes: 'किलोबाइट',
+                megabytes: 'मिगाबाइट',
+            },
+            fetch_error: 'फाइल कंटेन्ट लोड करण्यात असला असला',
             error: {
                 title: 'एरर',
                 description: 'Minio storageमधून फाइल लोड करण्यात असला असला',

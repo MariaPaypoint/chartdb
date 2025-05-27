@@ -30,9 +30,8 @@ export const vi: LanguageTranslation = {
                 theme: 'Chủ đề',
                 show_dependencies: 'Hiển thị các phụ thuộc',
                 hide_dependencies: 'Ẩn các phụ thuộc',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'Hiển thị Mini Map',
+                hide_minimap: 'Ẩn Mini Map',
             },
             backup: {
                 backup: 'Hỗ trợ',
@@ -40,6 +39,16 @@ export const vi: LanguageTranslation = {
                 restore_diagram: 'Khôi phục sơ đồ',
                 save_to_minio: 'Lưu vào Minio',
                 import_from_minio: 'Nhập từ Minio',
+                copied: 'Đã sao chép',
+                copy_url: 'Sao chép URL',
+                copy_url_tooltip:
+                    'Sao chép link đến sơ đồ này với tham số minio',
+                saving: 'Đang lưu...',
+                saved: 'Đã lưu',
+                copy_to_clipboard: 'Sao chép thành PNG',
+                copy_to_clipboard_tooltip:
+                    'Sao chép sơ đồ thành PNG với nền transparent',
+                save_to_minio_tooltip: 'Lưu sơ đồ hiện tại vào MinIO',
             },
             help: {
                 help: 'Trợ giúp',
@@ -410,6 +419,8 @@ export const vi: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'Xuất sơ đồ',
+            title_minio: 'Xuất Sơ Đồ vào MinIO',
+            title_local: 'Xuất Sơ Đồ Lên Đa',
             description: 'Chọn định dạng để xuất:',
             format_json: 'JSON',
             cancel: 'Hủy',
@@ -444,6 +455,12 @@ export const vi: LanguageTranslation = {
             import: 'Nhập',
             cancel: 'Hủy',
             no_files: 'Không tìm thấy tệp trong Minio',
+            file_size: {
+                bytes: 'byte',
+                kilobytes: 'KB',
+                megabytes: 'MB',
+            },
+            fetch_error: 'Không thể lấy nội dung tệp',
             error: {
                 title: 'Lỗi',
                 description: 'Không thể tải tệp từ Minio',

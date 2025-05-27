@@ -73,8 +73,8 @@ export const ExportDiagramDialog: React.FC<ExportDiagramDialogProps> = ({
                 <DialogHeader>
                     <DialogTitle>
                         {destination === 'minio'
-                            ? 'Export Diagram to MinIO'
-                            : 'Export Diagram Locally'}
+                            ? t('export_diagram_dialog.title_minio')
+                            : t('export_diagram_dialog.title_local')}
                     </DialogTitle>
                     <DialogDescription>
                         {t('export_diagram_dialog.description')}

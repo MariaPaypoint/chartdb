@@ -39,6 +39,16 @@ export const uk: LanguageTranslation = {
                 restore_diagram: 'Відновити діаграму',
                 save_to_minio: 'Зберегти в Minio',
                 import_from_minio: 'Імпортувати з Minio',
+                copied: 'Скопійовано',
+                copy_url: 'Скопіювати URL',
+                copy_url_tooltip:
+                    'Скопіювати посилання на цю діаграму з параметром minio',
+                saving: 'Збереження...',
+                saved: 'Збережено',
+                copy_to_clipboard: 'Скопіювати як PNG',
+                copy_to_clipboard_tooltip:
+                    'Скопіювати діаграму як PNG з прозорим фоном',
+                save_to_minio_tooltip: 'Зберегти поточну діаграму в MinIO',
             },
             help: {
                 help: 'Довідка',
@@ -410,6 +420,8 @@ export const uk: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'Експорт Діаграми',
+            title_minio: 'Експорт Діаграми в MinIO',
+            title_local: 'Експорт Діаграми Локально',
             description: 'Оберіть формат експорту:',
             format_json: 'JSON',
             cancel: 'Скасувати',
@@ -443,6 +455,12 @@ export const uk: LanguageTranslation = {
             import: 'Імпортувати',
             cancel: 'Скасувати',
             no_files: 'Файли не знайдено в Minio',
+            file_size: {
+                bytes: 'Б',
+                kilobytes: 'КБ',
+                megabytes: 'МБ',
+            },
+            fetch_error: 'Не вдалося отримати файл',
             error: {
                 title: 'Помилка',
                 description: 'Не вдалося завантажити файли з Minio',

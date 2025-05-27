@@ -30,17 +30,26 @@ export const ne: LanguageTranslation = {
                 theme: 'थिम',
                 show_dependencies: 'डिपेन्डेन्सीहरू देखाउनुहोस्',
                 hide_dependencies: 'डिपेन्डेन्सीहरू लुकाउनुहोस्',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'मिनी म्याप देखाउनुहोस्',
+                hide_minimap: 'मिनी म्याप लुकाउनुहोस्',
             },
-            // TODO: Translate
             backup: {
-                backup: 'Backup',
-                export_diagram: 'Export Diagram',
-                restore_diagram: 'Restore Diagram',
+                backup: 'ब्याकअप',
+                export_diagram: 'डायग्राम निर्यात गर्नुहोस्',
+                restore_diagram: 'डायग्राम पुनर्स्थापना गर्नुहोस्',
                 save_to_minio: 'Minio मा संरक्षण गर्नुहोस्',
                 import_from_minio: 'Minio बाट आयात गर्नुहोस्',
+                copied: 'प्रतिलिपि गरियो',
+                copy_url: 'URL प्रतिलिपि गर्नुहोस्',
+                copy_url_tooltip:
+                    'minio प्यारामिटर सहित यो डायग्रामको लिंक प्रतिलिपि गर्नुहोस्',
+                saving: 'सञ्चय गर्दैछ...',
+                saved: 'सञ्चित गरियो',
+                copy_to_clipboard: 'PNG को रूपमा प्रतिलिपि गर्नुहोस्',
+                copy_to_clipboard_tooltip:
+                    'पारदर्शी पृष्ठभूमिसहित डायग्राम PNG को रूपमा प्रतिलिपि गर्नुहोस्',
+                save_to_minio_tooltip:
+                    'हालको डायग्राम MinIO मा सञ्चय गर्नुहोस्',
             },
             help: {
                 help: 'मद्दत',
@@ -415,6 +424,8 @@ export const ne: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'डायाग्राम निर्यात गर्नुहोस्',
+            title_minio: 'डायाग्राम निर्यात गर्नुहोस्',
+            title_local: 'डायाग्राम निर्यात गर्नुहोस्',
             description: 'निर्यात गर्नका लागि निर्यात फरम्याट छान्नुहोस:',
             format_json: 'JSON',
             cancel: 'रद्द गर्नुहोस्',
@@ -450,6 +461,12 @@ export const ne: LanguageTranslation = {
             import: 'आयात गर्नुहोस्',
             cancel: 'रद्द गर्नुहोस्',
             no_files: 'Minio storageमधून फाइल नाहीत',
+            file_size: {
+                bytes: 'बाइट',
+                kilobytes: 'किलोबाइट',
+                megabytes: 'मिगाबाइट',
+            },
+            fetch_error: 'फाइल कंटेन्ट लोड गर्न्यात असला असला',
             error: {
                 title: 'एरर',
                 description: 'Minio storageमधून फाइल लोड गर्न्यात असला असला',

@@ -41,11 +41,17 @@ export const gu: LanguageTranslation = {
                 restore_diagram: 'ડાયાગ્રામ પુનઃસ્થાપિત કરો',
                 save_to_minio: 'Minio માં સંભાળો',
                 import_from_minio: 'Minio માંથી આયાત કરો',
-            },
-            help: {
-                help: 'મદદ',
-                docs_website: 'દસ્તાવેજીકરણ',
-                join_discord: 'અમારા Discordમાં જોડાઓ',
+                copied: 'નકલ થયું!',
+                copy_url: 'URL નકલ કરો',
+                copy_url_tooltip:
+                    'છેલ્લે સાચવ્યું પરને છેલ્લે સાચવ્યું નકલ કરો',
+                saving: 'સંભાળતો છે...',
+                saved: 'સંભાળ્યું',
+                copy_to_clipboard: 'ક્લિપબોર્ડમાં નકલ કરો',
+                copy_to_clipboard_tooltip:
+                    'ડાયાગ્રામ કેટલાક પરને છેલ્લે સાચવ્યું નકલ કરો',
+                save_to_minio_tooltip:
+                    'છેલ્લે સાચવ્યું માટે છેલ્લે સાચવ્યું માં સંભાળો',
             },
         },
 
@@ -413,6 +419,8 @@ export const gu: LanguageTranslation = {
 
         export_diagram_dialog: {
             title: 'ડાયાગ્રામ નિકાસ કરો',
+            title_minio: 'ડાયાગ્રામ નિકાસ કરો',
+            title_local: 'ડાયાગ્રામ નિકાસ કરો',
             description: 'નિકાસ માટે ફોર્મેટ પસંદ કરો:',
             format_json: 'JSON',
             cancel: 'રદ કરો',
@@ -447,6 +455,12 @@ export const gu: LanguageTranslation = {
             import: 'આયાત કરો',
             cancel: 'રદ કરો',
             no_files: 'Minio માં કોઈ ફાઇલ મળ્યા નથી',
+            file_size: {
+                bytes: 'બાઇટ',
+                kilobytes: 'કિલોબાઇટ',
+                megabytes: 'મેગાબાઇટ',
+            },
+            fetch_error: 'ફાઇલ સામગ્રી મેળવવામાં નિષ્ફળતા',
             error: {
                 title: 'ભૂલ',
                 description: 'Minio માં ફાઇલો લોડ કરવામાં ભૂલ',

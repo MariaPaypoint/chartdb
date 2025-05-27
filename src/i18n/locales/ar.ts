@@ -30,9 +30,8 @@ export const ar: LanguageTranslation = {
                 theme: 'المظهر',
                 show_dependencies: 'إظهار الاعتمادات',
                 hide_dependencies: 'إخفاء الاعتمادات',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'إظهار الخريطة المصغرة',
+                hide_minimap: 'إخفاء الخريطة المصغرة',
             },
             backup: {
                 backup: 'النسخ الاحتياطي',
@@ -40,6 +39,14 @@ export const ar: LanguageTranslation = {
                 restore_diagram: 'استعادة المخطط',
                 save_to_minio: 'حفظ في Minio',
                 import_from_minio: 'استيراد من Minio',
+                copied: 'تم نسخ',
+                copy_url: 'نسخ الرابط',
+                copy_url_tooltip: 'نسخ الرابط إلى هذا المخطط مع معامل minio',
+                saving: 'جارٍ الحفظ...',
+                saved: 'تم الحفظ',
+                copy_to_clipboard: 'نسخ كصورة PNG',
+                copy_to_clipboard_tooltip: 'نسخ المخطط كصورة PNG بخلفية شفافة',
+                save_to_minio_tooltip: 'حفظ المخطط الحالي في MinIO',
             },
             help: {
                 help: 'مساعدة',
@@ -411,6 +418,8 @@ export const ar: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'تصدير المخطط',
+            title_minio: 'تصدير المخطط إلى MinIO',
+            title_local: 'تصدير المخطط تجلياً',
             description: ':اختر التنسيق للتصدير',
             format_json: 'JSON',
             cancel: 'إلغاء',
@@ -444,6 +453,12 @@ export const ar: LanguageTranslation = {
             import: 'استيراد',
             cancel: 'إلغاء',
             no_files: 'لا يوجد ملفات في Minio',
+            file_size: {
+                bytes: 'بايت',
+                kilobytes: 'كيلوبايت',
+                megabytes: 'ميغابايت',
+            },
+            fetch_error: 'فشل في جلب محتوى الملف',
             error: {
                 title: 'خطأ',
                 description: 'فشل في تحميل الملفات من Minio',

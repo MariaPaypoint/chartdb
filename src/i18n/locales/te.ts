@@ -30,17 +30,26 @@ export const te: LanguageTranslation = {
                 theme: 'థీమ్',
                 show_dependencies: 'ఆధారాలు చూపించండి',
                 hide_dependencies: 'ఆధారాలను దాచండి',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'మినీ మ్యాప్ చూపించు',
+                hide_minimap: 'మినీ మ్యాప్ దాచండి',
             },
-            // TODO: Translate
             backup: {
-                backup: 'Backup',
-                export_diagram: 'Export Diagram',
-                restore_diagram: 'Restore Diagram',
+                backup: 'బ్యాకప్',
+                export_diagram: 'డయాగ్రామ్ ఎగుమతి చేయండి',
+                restore_diagram: 'డయాగ్రామ్ పునరుద్ధరించండి',
                 save_to_minio: 'Minio లో సంరక్షించు',
                 import_from_minio: 'Minio నుండి ఆయాతం చేయండి',
+                copied: 'కాపీ చేయబడింది',
+                copy_url: 'URL కాపీ చేయండి',
+                copy_url_tooltip:
+                    'minio పారామీటర్‌తో ఈ డయాగ్రామ్‌కు లింక్‌ను కాపీ చేయండి',
+                saving: 'సేవ్ చేస్తున్నాము...',
+                saved: 'సేవ్ చేయబడింది',
+                copy_to_clipboard: 'PNG గా కాపీ చేయండి',
+                copy_to_clipboard_tooltip:
+                    'పారదర్శక నేపథ్యంతో డయాగ్రామ్‌ను PNG గా కాపీ చేయండి',
+                save_to_minio_tooltip:
+                    'ప్రస్తుత డయాగ్రామ్‌ను MinIO లో సేవ్ చేయండి',
             },
             help: {
                 help: 'సహాయం',
@@ -416,6 +425,8 @@ export const te: LanguageTranslation = {
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
+            title_minio: 'Export Diagram to MinIO',
+            title_local: 'Export Diagram Locally',
             description: 'Choose the format for export:',
             format_json: 'JSON',
             cancel: 'Cancel',
@@ -451,6 +462,12 @@ export const te: LanguageTranslation = {
             import: 'మాట్లాడి',
             cancel: 'రద్దు',
             no_files: 'Minio స్టోరేజ్లో ఫైల్లు కనుగొనబడలేదు',
+            file_size: {
+                bytes: 'బాయె',
+                kilobytes: 'కిలోబాయె',
+                megabytes: 'మిగాబాయె',
+            },
+            fetch_error: 'ఫైల్ లోడ్ అవుతుంది',
             error: {
                 title: 'ప్రశ్న',
                 description: 'Minio స్టోరేజ్లో ఫైల్లు లోడ్ అవుతుంది',

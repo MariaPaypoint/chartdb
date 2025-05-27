@@ -39,6 +39,16 @@ export const ru: LanguageTranslation = {
                 restore_diagram: 'Восстановить диаграмму',
                 save_to_minio: 'Сохранить в Minio',
                 import_from_minio: 'Импорт из Minio',
+                copied: 'Скопировано',
+                copy_url: 'Скопировать ссылку',
+                copy_url_tooltip:
+                    'Скопировать ссылку на эту диаграмму с параметром minio',
+                saving: 'Сохранение...',
+                saved: 'Сохранено',
+                copy_to_clipboard: 'Скопировать как PNG',
+                copy_to_clipboard_tooltip:
+                    'Скопировать диаграмму как PNG с прозрачным фоном',
+                save_to_minio_tooltip: 'Сохранить текущую диаграмму в MinIO',
             },
             help: {
                 help: 'Помощь',
@@ -410,6 +420,8 @@ export const ru: LanguageTranslation = {
         },
         export_diagram_dialog: {
             title: 'Экспорт кода диаграммы',
+            title_minio: 'Экспорт диаграммы в MinIO',
+            title_local: 'Экспорт диаграммы локально',
             description: 'Выберите формат экспорта:',
             format_json: 'JSON',
             cancel: 'Отменить',
@@ -444,6 +456,12 @@ export const ru: LanguageTranslation = {
             import: 'Импортировать',
             cancel: 'Отменить',
             no_files: 'Файлы не найдены в хранилище Minio',
+            file_size: {
+                bytes: 'Б',
+                kilobytes: 'КБ',
+                megabytes: 'МБ',
+            },
+            fetch_error: 'Не удалось получить содержимое файла',
             error: {
                 title: 'Ошибка',
                 description: 'Не удалось загрузить файлы из хранилища Minio',
