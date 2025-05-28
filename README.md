@@ -137,7 +137,13 @@ VITE_LLM_MODEL_NAME=         # Default: gpt-4
 
 # UI configuration
 VITE_HIDE_BUCKLE_DOT_DEV=    # Default: false
-```
+
+# MinIO configuration for importing/exporting diagrams
+VITE_MINIO_ENDPOINT=         # MinIO server endpoint (e.g., localhost:9000)
+VITE_MINIO_PORT=             # MinIO server port (e.g., 9000)
+VITE_MINIO_USE_SSL=          # Whether to use SSL (true/false)
+VITE_MINIO_ACCESS_KEY=       # MinIO access key
+VITE_MINIO_SECRET_KEY=       # MinIO secret key
 VITE_MINIO_BUCKET_NAME=      # MinIO bucket name (default: chartdb)
 ```
 
