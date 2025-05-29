@@ -22,9 +22,12 @@ interface ExportOptions {
     destination?: 'local' | 'minio';
 }
 
+import { useExportImage } from './use-export-image';
+
 export const useExportDiagram = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { closeExportDiagramDialog } = useDialog();
+    const { exportImage } = useExportImage();
 
     const downloadOutput = useCallback((name: string, dataUrl: string) => {
         const a = document.createElement('a');
@@ -32,6 +35,39 @@ export const useExportDiagram = () => {
         a.setAttribute('href', dataUrl);
         a.click();
     }, []);
+
+    // Function to copy SVG to clipboard
+    const copyImageToClipboard = useCallback(async () => {
+        try {
+            // Get PNG with transparent background
+            const pngUrl = await exportImage('png', {
+                scale: 2, // Increase scale for better quality
+                transparent: true, // Transparent background
+                includePatternBG: false, // Without background pattern
+            });
+
+            if (!pngUrl) {
+                throw new Error('Failed to get image URL');
+            }
+
+            // Get Blob from URL
+            const response = await fetch(pngUrl);
+            const blob = await response.blob();
+
+            // Copy to clipboard
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob,
+                }),
+            ]);
+
+            console.log('Diagram copied to clipboard as PNG');
+            return true;
+        } catch (error) {
+            console.error('Error copying PNG to clipboard:', error);
+            return false;
+        }
+    }, [exportImage]);
 
     const uploadToMinio = useCallback(async (name: string, blob: Blob) => {
         try {
@@ -131,5 +167,6 @@ export const useExportDiagram = () => {
     return {
         exportDiagram: handleExport,
         isExporting: isLoading,
+        copyImageToClipboard,
     };
 };
