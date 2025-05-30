@@ -13,6 +13,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/button/button';
 import { SaveIcon, CopyIcon, ImageIcon } from 'lucide-react';
+import { autoCropImage } from '@/utils/image-utils';
 
 export interface TopNavbarProps {}
 
@@ -23,7 +24,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
     const { currentDiagram } = useChartDB();
     const { t } = useTranslation();
 
-    // Состояния для кнопок
+    // Button states
     const [saveButtonState, setSaveButtonState] = useState<
         'idle' | 'loading' | 'success'
     >('idle');
@@ -34,22 +35,22 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         'idle' | 'loading' | 'success'
     >('idle');
 
-    // Состояние для отслеживания изменений в диаграмме
+    // State for tracking diagram changes
     const [diagramChanged, setDiagramChanged] = useState(false);
 
-    // Состояние для отслеживания, была ли диаграмма открыта из MinIO или сохранена в MinIO
+    // State for tracking if the diagram was opened from MinIO or saved to MinIO
     const [isMinIODiagram, setIsMinIODiagram] = useState(false);
 
-    // Предыдущее состояние диаграммы для отслеживания изменений
+    // Previous diagram state for tracking changes
     const previousDiagramRef = useRef<string>('');
 
-    // Получаем параметры URL
+    // Get URL parameters
     const [searchParams] = useSearchParams();
     const minioParam = searchParams.get('minio');
 
-    // Проверяем, была ли диаграмма открыта из MinIO
+    // Check if the diagram was opened from MinIO
     useEffect(() => {
-        // Если в URL есть параметр minio, значит диаграмма связана с MinIO
+        // If the URL has a minio parameter, the diagram is associated with MinIO
         if (minioParam) {
             console.log('Diagram opened from MinIO with param:', minioParam);
             setIsMinIODiagram(true);
@@ -67,11 +68,11 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         );
     }, []);
 
-    // Отслеживаем изменения в диаграмме по ее сериализованному значению
+    // Track changes in the diagram by its serialized value
     useEffect(() => {
         if (!currentDiagram) return;
 
-        // Сериализуем только важные части диаграммы для сравнения
+        // Serialize only important parts of the diagram for comparison
         const diagramContent = {
             tables: currentDiagram.tables || [],
             relationships: currentDiagram.relationships || [],
@@ -80,15 +81,15 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         };
         const currentDiagramString = JSON.stringify(diagramContent);
 
-        // Если это первая загрузка диаграммы
+        // If this is the first diagram load
         if (!previousDiagramRef.current) {
             previousDiagramRef.current = currentDiagramString;
             return;
         }
 
-        // Если диаграмма изменилась
+        // If the diagram has changed
         if (previousDiagramRef.current !== currentDiagramString) {
-            // Устанавливаем флаг изменения только если диаграмма связана с MinIO
+            // Set the change flag only if the diagram is associated with MinIO
             if (isMinIODiagram) {
                 console.log('Diagram changed and related to MinIO');
                 setDiagramChanged(true);
@@ -97,17 +98,17 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
             }
         }
 
-        // Обновляем ссылку на предыдущее состояние
+        // Update the reference to the previous state
         previousDiagramRef.current = currentDiagramString;
     }, [currentDiagram, isMinIODiagram]);
 
-    // Функция для сохранения в MinIO
+    // Function to save to MinIO
     const saveToMinIO = useCallback(async () => {
-        // Изменяем состояние кнопки на загрузку
+        // Change button state to loading
         setSaveButtonState('loading');
 
         try {
-            // Экспорт диаграммы в MinIO
+            // Export diagram to MinIO
             await exportDiagram({
                 diagram: currentDiagram,
                 destination: 'minio',
@@ -115,13 +116,13 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
 
             console.log('Successfully saved to MinIO');
 
-            // Устанавливаем флаг, что диаграмма связана с MinIO
+            // Set flag that diagram is associated with MinIO
             setIsMinIODiagram(true);
 
-            // Сбрасываем флаг измененной диаграммы
+            // Reset the changed diagram flag
             setDiagramChanged(false);
 
-            // Обновляем ссылку на предыдущее состояние
+            // Update the reference to the previous state
             previousDiagramRef.current = JSON.stringify({
                 tables: currentDiagram.tables || [],
                 relationships: currentDiagram.relationships || [],
@@ -129,10 +130,10 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                 areas: currentDiagram.areas || [],
             });
 
-            // Меняем состояние кнопки на успех
+            // Change button state to success
             setSaveButtonState('success');
 
-            // Возвращаем исходное состояние через 2 секунды
+            // Return to original state after 2 seconds
             setTimeout(() => {
                 console.log('Resetting button state to idle');
                 setSaveButtonState('idle');
@@ -140,17 +141,17 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         } catch (error) {
             console.error('Error saving to MinIO:', error);
 
-            // Создаем уведомление об ошибке
+            // Create error notification
             const toast = document.createElement('div');
             toast.className =
                 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-md z-50 transition-opacity duration-500';
             toast.innerHTML = `<p>${t('error_saving_to_minio')}</p>`;
             document.body.appendChild(toast);
 
-            // Возвращаем исходное состояние кнопки
+            // Return to original button state
             setSaveButtonState('idle');
 
-            // Удаляем уведомление об ошибке через 3 секунды
+            // Remove error notification after 3 seconds
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => {
@@ -160,45 +161,45 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         }
     }, [exportDiagram, currentDiagram, t]);
 
-    // Функция для копирования URL
+    // Function to copy URL
     const copyUrl = useCallback(async () => {
-        // Изменяем состояние кнопки на загрузку
+        // Change button state to loading
         setUrlButtonState('loading');
 
         try {
-            // Получаем текущий URL
+            // Get current URL
             const url = new URL(window.location.href);
 
-            // Устанавливаем путь на корень
+            // Set path to root
             url.pathname = '/';
 
-            // Добавляем параметр minio с именем текущей диаграммы
+            // Add minio parameter with current diagram name
             url.searchParams.set('minio', currentDiagram.name);
 
-            // Копируем URL в буфер обмена
+            // Copy URL to clipboard
             await navigator.clipboard.writeText(url.toString());
 
-            // Меняем состояние кнопки на успех
+            // Change button state to success
             setUrlButtonState('success');
 
-            // Возвращаем исходное состояние через 2 секунды
+            // Return to original state after 2 seconds
             setTimeout(() => {
                 setUrlButtonState('idle');
             }, 2000);
         } catch (error) {
             console.error('Error copying URL to clipboard:', error);
 
-            // Создаем уведомление об ошибке
+            // Create error notification
             const errorElement = document.createElement('div');
             errorElement.className =
                 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-md z-50 transition-opacity duration-500';
             errorElement.innerHTML = `<p>Error copying URL</p>`;
             document.body.appendChild(errorElement);
 
-            // Возвращаем исходное состояние кнопки
+            // Return to original button state
             setUrlButtonState('idle');
 
-            // Удаляем уведомление через 3 секунды
+            // Remove notification after 3 seconds
             setTimeout(() => {
                 errorElement.style.opacity = '0';
                 setTimeout(() => {
@@ -208,34 +209,38 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         }
     }, [currentDiagram]);
 
-    // Функция для копирования PNG
+    // Function to copy PNG
     const copyPngToClipboard = useCallback(async () => {
-        // Изменяем состояние кнопки на загрузку
+        // Change button state to loading
         setPngButtonState('loading');
 
         try {
-            // Получаем PNG с прозрачным фоном
+            // Get PNG with transparent background
             const pngUrl = await exportImage('png', {
-                scale: 2, // Увеличиваем масштаб для лучшего качества
-                transparent: true, // Прозрачный фон
-                includePatternBG: false, // Без фонового узора
+                scale: 2, // Increase scale for better quality
+                transparent: true, // Transparent background
+                includePatternBG: false, // Without background pattern
             });
 
-            // Получаем Blob из URL
-            const response = await fetch(pngUrl);
+            // Apply automatic cropping of empty space
+            console.log('[top-navbar] Applying automatic cropping');
+            const croppedPngUrl = await autoCropImage(pngUrl, 50, 'png');
+
+            // Get Blob from URL
+            const response = await fetch(croppedPngUrl);
             const blob = await response.blob();
 
-            // Копируем в буфер обмена
+            // Copy to clipboard
             await navigator.clipboard.write([
                 new ClipboardItem({
                     'image/png': blob,
                 }),
             ]);
 
-            // Меняем состояние кнопки на успех
+            // Change button state to success
             setPngButtonState('success');
 
-            // Возвращаем исходное состояние через 2 секунды
+            // Return to original state after 2 seconds
             setTimeout(() => {
                 setPngButtonState('idle');
             }, 2000);
@@ -244,17 +249,17 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         } catch (error) {
             console.error('Error copying PNG to clipboard:', error);
 
-            // Создаем уведомление об ошибке
+            // Create error notification
             const errorElement = document.createElement('div');
             errorElement.className =
                 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-md z-50 transition-opacity duration-500';
             errorElement.innerHTML = `<p>Error copying PNG</p>`;
             document.body.appendChild(errorElement);
 
-            // Возвращаем исходное состояние кнопки
+            // Return to original button state
             setPngButtonState('idle');
 
-            // Удаляем уведомление через 3 секунды
+            // Remove notification after 3 seconds
             setTimeout(() => {
                 errorElement.style.opacity = '0';
                 setTimeout(() => {
