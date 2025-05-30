@@ -54,6 +54,18 @@ export const zh_CN: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: '保存到 MinIO',
+            button_save_to_minio_loading: '保存中...',
+            button_save_to_minio_success: '已保存！',
+            button_copy_url: '复制 URL',
+            button_copy_url_loading: '复制中...',
+            button_copy_url_success: '已复制！',
+            button_copy_png: '复制为 PNG',
+            button_copy_png_loading: '复制中...',
+            button_copy_png_success: '已复制！',
+        },
+
         delete_diagram_alert: {
             title: '删除关系图',
             description: '此操作无法撤销。这将永久删除关系图。',

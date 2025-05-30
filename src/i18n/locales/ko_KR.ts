@@ -55,6 +55,18 @@ export const ko_KR: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIO에 저장',
+            button_save_to_minio_loading: '저장 중...',
+            button_save_to_minio_success: '저장되었습니다!',
+            button_copy_url: 'URL 복사',
+            button_copy_url_loading: '복사 중...',
+            button_copy_url_success: '복사되었습니다!',
+            button_copy_png: 'PNG로 복사',
+            button_copy_png_loading: '복사 중...',
+            button_copy_png_success: '복사되었습니다!',
+        },
+
         delete_diagram_alert: {
             title: '다이어그램 삭제',
             description:

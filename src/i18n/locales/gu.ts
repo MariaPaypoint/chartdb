@@ -55,6 +55,18 @@ export const gu: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIO પર સાચવો',
+            button_save_to_minio_loading: 'સાચવી રહ્યું છે...',
+            button_save_to_minio_success: 'સાચવી લીધું!',
+            button_copy_url: 'URL કોપી કરો',
+            button_copy_url_loading: 'કોપી કરી રહ્યું છે...',
+            button_copy_url_success: 'કોપી થઈ ગયું!',
+            button_copy_png: 'PNG તરીકે કોપી કરો',
+            button_copy_png_loading: 'કોપી કરી રહ્યું છે...',
+            button_copy_png_success: 'કોપી થઈ ગયું!',
+        },
+
         delete_diagram_alert: {
             title: 'ડાયાગ્રામ કાઢી નાખો',
             description:

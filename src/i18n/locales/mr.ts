@@ -55,6 +55,18 @@ export const mr: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIO मध्ये सेव्ह करा',
+            button_save_to_minio_loading: 'सेव्ह करत आहे...',
+            button_save_to_minio_success: 'सेव्ह केले!',
+            button_copy_url: 'URL कॉपी करा',
+            button_copy_url_loading: 'कॉपी करत आहे...',
+            button_copy_url_success: 'कॉपी केले!',
+            button_copy_png: 'PNG म्हणून कॉपी करा',
+            button_copy_png_loading: 'कॉपी करत आहे...',
+            button_copy_png_success: 'कॉपी केले!',
+        },
+
         delete_diagram_alert: {
             title: 'आरेख हटवा',
             description:

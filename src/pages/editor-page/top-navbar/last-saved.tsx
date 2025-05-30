@@ -95,13 +95,15 @@ export const LastSaved: React.FC<LastSavedProps> = () => {
             <TooltipTrigger>
                 <Badge
                     variant="secondary"
-                    className="flex gap-1.5 whitespace-nowrap"
+                    className="flex w-[180px] justify-center gap-1.5 overflow-hidden whitespace-nowrap"
                 >
-                    <Save size={16} />
-                    <TimeAgo
-                        datetime={currentDiagram.updatedAt}
-                        locale={language}
-                    />
+                    <Save size={16} className="shrink-0" />
+                    <span className="truncate text-center">
+                        <TimeAgo
+                            datetime={currentDiagram.updatedAt}
+                            locale={language}
+                        />
+                    </span>
                 </Badge>
             </TooltipTrigger>
             <TooltipContent>

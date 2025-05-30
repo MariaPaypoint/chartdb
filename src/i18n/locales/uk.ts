@@ -53,6 +53,18 @@ export const uk: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Зберегти в MinIO',
+            button_save_to_minio_loading: 'Зберігання...',
+            button_save_to_minio_success: 'Збережено!',
+            button_copy_url: 'Копіювати URL',
+            button_copy_url_loading: 'Копіювання...',
+            button_copy_url_success: 'Скопійовано!',
+            button_copy_png: 'Копіювати як PNG',
+            button_copy_png_loading: 'Копіювання...',
+            button_copy_png_success: 'Скопійовано!',
+        },
+
         delete_diagram_alert: {
             title: 'Видалити діаграму',
             description:

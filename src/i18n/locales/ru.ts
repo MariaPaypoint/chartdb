@@ -53,6 +53,17 @@ export const ru: LanguageTranslation = {
                 join_discord: 'Присоединиться к сообществу в Discord',
             },
         },
+        top_navbar: {
+            button_save_to_minio: 'Сохранить в MinIO',
+            button_save_to_minio_loading: 'Сохранение...',
+            button_save_to_minio_success: 'Сохранено!',
+            button_copy_url: 'Копировать URL',
+            button_copy_url_loading: 'Копирование...',
+            button_copy_url_success: 'Скопировано!',
+            button_copy_png: 'Копировать PNG',
+            button_copy_png_loading: 'Копирование...',
+            button_copy_png_success: 'Скопировано!',
+        },
 
         delete_diagram_alert: {
             title: 'Удалить диаграмму',

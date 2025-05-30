@@ -56,6 +56,18 @@ export const ja: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIOに保存',
+            button_save_to_minio_loading: '保存中...',
+            button_save_to_minio_success: '保存しました！',
+            button_copy_url: 'URLをコピー',
+            button_copy_url_loading: 'コピー中...',
+            button_copy_url_success: 'コピーしました！',
+            button_copy_png: 'PNGとしてコピー',
+            button_copy_png_loading: 'コピー中...',
+            button_copy_png_success: 'コピーしました！',
+        },
+
         delete_diagram_alert: {
             title: 'ダイアグラムを削除',
             description:
