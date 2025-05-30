@@ -16,6 +16,7 @@ import type { BaseDialogProps } from '../common/base-dialog-props';
 import { useTranslation } from 'react-i18next';
 import type { ImageType } from '@/context/export-image-context/export-image-context';
 import { useExportImage } from '@/hooks/use-export-image';
+import { autoCropImage } from '@/utils/image-utils';
 import { Checkbox } from '@/components/checkbox/checkbox';
 import {
     Accordion,
@@ -30,6 +31,7 @@ export interface ExportImageDialogProps extends BaseDialogProps {
 
 const DEFAULT_INCLUDE_PATTERN_BG = true;
 const DEFAULT_TRANSPARENT = false;
+const DEFAULT_AUTO_CROP = true;
 const DEFAULT_SCALE = '2';
 export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
     dialog,
@@ -42,6 +44,7 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
     );
     const [transparent, setTransparent] =
         useState<boolean>(DEFAULT_TRANSPARENT);
+    const [autoCrop, setAutoCrop] = useState<boolean>(DEFAULT_AUTO_CROP);
     const { exportImage } = useExportImage();
 
     useEffect(() => {
@@ -49,16 +52,116 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
         setScale(DEFAULT_SCALE);
         setIncludePatternBG(DEFAULT_INCLUDE_PATTERN_BG);
         setTransparent(DEFAULT_TRANSPARENT);
+        setAutoCrop(DEFAULT_AUTO_CROP);
     }, [dialog.open]);
+
+    // Выключаем опцию обрезки, если включен фоновый паттерн
+    useEffect(() => {
+        if (includePatternBG && autoCrop) {
+            setAutoCrop(false);
+        }
+    }, [includePatternBG, autoCrop]);
     const { closeExportImageDialog } = useDialog();
 
-    const handleExport = useCallback(() => {
-        exportImage(format, {
-            transparent,
-            includePatternBG,
-            scale: Number(scale),
-        });
-    }, [exportImage, format, includePatternBG, transparent, scale]);
+    const handleExport = useCallback(async () => {
+        try {
+            console.log(
+                `[export-dialog] Экспорт диаграммы в формате: ${format}`
+            );
+
+            // Отдельная обработка для формата SVG
+            if (format === 'svg') {
+                console.log(
+                    '[export-dialog] Используем метод загрузки через fetch для SVG'
+                );
+
+                try {
+                    // Получаем SVG данные
+                    const imageUrl = await exportImage('svg', {
+                        transparent,
+                        includePatternBG,
+                        scale: Number(scale),
+                    });
+
+                    console.log(
+                        '[export-dialog] Получен SVG URL, длина:',
+                        imageUrl.length
+                    );
+
+                    // Используем fetch для получения данных SVG
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+
+                    console.log(
+                        '[export-dialog] Создан blob для SVG, размер:',
+                        blob.size
+                    );
+
+                    // Создаем файл и начинаем загрузку
+                    const url = window.URL.createObjectURL(blob);
+                    const filename = 'diagram.svg';
+
+                    // Создаем новый элемент ссылки для загрузки
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;
+                    downloadLink.download = filename;
+                    downloadLink.style.display = 'none';
+
+                    // Добавляем в DOM, кликаем и удаляем
+                    document.body.appendChild(downloadLink);
+                    console.log('[export-dialog] Начинаем загрузку SVG файла');
+                    downloadLink.click();
+
+                    // Даем время на скачивание перед удалением
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+
+                    document.body.removeChild(downloadLink);
+                    window.URL.revokeObjectURL(url);
+                    console.log('[export-dialog] Загрузка SVG завершена');
+
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка при экспорте SVG:', error);
+                    throw error;
+                }
+            } else {
+                // Для PNG и JPEG применяем стандартный метод экспорта
+                console.log(
+                    `[export-dialog] Экспорт ${format} с параметрами: масштаб=${scale}, прозрачность=${transparent}`
+                );
+
+                // Получаем изображение
+                const imageUrl = await exportImage(format, {
+                    transparent,
+                    includePatternBG,
+                    scale: Number(scale),
+                });
+
+                // Применяем автоматическую обрезку, если нужно
+                let finalImageUrl;
+
+                if (autoCrop && !includePatternBG) {
+                    console.log(
+                        '[export-dialog] Применяем автоматическую обрезку'
+                    );
+                    finalImageUrl = await autoCropImage(imageUrl, 50, format);
+                } else {
+                    finalImageUrl = imageUrl;
+                }
+
+                // Создаем ссылку для скачивания
+                const link = document.createElement('a');
+                link.download = `diagram.${format}`;
+                link.href = finalImageUrl;
+                document.body.appendChild(link);
+                console.log(`[export-dialog] Запуск скачивания ${format}`);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } catch (error) {
+            console.error('Ошибка при экспорте изображения:', error);
+        }
+    }, [exportImage, format, includePatternBG, transparent, scale, autoCrop]);
 
     const scaleOptions: SelectBoxOption[] = useMemo(
         () =>
@@ -154,6 +257,36 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                                             </span>
                                         </div>
                                     </div>
+                                    <div className="flex items-start gap-3">
+                                        <Checkbox
+                                            id="auto-crop-checkbox"
+                                            className="mt-1 data-[state=checked]:border-pink-600 data-[state=checked]:bg-pink-600 data-[state=checked]:text-white"
+                                            checked={autoCrop}
+                                            disabled={includePatternBG}
+                                            onCheckedChange={(value) =>
+                                                setAutoCrop(value as boolean)
+                                            }
+                                        />
+                                        <div className="flex flex-col">
+                                            <label
+                                                htmlFor="auto-crop-checkbox"
+                                                className={`cursor-pointer font-medium ${includePatternBG ? 'text-muted-foreground' : ''}`}
+                                            >
+                                                Обрезать пустые поля
+                                            </label>
+                                            <span className="text-sm text-muted-foreground">
+                                                Автоматически обрезать пустые
+                                                поля вокруг диаграммы
+                                                {includePatternBG && (
+                                                    <span className="mt-1 block text-xs italic">
+                                                        (Недоступно при
+                                                        включенном фоновом
+                                                        паттерне)
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
@@ -165,11 +298,28 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                             {t('export_image_dialog.cancel')}
                         </Button>
                     </DialogClose>
-                    <DialogClose asChild>
-                        <Button onClick={handleExport}>
-                            {t('export_image_dialog.export')}
-                        </Button>
-                    </DialogClose>
+                    <Button
+                        onClick={async () => {
+                            console.log(
+                                `[export-button] Нажата кнопка экспорта, формат: ${format}`
+                            );
+                            try {
+                                await handleExport();
+                                console.log(
+                                    '[export-button] Экспорт успешно завершен'
+                                );
+                                // Закрываем диалог только после завершения экспорта
+                                closeExportImageDialog();
+                            } catch (error) {
+                                console.error(
+                                    '[export-button] Ошибка при экспорте:',
+                                    error
+                                );
+                            }
+                        }}
+                    >
+                        {t('export_image_dialog.export')}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
