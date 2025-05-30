@@ -28,9 +28,7 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
     const exportImage: ExportImageContext['exportImage'] = useCallback(
         async (type, { includePatternBG, transparent, scale }) => {
             try {
-                console.log(
-                    `[export-provider] Экспорт изображения типа: ${type}`
-                );
+                console.log(`[export-provider] Exporting image type: ${type}`);
 
                 showLoader({
                     animated: false,
@@ -151,14 +149,14 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
 
                 const imageCreateFn = imageCreatorMap[type];
                 console.log(
-                    `[export-provider] Вызываем функцию создания изображения для типа: ${type}`
+                    `[export-provider] Calling image creation function for type: ${type}`
                 );
 
                 let dataUrl;
 
                 if (type === 'svg') {
                     try {
-                        console.log('[export-provider] Начинаем создание SVG');
+                        console.log('[export-provider] Starting SVG creation');
 
                         // Для SVG используем специальные параметры
                         dataUrl = await toSvg(viewportElement, {
@@ -175,7 +173,7 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                                 transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
                             },
                             filter: (node) => {
-                                // Исключаем некоторые элементы, которые могут вызывать проблемы
+                                // Exclude certain elements that may cause problems
                                 const excludeClasses = [
                                     'react-flow__minimap',
                                     'react-flow__controls',
@@ -188,33 +186,33 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                         });
 
                         console.log(
-                            '[export-provider] SVG создан успешно, длина data URL:',
+                            '[export-provider] SVG created successfully, data URL length:',
                             dataUrl?.length || 0
                         );
 
-                        // Сразу запускаем скачивание SVG
+                        // Start SVG download immediately
                         console.log(
-                            '[export-provider] Пытаемся скачать SVG напрямую из провайдера'
+                            '[export-provider] Attempting to download SVG directly from provider'
                         );
 
                         try {
-                            // Используем fetch для получения данных SVG
+                            // Use fetch to retrieve SVG data
                             console.log(
-                                '[export-provider] Используем fetch для получения SVG'
+                                '[export-provider] Using fetch to get SVG data'
                             );
                             const response = await fetch(dataUrl);
                             const blob = await response.blob();
                             console.log(
-                                '[export-provider] Получен blob, размер:',
+                                '[export-provider] Received blob, size:',
                                 blob.size
                             );
 
                             // Создаем URL для скачивания
                             const url = URL.createObjectURL(blob);
 
-                            // Приоритет - скачивание SVG
+                            // Priority - direct SVG download
                             console.log(
-                                '[export-provider] Приоритетно используем прямое скачивание SVG'
+                                '[export-provider] Using direct SVG download as priority'
                             );
 
                             // Создаем ссылку для скачивания
@@ -225,42 +223,42 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                             document.body.appendChild(link);
 
                             console.log(
-                                '[export-provider] Запускаем скачивание SVG'
+                                '[export-provider] Starting SVG download'
                             );
                             link.click();
 
-                            // Даем время на скачивание
+                            // Allow time for download
                             await new Promise((resolve) =>
                                 setTimeout(resolve, 1000)
                             ); // Увеличиваем время ожидания
 
                             document.body.removeChild(link);
 
-                            // Очищаем URL после задержки
+                            // Clean up URL after delay
                             setTimeout(() => URL.revokeObjectURL(url), 5000);
 
                             console.log(
-                                '[export-provider] SVG обработка завершена'
+                                '[export-provider] SVG processing completed'
                             );
                         } catch (downloadError) {
                             console.error(
-                                '[export-provider] Ошибка при скачивании SVG:',
+                                '[export-provider] Error downloading SVG:',
                                 downloadError
                             );
 
-                            // Дополнительная попытка - открыть SVG в новом окне
+                            // Fallback option - open SVG in new window
                             try {
                                 const newWindow = window.open(
                                     dataUrl,
                                     '_blank'
                                 );
                                 console.log(
-                                    '[export-provider] Попытка открыть SVG в новом окне:',
-                                    newWindow ? 'успешно' : 'неудача'
+                                    '[export-provider] Attempt to open SVG in new window:',
+                                    newWindow ? 'success' : 'failed'
                                 );
                             } catch (windowError) {
                                 console.error(
-                                    '[export-provider] Не удалось открыть SVG в новом окне:',
+                                    '[export-provider] Failed to open SVG in new window:',
                                     windowError
                                 );
                             }
@@ -268,11 +266,11 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                     } catch (error) {
                         const svgError = error as Error;
                         console.error(
-                            '[export-provider] Ошибка при создании SVG:',
+                            '[export-provider] Error creating SVG:',
                             svgError
                         );
                         throw new Error(
-                            `Ошибка при создании SVG: ${svgError.message || 'Неизвестная ошибка'}`
+                            `Error creating SVG: ${svgError.message || 'Unknown error'}`
                         );
                     }
                 } else {

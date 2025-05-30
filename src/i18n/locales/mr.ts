@@ -405,6 +405,9 @@ export const mr: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'रिकामी जागा कापा',
+            crop_description: 'आकृतीभोवती रिकामी जागा स्वयंचलितपणे कापा.',
+            crop_unavailable: '(बॅकग्राउंड पॅटर्नसह उपलब्ध नाही)',
         },
 
         new_table_schema_dialog: {

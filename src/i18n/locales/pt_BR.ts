@@ -401,6 +401,10 @@ export const pt_BR: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Recortar espaço vazio',
+            crop_description:
+                'Recortar automaticamente o espaço vazio ao redor do diagrama.',
+            crop_unavailable: '(Não disponível com padrão de fundo)',
         },
 
         new_table_schema_dialog: {

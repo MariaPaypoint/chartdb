@@ -406,6 +406,10 @@ export const ja: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: '空白部分をトリミング',
+            crop_description: '図の周りの空白部分を自動的にトリミングします。',
+            crop_unavailable:
+                '(背景パターンを使用している場合は利用できません)',
         },
 
         new_table_schema_dialog: {

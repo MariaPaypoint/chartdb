@@ -90,6 +90,7 @@ export const Menu: React.FC<MenuProps> = () => {
     };
 
     const exportSVG = useCallback(() => {
+        // Direct export of SVG with default settings
         exportImage('svg', {
             scale: 1,
             transparent: true,

@@ -393,6 +393,9 @@ export const en = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Crop empty space',
+            crop_description: 'Automatically crop empty space around diagram.',
+            crop_unavailable: '(Not available with background pattern)',
         },
 
         new_table_schema_dialog: {

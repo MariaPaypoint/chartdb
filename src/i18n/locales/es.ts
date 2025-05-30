@@ -392,6 +392,10 @@ export const es: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Recortar espacio vacío',
+            crop_description:
+                'Recortar automáticamente el espacio vacío alrededor del diagrama.',
+            crop_unavailable: '(No disponible con patrón de fondo)',
         },
 
         new_table_schema_dialog: {

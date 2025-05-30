@@ -398,6 +398,10 @@ export const uk: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Обрізати порожні області',
+            crop_description:
+                'Автоматично обрізати порожні області навколо діаграми.',
+            crop_unavailable: '(Недоступно з фоновим візерунком)',
         },
 
         new_table_schema_dialog: {

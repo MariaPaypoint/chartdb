@@ -55,7 +55,7 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
         setAutoCrop(DEFAULT_AUTO_CROP);
     }, [dialog.open]);
 
-    // Выключаем опцию обрезки, если включен фоновый паттерн
+    // Disable cropping option if background pattern is enabled
     useEffect(() => {
         if (includePatternBG && autoCrop) {
             setAutoCrop(false);
@@ -66,17 +66,17 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
     const handleExport = useCallback(async () => {
         try {
             console.log(
-                `[export-dialog] Экспорт диаграммы в формате: ${format}`
+                `[export-dialog] Exporting diagram in format: ${format}`
             );
 
-            // Отдельная обработка для формата SVG
+            // Separate processing for SVG format
             if (format === 'svg') {
                 console.log(
-                    '[export-dialog] Используем метод загрузки через fetch для SVG'
+                    '[export-dialog] Using fetch method for SVG download'
                 );
 
                 try {
-                    // Получаем SVG данные
+                    // Get SVG data
                     const imageUrl = await exportImage('svg', {
                         transparent,
                         includePatternBG,
@@ -84,82 +84,80 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                     });
 
                     console.log(
-                        '[export-dialog] Получен SVG URL, длина:',
+                        '[export-dialog] Received SVG URL, length:',
                         imageUrl.length
                     );
 
-                    // Используем fetch для получения данных SVG
+                    // Use fetch to get SVG data
                     const response = await fetch(imageUrl);
                     const blob = await response.blob();
 
                     console.log(
-                        '[export-dialog] Создан blob для SVG, размер:',
+                        '[export-dialog] Created blob for SVG, size:',
                         blob.size
                     );
 
-                    // Создаем файл и начинаем загрузку
+                    // Create file and start download
                     const url = window.URL.createObjectURL(blob);
                     const filename = 'diagram.svg';
 
-                    // Создаем новый элемент ссылки для загрузки
+                    // Create download link element
                     const downloadLink = document.createElement('a');
                     downloadLink.href = url;
                     downloadLink.download = filename;
                     downloadLink.style.display = 'none';
 
-                    // Добавляем в DOM, кликаем и удаляем
+                    // Add to DOM, click and remove
                     document.body.appendChild(downloadLink);
-                    console.log('[export-dialog] Начинаем загрузку SVG файла');
+                    console.log('[export-dialog] Starting SVG file download');
                     downloadLink.click();
 
-                    // Даем время на скачивание перед удалением
+                    // Allow time for download before removal
                     await new Promise((resolve) => setTimeout(resolve, 300));
 
                     document.body.removeChild(downloadLink);
                     window.URL.revokeObjectURL(url);
-                    console.log('[export-dialog] Загрузка SVG завершена');
+                    console.log('[export-dialog] SVG download completed');
 
                     return true;
                 } catch (error) {
-                    console.error('Ошибка при экспорте SVG:', error);
+                    console.error('Error exporting SVG:', error);
                     throw error;
                 }
             } else {
-                // Для PNG и JPEG применяем стандартный метод экспорта
+                // For PNG and JPEG use standard export method
                 console.log(
-                    `[export-dialog] Экспорт ${format} с параметрами: масштаб=${scale}, прозрачность=${transparent}`
+                    `[export-dialog] Exporting ${format} with parameters: scale=${scale}, transparency=${transparent}`
                 );
 
-                // Получаем изображение
+                // Get the image
                 const imageUrl = await exportImage(format, {
                     transparent,
                     includePatternBG,
                     scale: Number(scale),
                 });
 
-                // Применяем автоматическую обрезку, если нужно
+                // Apply automatic cropping if needed
                 let finalImageUrl;
 
                 if (autoCrop && !includePatternBG) {
-                    console.log(
-                        '[export-dialog] Применяем автоматическую обрезку'
-                    );
+                    console.log('[export-dialog] Applying automatic cropping');
                     finalImageUrl = await autoCropImage(imageUrl, 50, format);
                 } else {
                     finalImageUrl = imageUrl;
                 }
 
-                // Создаем ссылку для скачивания
+                // Create download link
                 const link = document.createElement('a');
                 link.download = `diagram.${format}`;
                 link.href = finalImageUrl;
                 document.body.appendChild(link);
-                console.log(`[export-dialog] Запуск скачивания ${format}`);
+                console.log(`[export-dialog] Starting ${format} download`);
                 link.click();
                 document.body.removeChild(link);
             }
         } catch (error) {
-            console.error('Ошибка при экспорте изображения:', error);
+            console.error('Error exporting image:', error);
         }
     }, [exportImage, format, includePatternBG, transparent, scale, autoCrop]);
 
@@ -272,16 +270,19 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                                                 htmlFor="auto-crop-checkbox"
                                                 className={`cursor-pointer font-medium ${includePatternBG ? 'text-muted-foreground' : ''}`}
                                             >
-                                                Обрезать пустые поля
+                                                {t(
+                                                    'export_image_dialog.crop_empty_space'
+                                                )}
                                             </label>
                                             <span className="text-sm text-muted-foreground">
-                                                Автоматически обрезать пустые
-                                                поля вокруг диаграммы
+                                                {t(
+                                                    'export_image_dialog.crop_description'
+                                                )}
                                                 {includePatternBG && (
                                                     <span className="mt-1 block text-xs italic">
-                                                        (Недоступно при
-                                                        включенном фоновом
-                                                        паттерне)
+                                                        {t(
+                                                            'export_image_dialog.crop_unavailable'
+                                                        )}
                                                     </span>
                                                 )}
                                             </span>
@@ -301,18 +302,18 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                     <Button
                         onClick={async () => {
                             console.log(
-                                `[export-button] Нажата кнопка экспорта, формат: ${format}`
+                                `[export-button] Export button pressed, format: ${format}`
                             );
                             try {
                                 await handleExport();
                                 console.log(
-                                    '[export-button] Экспорт успешно завершен'
+                                    '[export-button] Export completed successfully'
                                 );
-                                // Закрываем диалог только после завершения экспорта
+                                // Close dialog only after export is complete
                                 closeExportImageDialog();
                             } catch (error) {
                                 console.error(
-                                    '[export-button] Ошибка при экспорте:',
+                                    '[export-button] Error during export:',
                                     error
                                 );
                             }

@@ -398,6 +398,9 @@ export const ko_KR: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: '빈 공간 자르기',
+            crop_description: '다이어그램 주변의 빈 공간을 자동으로 자릅니다.',
+            crop_unavailable: '(배경 패턴을 사용할 때는 사용할 수 없음)',
         },
 
         new_table_schema_dialog: {

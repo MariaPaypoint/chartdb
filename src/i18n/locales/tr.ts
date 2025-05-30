@@ -393,6 +393,10 @@ export const tr: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Boş alanları kırp',
+            crop_description:
+                'Diyagramın etrafındaki boş alanları otomatik olarak kırp.',
+            crop_unavailable: '(Arka plan deseni ile kullanılamaz)',
         },
         new_table_schema_dialog: {
             title: 'Şema Seç',
