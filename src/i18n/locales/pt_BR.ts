@@ -56,6 +56,18 @@ export const pt_BR: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Salvar no MinIO',
+            button_save_to_minio_loading: 'Salvando...',
+            button_save_to_minio_success: 'Salvo!',
+            button_copy_url: 'Copiar URL',
+            button_copy_url_loading: 'Copiando...',
+            button_copy_url_success: 'Copiado!',
+            button_copy_png: 'Copiar como PNG',
+            button_copy_png_loading: 'Copiando...',
+            button_copy_png_success: 'Copiado!',
+        },
+
         delete_diagram_alert: {
             title: 'Excluir Diagrama',
             description:

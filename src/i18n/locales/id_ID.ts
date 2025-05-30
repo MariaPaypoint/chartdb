@@ -55,6 +55,18 @@ export const id_ID: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Simpan ke MinIO',
+            button_save_to_minio_loading: 'Menyimpan...',
+            button_save_to_minio_success: 'Tersimpan!',
+            button_copy_url: 'Salin URL',
+            button_copy_url_loading: 'Menyalin...',
+            button_copy_url_success: 'Tersalin!',
+            button_copy_png: 'Salin sebagai PNG',
+            button_copy_png_loading: 'Menyalin...',
+            button_copy_png_success: 'Tersalin!',
+        },
+
         delete_diagram_alert: {
             title: 'Hapus Diagram',
             description:

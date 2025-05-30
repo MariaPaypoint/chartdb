@@ -56,6 +56,18 @@ export const bn: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIO-তে সংরক্ষণ করুন',
+            button_save_to_minio_loading: 'সংরক্ষিত হচ্ছে...',
+            button_save_to_minio_success: 'সংরক্ষিত!',
+            button_copy_url: 'URL কপি করুন',
+            button_copy_url_loading: 'কপি হচ্ছে...',
+            button_copy_url_success: 'কপি করা হয়েছে!',
+            button_copy_png: 'PNG হিসেবে কপি করুন',
+            button_copy_png_loading: 'কপি হচ্ছে...',
+            button_copy_png_success: 'কপি করা হয়েছে!',
+        },
+
         delete_diagram_alert: {
             title: 'ডায়াগ্রাম মুছুন',
             description:

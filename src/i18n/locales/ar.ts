@@ -54,6 +54,18 @@ export const ar: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'حفظ إلى MinIO',
+            button_save_to_minio_loading: 'جاري الحفظ...',
+            button_save_to_minio_success: 'تم الحفظ!',
+            button_copy_url: 'نسخ URL',
+            button_copy_url_loading: 'جاري النسخ...',
+            button_copy_url_success: 'تم النسخ!',
+            button_copy_png: 'نسخ كـ PNG',
+            button_copy_png_loading: 'جاري النسخ...',
+            button_copy_png_success: 'تم النسخ!',
+        },
+
         delete_diagram_alert: {
             title: 'حذف المخطط',
             description:

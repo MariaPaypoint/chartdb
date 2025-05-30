@@ -54,6 +54,18 @@ export const en = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Save to MinIO',
+            button_save_to_minio_loading: 'Saving...',
+            button_save_to_minio_success: 'Saved!',
+            button_copy_url: 'Copy URL',
+            button_copy_url_loading: 'Copying...',
+            button_copy_url_success: 'Copied!',
+            button_copy_png: 'Copy as PNG',
+            button_copy_png_loading: 'Copying...',
+            button_copy_png_success: 'Copied!',
+        },
+
         delete_diagram_alert: {
             title: 'Delete Diagram',
             description:

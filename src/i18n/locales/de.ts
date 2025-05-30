@@ -56,6 +56,18 @@ export const de: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'In MinIO speichern',
+            button_save_to_minio_loading: 'Speichern...',
+            button_save_to_minio_success: 'Gespeichert!',
+            button_copy_url: 'URL kopieren',
+            button_copy_url_loading: 'Kopieren...',
+            button_copy_url_success: 'Kopiert!',
+            button_copy_png: 'Als PNG kopieren',
+            button_copy_png_loading: 'Kopieren...',
+            button_copy_png_success: 'Kopiert!',
+        },
+
         delete_diagram_alert: {
             title: 'Diagramm löschen',
             description:

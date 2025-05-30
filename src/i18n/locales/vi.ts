@@ -54,6 +54,18 @@ export const vi: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Lưu vào MinIO',
+            button_save_to_minio_loading: 'Đang lưu...',
+            button_save_to_minio_success: 'Đã lưu!',
+            button_copy_url: 'Sao chép URL',
+            button_copy_url_loading: 'Đang sao chép...',
+            button_copy_url_success: 'Đã sao chép!',
+            button_copy_png: 'Sao chép dạng PNG',
+            button_copy_png_loading: 'Đang sao chép...',
+            button_copy_png_success: 'Đã sao chép!',
+        },
+
         delete_diagram_alert: {
             title: 'Xóa sơ đồ',
             description:

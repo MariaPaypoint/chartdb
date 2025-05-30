@@ -54,6 +54,18 @@ export const fr: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'Sauver MinIO',
+            button_save_to_minio_loading: 'Enregistrement...',
+            button_save_to_minio_success: 'Enregistré !',
+            button_copy_url: 'Copier URL',
+            button_copy_url_loading: 'Copie...',
+            button_copy_url_success: 'Copié !',
+            button_copy_png: 'Copier en PNG',
+            button_copy_png_loading: 'Copie...',
+            button_copy_png_success: 'Copié !',
+        },
+
         delete_diagram_alert: {
             title: 'Supprimer le Diagramme',
             description:

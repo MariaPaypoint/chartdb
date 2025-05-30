@@ -56,6 +56,18 @@ export const ne: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIO मा सुरक्षित',
+            button_save_to_minio_loading: 'सुरक्षित गर्दै...',
+            button_save_to_minio_success: 'सुरक्षित गरियो!',
+            button_copy_url: 'URL प्रतिलिपि गर्नुहोस्',
+            button_copy_url_loading: 'प्रतिलिपि गर्दै...',
+            button_copy_url_success: 'प्रतिलिपि गरियो!',
+            button_copy_png: 'PNG प्रतिलिपि गर्नुहोस्',
+            button_copy_png_loading: 'प्रतिलिपि गर्दै...',
+            button_copy_png_success: 'प्रतिलिपि गरियो!',
+        },
+
         delete_diagram_alert: {
             title: 'डायाग्राम हटाउनुहोस्',
             description:

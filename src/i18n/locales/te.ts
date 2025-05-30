@@ -56,6 +56,18 @@ export const te: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: 'MinIOలో సేవ్ చేయండి',
+            button_save_to_minio_loading: 'సేవ్ చేస్తున్నారు...',
+            button_save_to_minio_success: 'సేవ్ చేసారు!',
+            button_copy_url: 'URL కాపీ చేయండి',
+            button_copy_url_loading: 'కాపీ చేస్తున్నారు...',
+            button_copy_url_success: 'కాపీ చేసారు!',
+            button_copy_png: 'PNGగా కాపీ చేయండి',
+            button_copy_png_loading: 'కాపీ చేస్తున్నారు...',
+            button_copy_png_success: 'కాపీ చేసారు!',
+        },
+
         delete_diagram_alert: {
             title: 'చిత్రం తొలగించండి',
             description:

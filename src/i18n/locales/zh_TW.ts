@@ -54,6 +54,18 @@ export const zh_TW: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: '儲存到 MinIO',
+            button_save_to_minio_loading: '儲存中...',
+            button_save_to_minio_success: '已儲存！',
+            button_copy_url: '複製 URL',
+            button_copy_url_loading: '複製中...',
+            button_copy_url_success: '已複製！',
+            button_copy_png: '複製為 PNG',
+            button_copy_png_loading: '複製中...',
+            button_copy_png_success: '已複製！',
+        },
+
         delete_diagram_alert: {
             title: '刪除圖表',
             description: '此操作無法復原，圖表將被永久刪除。',

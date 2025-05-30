@@ -55,6 +55,18 @@ export const tr: LanguageTranslation = {
             },
         },
 
+        top_navbar: {
+            button_save_to_minio: "MinIO'ya Kaydet",
+            button_save_to_minio_loading: 'Kaydediliyor...',
+            button_save_to_minio_success: 'Kaydedildi!',
+            button_copy_url: 'URL Kopyala',
+            button_copy_url_loading: 'Kopyalanıyor...',
+            button_copy_url_success: 'Kopyalandı!',
+            button_copy_png: 'PNG olarak kopyala',
+            button_copy_png_loading: 'Kopyalanıyor...',
+            button_copy_png_success: 'Kopyalandı!',
+        },
+
         delete_diagram_alert: {
             title: 'Diyagramı Sil',
             description:
