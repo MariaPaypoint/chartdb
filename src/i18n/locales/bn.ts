@@ -412,6 +412,10 @@ export const bn: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'খালি স্থান কাটুন',
+            crop_description:
+                'ডায়াগ্রামের চারপাশের খালি স্থান স্বয়ংক্রিয়ভাবে কাটুন।',
+            crop_unavailable: '(পটভূমি প্যাটার্নের সাথে উপলব্ধ নয়)',
         },
 
         new_table_schema_dialog: {

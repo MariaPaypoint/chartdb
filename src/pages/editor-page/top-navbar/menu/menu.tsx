@@ -32,6 +32,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { useLocalConfig } from '@/hooks/use-local-config';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '@/context/alert-context/alert-context';
+import { autoCropImage } from '@/utils/image-utils';
 
 export interface MenuProps {}
 
@@ -89,6 +90,7 @@ export const Menu: React.FC<MenuProps> = () => {
     };
 
     const exportSVG = useCallback(() => {
+        // Direct export of SVG with default settings
         exportImage('svg', {
             scale: 1,
             transparent: true,
@@ -106,8 +108,11 @@ export const Menu: React.FC<MenuProps> = () => {
                 includePatternBG: false, // Without background pattern
             });
 
+            // Apply auto-cropping to remove empty spaces
+            const croppedPngUrl = await autoCropImage(pngUrl, 50, 'png');
+
             // Get Blob from URL
-            const response = await fetch(pngUrl);
+            const response = await fetch(croppedPngUrl);
             const blob = await response.blob();
 
             // Copy to clipboard
@@ -117,7 +122,7 @@ export const Menu: React.FC<MenuProps> = () => {
                 }),
             ]);
 
-            console.log('Diagram copied to clipboard as PNG');
+            console.log('Diagram copied to clipboard as PNG (auto-cropped)');
         } catch (error) {
             console.error('Error copying PNG to clipboard:', error);
         }

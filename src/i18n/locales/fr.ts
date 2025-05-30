@@ -367,6 +367,10 @@ export const fr: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Rogner les espaces vides',
+            crop_description:
+                'Rogner automatiquement les espaces vides autour du diagramme.',
+            crop_unavailable: '(Non disponible avec motif de fond)',
         },
 
         multiple_schemas_alert: {

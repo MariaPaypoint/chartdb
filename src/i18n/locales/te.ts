@@ -414,6 +414,10 @@ export const te: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'ఖాళీ స్థలాన్ని కత్తిరించు',
+            crop_description:
+                'చిత్రం చుట్టూ ఉన్న ఖాళీ స్థలాన్ని స్వయంచాలకంగా కత్తిరించు.',
+            crop_unavailable: '(నేపథ్య ప్యాటర్న్ తో లభ్యం కాదు)',
         },
 
         new_table_schema_dialog: {

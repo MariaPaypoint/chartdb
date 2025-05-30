@@ -409,6 +409,9 @@ export const vi: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Cắt bỏ khoảng trống',
+            crop_description: 'Tự động cắt bỏ khoảng trống xung quanh sơ đồ.',
+            crop_unavailable: '(Không khả dụng với mẫu nền)',
         },
 
         new_table_schema_dialog: {

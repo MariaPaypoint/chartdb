@@ -16,6 +16,7 @@ import type { BaseDialogProps } from '../common/base-dialog-props';
 import { useTranslation } from 'react-i18next';
 import type { ImageType } from '@/context/export-image-context/export-image-context';
 import { useExportImage } from '@/hooks/use-export-image';
+import { autoCropImage } from '@/utils/image-utils';
 import { Checkbox } from '@/components/checkbox/checkbox';
 import {
     Accordion,
@@ -30,6 +31,7 @@ export interface ExportImageDialogProps extends BaseDialogProps {
 
 const DEFAULT_INCLUDE_PATTERN_BG = true;
 const DEFAULT_TRANSPARENT = false;
+const DEFAULT_AUTO_CROP = true;
 const DEFAULT_SCALE = '2';
 export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
     dialog,
@@ -42,6 +44,7 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
     );
     const [transparent, setTransparent] =
         useState<boolean>(DEFAULT_TRANSPARENT);
+    const [autoCrop, setAutoCrop] = useState<boolean>(DEFAULT_AUTO_CROP);
     const { exportImage } = useExportImage();
 
     useEffect(() => {
@@ -49,16 +52,114 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
         setScale(DEFAULT_SCALE);
         setIncludePatternBG(DEFAULT_INCLUDE_PATTERN_BG);
         setTransparent(DEFAULT_TRANSPARENT);
+        setAutoCrop(DEFAULT_AUTO_CROP);
     }, [dialog.open]);
+
+    // Disable cropping option if background pattern is enabled
+    useEffect(() => {
+        if (includePatternBG && autoCrop) {
+            setAutoCrop(false);
+        }
+    }, [includePatternBG, autoCrop]);
     const { closeExportImageDialog } = useDialog();
 
-    const handleExport = useCallback(() => {
-        exportImage(format, {
-            transparent,
-            includePatternBG,
-            scale: Number(scale),
-        });
-    }, [exportImage, format, includePatternBG, transparent, scale]);
+    const handleExport = useCallback(async () => {
+        try {
+            console.log(
+                `[export-dialog] Exporting diagram in format: ${format}`
+            );
+
+            // Separate processing for SVG format
+            if (format === 'svg') {
+                console.log(
+                    '[export-dialog] Using fetch method for SVG download'
+                );
+
+                try {
+                    // Get SVG data
+                    const imageUrl = await exportImage('svg', {
+                        transparent,
+                        includePatternBG,
+                        scale: Number(scale),
+                    });
+
+                    console.log(
+                        '[export-dialog] Received SVG URL, length:',
+                        imageUrl.length
+                    );
+
+                    // Use fetch to get SVG data
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+
+                    console.log(
+                        '[export-dialog] Created blob for SVG, size:',
+                        blob.size
+                    );
+
+                    // Create file and start download
+                    const url = window.URL.createObjectURL(blob);
+                    const filename = 'diagram.svg';
+
+                    // Create download link element
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;
+                    downloadLink.download = filename;
+                    downloadLink.style.display = 'none';
+
+                    // Add to DOM, click and remove
+                    document.body.appendChild(downloadLink);
+                    console.log('[export-dialog] Starting SVG file download');
+                    downloadLink.click();
+
+                    // Allow time for download before removal
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+
+                    document.body.removeChild(downloadLink);
+                    window.URL.revokeObjectURL(url);
+                    console.log('[export-dialog] SVG download completed');
+
+                    return true;
+                } catch (error) {
+                    console.error('Error exporting SVG:', error);
+                    throw error;
+                }
+            } else {
+                // For PNG and JPEG use standard export method
+                console.log(
+                    `[export-dialog] Exporting ${format} with parameters: scale=${scale}, transparency=${transparent}`
+                );
+
+                // Get the image
+                const imageUrl = await exportImage(format, {
+                    transparent,
+                    includePatternBG,
+                    scale: Number(scale),
+                });
+
+                // Apply automatic cropping if needed
+                let finalImageUrl;
+
+                if (autoCrop && !includePatternBG) {
+                    console.log('[export-dialog] Applying automatic cropping');
+                    finalImageUrl = await autoCropImage(imageUrl, 50, format);
+                } else {
+                    finalImageUrl = imageUrl;
+                }
+
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `diagram.${format}`;
+                link.href = finalImageUrl;
+                document.body.appendChild(link);
+                console.log(`[export-dialog] Starting ${format} download`);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } catch (error) {
+            console.error('Error exporting image:', error);
+        }
+    }, [exportImage, format, includePatternBG, transparent, scale, autoCrop]);
 
     const scaleOptions: SelectBoxOption[] = useMemo(
         () =>
@@ -154,6 +255,39 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                                             </span>
                                         </div>
                                     </div>
+                                    <div className="flex items-start gap-3">
+                                        <Checkbox
+                                            id="auto-crop-checkbox"
+                                            className="mt-1 data-[state=checked]:border-pink-600 data-[state=checked]:bg-pink-600 data-[state=checked]:text-white"
+                                            checked={autoCrop}
+                                            disabled={includePatternBG}
+                                            onCheckedChange={(value) =>
+                                                setAutoCrop(value as boolean)
+                                            }
+                                        />
+                                        <div className="flex flex-col">
+                                            <label
+                                                htmlFor="auto-crop-checkbox"
+                                                className={`cursor-pointer font-medium ${includePatternBG ? 'text-muted-foreground' : ''}`}
+                                            >
+                                                {t(
+                                                    'export_image_dialog.crop_empty_space'
+                                                )}
+                                            </label>
+                                            <span className="text-sm text-muted-foreground">
+                                                {t(
+                                                    'export_image_dialog.crop_description'
+                                                )}
+                                                {includePatternBG && (
+                                                    <span className="mt-1 block text-xs italic">
+                                                        {t(
+                                                            'export_image_dialog.crop_unavailable'
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
@@ -165,11 +299,28 @@ export const ExportImageDialog: React.FC<ExportImageDialogProps> = ({
                             {t('export_image_dialog.cancel')}
                         </Button>
                     </DialogClose>
-                    <DialogClose asChild>
-                        <Button onClick={handleExport}>
-                            {t('export_image_dialog.export')}
-                        </Button>
-                    </DialogClose>
+                    <Button
+                        onClick={async () => {
+                            console.log(
+                                `[export-button] Export button pressed, format: ${format}`
+                            );
+                            try {
+                                await handleExport();
+                                console.log(
+                                    '[export-button] Export completed successfully'
+                                );
+                                // Close dialog only after export is complete
+                                closeExportImageDialog();
+                            } catch (error) {
+                                console.error(
+                                    '[export-button] Error during export:',
+                                    error
+                                );
+                            }
+                        }}
+                    >
+                        {t('export_image_dialog.export')}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

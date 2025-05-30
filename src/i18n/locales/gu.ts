@@ -411,6 +411,9 @@ export const gu: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'ખાલી જગ્યા કાપો',
+            crop_description: 'આકૃતિની આજુબાજુની ખાલી જગ્યા આપમેળે કાપો.',
+            crop_unavailable: '(બેકગ્રાઉન્ડ પેટર્ન સાથે ઉપલબ્ધ નથી)',
         },
 
         new_table_schema_dialog: {

@@ -410,6 +410,10 @@ export const id_ID: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Potong ruang kosong',
+            crop_description:
+                'Secara otomatis memotong ruang kosong di sekitar diagram.',
+            crop_unavailable: '(Tidak tersedia dengan pola latar belakang)',
         },
 
         new_table_schema_dialog: {

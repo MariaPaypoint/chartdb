@@ -411,6 +411,9 @@ export const ar: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'قص المساحة الفارغة',
+            crop_description: 'قص المساحة الفارغة حول الرسم البياني تلقائيًا',
+            crop_unavailable: '(غير متوفر مع نمط الخلفية)',
         },
 
         new_table_schema_dialog: {

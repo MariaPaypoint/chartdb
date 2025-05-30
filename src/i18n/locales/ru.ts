@@ -403,12 +403,15 @@ export const ru: LanguageTranslation = {
             scale_4x: '4x',
             cancel: 'Отменить',
             export: 'Экспортировать',
-            // TODO: Translate
-            advanced_options: 'Advanced Options',
-            pattern: 'Include background pattern',
-            pattern_description: 'Add subtle grid pattern to background.',
-            transparent: 'Transparent background',
-            transparent_description: 'Remove background color from image.',
+            advanced_options: 'Дополнительные настройки',
+            pattern: 'Включить фоновый паттерн',
+            pattern_description: 'Добавить сетку на фон изображения.',
+            transparent: 'Прозрачный фон',
+            transparent_description: 'Удалить цвет фона изображения.',
+            crop_empty_space: 'Обрезать пустые поля',
+            crop_description:
+                'Автоматически обрезать пустые поля вокруг диаграммы.',
+            crop_unavailable: '(Недоступно при включенном фоновом паттерне)',
         },
 
         new_table_schema_dialog: {

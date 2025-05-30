@@ -415,6 +415,10 @@ export const ne: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'खाली ठाउँ काट्नुहोस्',
+            crop_description:
+                'चित्रको वरिपरिको खाली ठाउँ स्वचालित रूपमा काट्नुहोस्।',
+            crop_unavailable: '(पृष्ठभूमि प्याटर्नको साथमा उपलब्ध छैन)',
         },
 
         new_table_schema_dialog: {

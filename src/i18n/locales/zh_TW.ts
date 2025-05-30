@@ -404,6 +404,9 @@ export const zh_TW: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: '裁剪空白區域',
+            crop_description: '自動裁剪圖表周圍的空白區域。',
+            crop_unavailable: '(使用背景圖案時不可用)',
         },
 
         new_table_schema_dialog: {

@@ -415,6 +415,10 @@ export const de: LanguageTranslation = {
             pattern_description: 'Add subtle grid pattern to background.',
             transparent: 'Transparent background',
             transparent_description: 'Remove background color from image.',
+            crop_empty_space: 'Leeren Bereich zuschneiden',
+            crop_description:
+                'Leeren Bereich um das Diagramm herum automatisch zuschneiden.',
+            crop_unavailable: '(Nicht verfügbar mit Hintergrundmuster)',
         },
 
         new_table_schema_dialog: {

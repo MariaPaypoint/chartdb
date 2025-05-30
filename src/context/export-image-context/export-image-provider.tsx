@@ -28,6 +28,8 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
     const exportImage: ExportImageContext['exportImage'] = useCallback(
         async (type, { includePatternBG, transparent, scale }) => {
             try {
+                console.log(`[export-provider] Exporting image type: ${type}`);
+
                 showLoader({
                     animated: false,
                 });
@@ -146,23 +148,151 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                 );
 
                 const imageCreateFn = imageCreatorMap[type];
-                const dataUrl = await imageCreateFn(viewportElement, {
-                    backgroundColor: transparent
-                        ? 'transparent'
-                        : effectiveTheme === 'light'
-                          ? '#ffffff'
-                          : '#1a1a1a',
-                    width: reactFlowBounds.width,
-                    height: reactFlowBounds.height,
-                    style: {
-                        width: `${reactFlowBounds.width}px`,
-                        height: `${reactFlowBounds.height}px`,
-                        transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-                    },
-                    quality: 1,
-                    pixelRatio: scale,
-                    skipFonts: true,
-                });
+                console.log(
+                    `[export-provider] Calling image creation function for type: ${type}`
+                );
+
+                let dataUrl;
+
+                if (type === 'svg') {
+                    try {
+                        console.log('[export-provider] Starting SVG creation');
+
+                        // Для SVG используем специальные параметры
+                        dataUrl = await toSvg(viewportElement, {
+                            backgroundColor: transparent
+                                ? 'transparent'
+                                : effectiveTheme === 'light'
+                                  ? '#ffffff'
+                                  : '#1a1a1a',
+                            width: reactFlowBounds.width,
+                            height: reactFlowBounds.height,
+                            style: {
+                                width: `${reactFlowBounds.width}px`,
+                                height: `${reactFlowBounds.height}px`,
+                                transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+                            },
+                            filter: (node) => {
+                                // Exclude certain elements that may cause problems
+                                const excludeClasses = [
+                                    'react-flow__minimap',
+                                    'react-flow__controls',
+                                ];
+                                return !excludeClasses.some((className) =>
+                                    node.classList?.contains(className)
+                                );
+                            },
+                            skipFonts: true,
+                        });
+
+                        console.log(
+                            '[export-provider] SVG created successfully, data URL length:',
+                            dataUrl?.length || 0
+                        );
+
+                        // Start SVG download immediately
+                        console.log(
+                            '[export-provider] Attempting to download SVG directly from provider'
+                        );
+
+                        try {
+                            // Use fetch to retrieve SVG data
+                            console.log(
+                                '[export-provider] Using fetch to get SVG data'
+                            );
+                            const response = await fetch(dataUrl);
+                            const blob = await response.blob();
+                            console.log(
+                                '[export-provider] Received blob, size:',
+                                blob.size
+                            );
+
+                            // Создаем URL для скачивания
+                            const url = URL.createObjectURL(blob);
+
+                            // Priority - direct SVG download
+                            console.log(
+                                '[export-provider] Using direct SVG download as priority'
+                            );
+
+                            // Создаем ссылку для скачивания
+                            const link = document.createElement('a');
+                            link.download = 'diagram.svg';
+                            link.href = url;
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+
+                            console.log(
+                                '[export-provider] Starting SVG download'
+                            );
+                            link.click();
+
+                            // Allow time for download
+                            await new Promise((resolve) =>
+                                setTimeout(resolve, 1000)
+                            ); // Увеличиваем время ожидания
+
+                            document.body.removeChild(link);
+
+                            // Clean up URL after delay
+                            setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+                            console.log(
+                                '[export-provider] SVG processing completed'
+                            );
+                        } catch (downloadError) {
+                            console.error(
+                                '[export-provider] Error downloading SVG:',
+                                downloadError
+                            );
+
+                            // Fallback option - open SVG in new window
+                            try {
+                                const newWindow = window.open(
+                                    dataUrl,
+                                    '_blank'
+                                );
+                                console.log(
+                                    '[export-provider] Attempt to open SVG in new window:',
+                                    newWindow ? 'success' : 'failed'
+                                );
+                            } catch (windowError) {
+                                console.error(
+                                    '[export-provider] Failed to open SVG in new window:',
+                                    windowError
+                                );
+                            }
+                        }
+                    } catch (error) {
+                        const svgError = error as Error;
+                        console.error(
+                            '[export-provider] Error creating SVG:',
+                            svgError
+                        );
+                        throw new Error(
+                            `Error creating SVG: ${svgError.message || 'Unknown error'}`
+                        );
+                    }
+                } else {
+                    // Для других типов используем стандартный подход
+                    dataUrl = await imageCreateFn(viewportElement, {
+                        backgroundColor: transparent
+                            ? 'transparent'
+                            : effectiveTheme === 'light'
+                              ? '#ffffff'
+                              : '#1a1a1a',
+                        width: reactFlowBounds.width,
+                        height: reactFlowBounds.height,
+                        style: {
+                            width: `${reactFlowBounds.width}px`,
+                            height: `${reactFlowBounds.height}px`,
+                            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+                        },
+                        quality: 1,
+                        pixelRatio: scale,
+                        skipFonts: true,
+                    });
+                }
 
                 // Remove temporary SVG after getting the image
                 if (
