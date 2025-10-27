@@ -17,7 +17,7 @@ import { useExportDiagram } from '@/hooks/use-export-diagram';
 import { useDialog } from '@/hooks/use-dialog';
 import { useExportImage } from '@/hooks/use-export-image';
 import { diagramToJSONOutput } from '@/lib/export-import-utils';
-import { exportBaseSQL } from '@/lib/data/export-metadata/export-sql-script';
+import { exportBaseSQL } from '@/lib/data/sql-export/export-sql-script';
 // import type { Diagram } from '@/lib/domain/diagram';
 import { databaseTypeToLabelMap } from '@/lib/databases';
 import { DatabaseType } from '@/lib/domain/database-type';

@@ -13,3 +13,5 @@ export const MINIO_USE_SSL: boolean =
 export const MINIO_ACCESS_KEY: string = import.meta.env.VITE_MINIO_ACCESS_KEY;
 export const MINIO_SECRET_KEY: string = import.meta.env.VITE_MINIO_SECRET_KEY;
 export const MINIO_BUCKET_NAME: string = import.meta.env.VITE_MINIO_BUCKET_NAME;
+export const HIDE_CHARTDB_CLOUD: boolean =
+    import.meta.env.VITE_HIDE_CHARTDB_CLOUD === 'true';
