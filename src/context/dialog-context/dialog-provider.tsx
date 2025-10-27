@@ -20,8 +20,6 @@ import type { ExportImageDialogProps } from '@/dialogs/export-image-dialog/expor
 import { ExportImageDialog } from '@/dialogs/export-image-dialog/export-image-dialog';
 import { ExportDiagramDialog } from '@/dialogs/export-diagram-dialog/export-diagram-dialog';
 import { ImportDiagramDialog } from '@/dialogs/import-diagram-dialog/import-diagram-dialog';
-import type { ImportDBMLDialogProps } from '@/dialogs/import-dbml-dialog/import-dbml-dialog';
-import { ImportDBMLDialog } from '@/dialogs/import-dbml-dialog/import-dbml-dialog';
 import { ImportFromMinioDialog } from '@/dialogs/import-from-minio-dialog/import-from-minio-dialog';
 
 export const DialogProvider: React.FC<React.PropsWithChildren> = ({
@@ -146,11 +144,6 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
     const [openImportDiagramDialog, setOpenImportDiagramDialog] =
         useState(false);
 
-    // Import DBML dialog
-    const [openImportDBMLDialog, setOpenImportDBMLDialog] = useState(false);
-    const [importDBMLDialogParams, setImportDBMLDialogParams] =
-        useState<Omit<ImportDBMLDialogProps, 'dialog'>>();
-
     // Import from Minio dialog
     const [openImportFromMinioDialog, setOpenImportFromMinioDialog] =
         useState(false);
@@ -182,11 +175,6 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
                 openImportDiagramDialog: () => setOpenImportDiagramDialog(true),
                 closeImportDiagramDialog: () =>
                     setOpenImportDiagramDialog(false),
-                openImportDBMLDialog: (params) => {
-                    setImportDBMLDialogParams(params);
-                    setOpenImportDBMLDialog(true);
-                },
-                closeImportDBMLDialog: () => setOpenImportDBMLDialog(false),
                 openImportFromMinioDialog: () =>
                     setOpenImportFromMinioDialog(true),
                 closeImportFromMinioDialog: () =>
@@ -228,10 +216,6 @@ export const DialogProvider: React.FC<React.PropsWithChildren> = ({
                 destination={exportDiagramParams.destination}
             />
             <ImportDiagramDialog dialog={{ open: openImportDiagramDialog }} />
-            <ImportDBMLDialog
-                dialog={{ open: openImportDBMLDialog }}
-                {...importDBMLDialogParams}
-            />
             <ImportFromMinioDialog
                 dialog={{ open: openImportFromMinioDialog }}
             />

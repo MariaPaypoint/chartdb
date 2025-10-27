@@ -1,182 +1,226 @@
-import {
-    createIndexesFromMetadata,
-    dbIndexSchema,
-    type DBIndex,
-} from './db-index';
-import {
-    createFieldsFromMetadata,
-    dbFieldSchema,
-    type DBField,
-} from './db-field';
-import type { TableInfo } from '../data/import-metadata/metadata-types/table-info';
-import { createAggregatedIndexes } from '../data/import-metadata/metadata-types/index-info';
-import { materializedViewColor, viewColor, randomColor } from '@/lib/colors';
+import { dbIndexSchema, type DBIndex } from './db-index';
+import { dbFieldSchema, type DBField } from './db-field';
 import type { DBRelationship } from './db-relationship';
-import {
-    decodeBase64ToUtf16LE,
-    decodeBase64ToUtf8,
-    deepCopy,
-    generateId,
-} from '../utils';
-import {
-    schemaNameToDomainSchemaName,
-    schemaNameToSchemaId,
-} from './db-schema';
-import { DatabaseType } from './database-type';
-import type { DatabaseMetadata } from '../data/import-metadata/metadata-types/database-metadata';
+import { deepCopy } from '../utils';
+import { schemaNameToDomainSchemaName } from './db-schema';
 import { z } from 'zod';
-import { getTableDimensions } from '@/pages/editor-page/canvas/canvas-utils';
+import type { Area } from './area';
+
+export const MAX_TABLE_SIZE = 450;
+export const MID_TABLE_SIZE = 337;
+export const MIN_TABLE_SIZE = 224;
+export const TABLE_MINIMIZED_FIELDS = 10;
 
 export interface DBTable {
     id: string;
     name: string;
-    schema?: string;
+    schema?: string | null;
     x: number;
     y: number;
     fields: DBField[];
     indexes: DBIndex[];
     color: string;
     isView: boolean;
-    isMaterializedView?: boolean;
+    isMaterializedView?: boolean | null;
     createdAt: number;
-    width?: number;
-    comments?: string;
-    order?: number;
-    expanded?: boolean;
+    width?: number | null;
+    comments?: string | null;
+    order?: number | null;
+    expanded?: boolean | null;
+    parentAreaId?: string | null;
 }
 
 export const dbTableSchema: z.ZodType<DBTable> = z.object({
     id: z.string(),
     name: z.string(),
-    schema: z.string().optional(),
+    schema: z.string().or(z.null()).optional(),
     x: z.number(),
     y: z.number(),
     fields: z.array(dbFieldSchema),
     indexes: z.array(dbIndexSchema),
     color: z.string(),
     isView: z.boolean(),
-    isMaterializedView: z.boolean().optional(),
+    isMaterializedView: z.boolean().or(z.null()).optional(),
     createdAt: z.number(),
-    width: z.number().optional(),
-    comments: z.string().optional(),
-    order: z.number().optional(),
-    expanded: z.boolean().optional(),
+    width: z.number().or(z.null()).optional(),
+    comments: z.string().or(z.null()).optional(),
+    order: z.number().or(z.null()).optional(),
+    expanded: z.boolean().or(z.null()).optional(),
+    parentAreaId: z.string().or(z.null()).optional(),
 });
 
-export const shouldShowTablesBySchemaFilter = (
-    table: DBTable,
-    filteredSchemas?: string[]
-): boolean =>
-    !filteredSchemas ||
-    !table.schema ||
-    filteredSchemas.includes(schemaNameToSchemaId(table.schema));
-
-export const decodeViewDefinition = (
-    databaseType: DatabaseType,
-    viewDefinition?: string
-): string => {
-    if (!viewDefinition) {
-        return '';
-    }
-
-    let decodedViewDefinition: string;
-    if (databaseType === DatabaseType.SQL_SERVER) {
-        decodedViewDefinition = decodeBase64ToUtf16LE(viewDefinition);
-    } else {
-        decodedViewDefinition = decodeBase64ToUtf8(viewDefinition);
-    }
-
-    return decodedViewDefinition;
-};
-
-export const createTablesFromMetadata = ({
-    databaseMetadata,
-    databaseType,
+export const generateTableKey = ({
+    schemaName,
+    tableName,
 }: {
-    databaseMetadata: DatabaseMetadata;
-    databaseType: DatabaseType;
-}): DBTable[] => {
-    const {
-        tables: tableInfos,
-        pk_info: primaryKeys,
-        columns,
-        indexes,
-        views: views,
-    } = databaseMetadata;
-
-    return tableInfos.map((tableInfo: TableInfo) => {
-        const tableSchema = schemaNameToDomainSchemaName(tableInfo.schema);
-
-        // Aggregate indexes with multiple columns
-        const aggregatedIndexes = createAggregatedIndexes({
-            tableInfo,
-            tableSchema,
-            indexes,
-        });
-
-        const fields = createFieldsFromMetadata({
-            aggregatedIndexes,
-            columns,
-            primaryKeys,
-            tableInfo,
-            tableSchema,
-        });
-
-        const dbIndexes = createIndexesFromMetadata({
-            aggregatedIndexes,
-            fields,
-        });
-
-        // Determine if the current table is a view by checking against viewInfo
-        const isView = views.some(
-            (view) =>
-                schemaNameToDomainSchemaName(view.schema) === tableSchema &&
-                view.view_name === tableInfo.table
-        );
-
-        const isMaterializedView = views.some(
-            (view) =>
-                schemaNameToDomainSchemaName(view.schema) === tableSchema &&
-                view.view_name === tableInfo.table &&
-                decodeViewDefinition(databaseType, view.view_definition)
-                    .toLowerCase()
-                    .includes('materialized')
-        );
-
-        // Initial random positions; these will be adjusted later
-        return {
-            id: generateId(),
-            name: tableInfo.table,
-            schema: tableSchema,
-            x: Math.random() * 1000, // Placeholder X
-            y: Math.random() * 800, // Placeholder Y
-            fields,
-            indexes: dbIndexes,
-            color: isMaterializedView
-                ? materializedViewColor
-                : isView
-                  ? viewColor
-                  : randomColor(),
-            isView: isView,
-            isMaterializedView: isMaterializedView,
-            createdAt: Date.now(),
-            comments: tableInfo.comment ? tableInfo.comment : undefined,
-        };
-    });
-};
+    schemaName: string | null | undefined;
+    tableName: string;
+}) => `${schemaNameToDomainSchemaName(schemaName) ?? ''}.${tableName}`;
 
 export const adjustTablePositions = ({
     relationships: inputRelationships,
     tables: inputTables,
+    areas: inputAreas = [],
     mode = 'all',
 }: {
     tables: DBTable[];
     relationships: DBRelationship[];
+    areas?: Area[];
     mode?: 'all' | 'perSchema';
 }): DBTable[] => {
+    // Deep copy inputs for manipulation
     const tables = deepCopy(inputTables);
     const relationships = deepCopy(inputRelationships);
+    const areas = deepCopy(inputAreas);
 
+    // If there are no areas, fall back to the original algorithm
+    if (areas.length === 0) {
+        return adjustTablePositionsWithoutAreas(tables, relationships, mode);
+    }
+
+    // Group tables by their parent area
+    const tablesByArea = new Map<string | null, DBTable[]>();
+
+    // Initialize with empty arrays for all areas
+    areas.forEach((area) => {
+        tablesByArea.set(area.id, []);
+    });
+
+    // Also create a group for tables without areas
+    tablesByArea.set(null, []);
+
+    // Group tables
+    tables.forEach((table) => {
+        const areaId = table.parentAreaId || null;
+        if (areaId && tablesByArea.has(areaId)) {
+            tablesByArea.get(areaId)!.push(table);
+        } else {
+            // If the area doesn't exist or table has no area, put it in the null group
+            tablesByArea.get(null)!.push(table);
+        }
+    });
+
+    // Check and adjust tables within each area
+    areas.forEach((area) => {
+        const tablesInArea = tablesByArea.get(area.id) || [];
+        if (tablesInArea.length === 0) return;
+
+        // Only reposition tables that are outside their area bounds
+        const tablesToReposition = tablesInArea.filter((table) => {
+            return !isTableInsideArea(table, area);
+        });
+
+        if (tablesToReposition.length > 0) {
+            // Create a sub-graph of relationships for tables that need repositioning
+            const areaRelationships = relationships.filter((rel) => {
+                const sourceNeedsReposition = tablesToReposition.some(
+                    (t) => t.id === rel.sourceTableId
+                );
+                const targetNeedsReposition = tablesToReposition.some(
+                    (t) => t.id === rel.targetTableId
+                );
+                return sourceNeedsReposition && targetNeedsReposition;
+            });
+
+            // Position only tables that are outside the area bounds
+            positionTablesWithinArea(
+                tablesToReposition,
+                areaRelationships,
+                area
+            );
+        }
+        // Tables already inside the area keep their positions
+    });
+
+    // Position free tables (those not in any area)
+    const freeTables = tablesByArea.get(null) || [];
+    if (freeTables.length > 0) {
+        // Create a sub-graph of relationships for free tables
+        const freeRelationships = relationships.filter((rel) => {
+            const sourceIsFree = freeTables.some(
+                (t) => t.id === rel.sourceTableId
+            );
+            const targetIsFree = freeTables.some(
+                (t) => t.id === rel.targetTableId
+            );
+            return sourceIsFree && targetIsFree;
+        });
+
+        // Use the original algorithm for free tables with area avoidance
+        adjustTablePositionsWithoutAreas(
+            freeTables,
+            freeRelationships,
+            mode,
+            areas
+        );
+    }
+
+    return tables;
+};
+
+// Helper function to check if a table is inside an area
+function isTableInsideArea(table: DBTable, area: Area): boolean {
+    const tableDimensions = getTableDimensions(table);
+    const padding = 20; // Same padding as used in positioning
+
+    return (
+        table.x >= area.x + padding &&
+        table.x + tableDimensions.width <= area.x + area.width - padding &&
+        table.y >= area.y + padding &&
+        table.y + tableDimensions.height <= area.y + area.height - padding
+    );
+}
+
+// Helper function to position tables within an area
+function positionTablesWithinArea(
+    tables: DBTable[],
+    _relationships: DBRelationship[],
+    area: Area
+) {
+    if (tables.length === 0) return;
+
+    const padding = 20; // Padding from area edges
+    const gapX = 50;
+    const gapY = 50;
+
+    // Available space within the area
+    const availableWidth = area.width - 2 * padding;
+    const availableHeight = area.height - 2 * padding;
+
+    // Simple grid layout within the area
+    const cols = Math.max(1, Math.floor(availableWidth / 250));
+    const rows = Math.ceil(tables.length / cols);
+
+    const cellWidth = availableWidth / cols;
+    const cellHeight = availableHeight / Math.max(rows, 1);
+
+    tables.forEach((table, index) => {
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+
+        // Position relative to area
+        table.x = area.x + padding + col * cellWidth + gapX / 2;
+        table.y = area.y + padding + row * cellHeight + gapY / 2;
+
+        // Ensure table stays within area bounds
+        const tableDimensions = getTableDimensions(table);
+        const maxX = area.x + area.width - padding - tableDimensions.width;
+        const maxY = area.y + area.height - padding - tableDimensions.height;
+
+        table.x = Math.min(table.x, maxX);
+        table.y = Math.min(table.y, maxY);
+        table.x = Math.max(table.x, area.x + padding);
+        table.y = Math.max(table.y, area.y + padding);
+    });
+}
+
+// Original algorithm with area avoidance
+function adjustTablePositionsWithoutAreas(
+    tables: DBTable[],
+    relationships: DBRelationship[],
+    mode: 'all' | 'perSchema',
+    areas: Area[] = []
+): DBTable[] {
     const adjustPositionsForTables = (tablesToAdjust: DBTable[]) => {
         const defaultTableWidth = 200;
         const defaultTableHeight = 300;
@@ -198,8 +242,23 @@ export const adjustTablePositions = ({
             tableConnections.get(rel.targetTableId)!.add(rel.sourceTableId);
         });
 
-        // Sort tables by number of connections
-        const sortedTables = [...tablesToAdjust].sort(
+        // Separate tables into connected and isolated
+        const connectedTables: DBTable[] = [];
+        const isolatedTables: DBTable[] = [];
+
+        tablesToAdjust.forEach((table) => {
+            if (
+                tableConnections.has(table.id) &&
+                tableConnections.get(table.id)!.size > 0
+            ) {
+                connectedTables.push(table);
+            } else {
+                isolatedTables.push(table);
+            }
+        });
+
+        // Sort connected tables by number of connections (most connected first)
+        connectedTables.sort(
             (a, b) =>
                 (tableConnections.get(b.id)?.size || 0) -
                 (tableConnections.get(a.id)?.size || 0)
@@ -227,6 +286,7 @@ export const adjustTablePositions = ({
             y: number,
             currentTableId: string
         ): boolean => {
+            // Check overlap with other tables
             for (const [tableId, pos] of tablePositions) {
                 if (tableId === currentTableId) continue;
 
@@ -238,6 +298,26 @@ export const adjustTablePositions = ({
                     return true;
                 }
             }
+
+            // Check overlap with areas
+            const { width: currentWidth, height: currentHeight } =
+                getTableWidthAndHeight(currentTableId);
+            const buffer = 50; // Add buffer around areas to keep tables away
+
+            for (const area of areas) {
+                // Check if the table position would overlap with the area (with buffer)
+                if (
+                    !(
+                        x + currentWidth < area.x - buffer ||
+                        x > area.x + area.width + buffer ||
+                        y + currentHeight < area.y - buffer ||
+                        y > area.y + area.height + buffer
+                    )
+                ) {
+                    return true;
+                }
+            }
+
             return false;
         };
 
@@ -321,19 +401,80 @@ export const adjustTablePositions = ({
             });
         };
 
-        // Position tables
-        sortedTables.forEach((table, index) => {
-            if (!positionedTables.has(table.id)) {
-                const row = Math.floor(index / 6);
-                const col = index % 6;
-                const { width: tableWidth, height: tableHeight } =
-                    getTableWidthAndHeight(table.id);
+        // Position connected tables first
+        if (connectedTables.length < 100) {
+            // Use relationship-based positioning for small sets of connected tables
+            connectedTables.forEach((table, index) => {
+                if (!positionedTables.has(table.id)) {
+                    const row = Math.floor(index / 6);
+                    const col = index % 6;
+                    const { width: tableWidth, height: tableHeight } =
+                        getTableWidthAndHeight(table.id);
 
-                const x = startX + col * (tableWidth + gapX * 2);
-                const y = startY + row * (tableHeight + gapY * 2);
-                positionTable(table, x, y);
+                    const x = startX + col * (tableWidth + gapX * 2);
+                    const y = startY + row * (tableHeight + gapY * 2);
+                    positionTable(table, x, y);
+                }
+            });
+        } else {
+            // Use simple grid layout for large sets of connected tables
+            connectedTables.forEach((table, index) => {
+                if (!positionedTables.has(table.id)) {
+                    const row = Math.floor(index / 10); // More columns for large sets
+                    const col = index % 10;
+                    const { width: tableWidth, height: tableHeight } =
+                        getTableWidthAndHeight(table.id);
+
+                    const x = startX + col * (tableWidth + gapX);
+                    const y = startY + row * (tableHeight + gapY);
+
+                    // Direct positioning without relationship-based clustering
+                    const finalPos = findNonOverlappingPosition(x, y, table.id);
+                    table.x = finalPos.x;
+                    table.y = finalPos.y;
+                    tablePositions.set(table.id, { x: table.x, y: table.y });
+                    positionedTables.add(table.id);
+                }
+            });
+        }
+
+        // Find the bottommost position of connected tables for isolated table placement
+        let maxY = startY;
+        for (const pos of tablePositions.values()) {
+            const tableId = [...tablePositions.entries()].find(
+                ([, p]) => p === pos
+            )?.[0];
+            if (tableId) {
+                const { height } = getTableWidthAndHeight(tableId);
+                maxY = Math.max(maxY, pos.y + height);
             }
-        });
+        }
+
+        // Position isolated tables after connected ones
+        if (isolatedTables.length > 0) {
+            const isolatedStartY = maxY + gapY * 2;
+            const isolatedStartX = startX;
+
+            isolatedTables.forEach((table, index) => {
+                if (!positionedTables.has(table.id)) {
+                    const row = Math.floor(index / 8); // More columns for isolated tables
+                    const col = index % 8;
+                    const { width: tableWidth, height: tableHeight } =
+                        getTableWidthAndHeight(table.id);
+
+                    // Use a simple grid layout for isolated tables
+                    const x = isolatedStartX + col * (tableWidth + gapX);
+                    const y = isolatedStartY + row * (tableHeight + gapY);
+
+                    // Find non-overlapping position
+                    const finalPos = findNonOverlappingPosition(x, y, table.id);
+                    table.x = finalPos.x;
+                    table.y = finalPos.y;
+                    tablePositions.set(table.id, { x: table.x, y: table.y });
+                    positionedTables.add(table.id);
+                }
+            });
+        }
 
         // Apply positions to tables
         tablesToAdjust.forEach((table) => {
@@ -367,4 +508,37 @@ export const adjustTablePositions = ({
     }
 
     return tables;
+}
+
+export const calcTableHeight = (table?: DBTable): number => {
+    if (!table) {
+        return 300;
+    }
+
+    const FIELD_HEIGHT = 32; // h-8 per field
+    const TABLE_FOOTER_HEIGHT = 32; // h-8 for show more button
+    const TABLE_HEADER_HEIGHT = 42;
+    // Calculate how many fields are visible
+    const fieldCount = table.fields.length;
+    let visibleFieldCount = fieldCount;
+
+    // If not expanded, use minimum of field count and TABLE_MINIMIZED_FIELDS
+    if (!table.expanded) {
+        visibleFieldCount = Math.min(fieldCount, TABLE_MINIMIZED_FIELDS);
+    }
+
+    // Calculate height based on visible fields
+    const fieldsHeight = visibleFieldCount * FIELD_HEIGHT;
+    const showMoreButtonHeight =
+        fieldCount > TABLE_MINIMIZED_FIELDS ? TABLE_FOOTER_HEIGHT : 0;
+
+    return TABLE_HEADER_HEIGHT + fieldsHeight + showMoreButtonHeight;
+};
+
+export const getTableDimensions = (
+    table: DBTable
+): { width: number; height: number } => {
+    const height = calcTableHeight(table);
+    const width = table.width || MIN_TABLE_SIZE;
+    return { width, height };
 };

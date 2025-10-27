@@ -10,13 +10,11 @@ import { EmptyState } from '@/components/empty-state/empty-state';
 import { ScrollArea } from '@/components/scroll-area/scroll-area';
 import { useTranslation } from 'react-i18next';
 import { useViewport } from '@xyflow/react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { getOperatingSystem } from '@/lib/utils';
 
 export interface AreasSectionProps {}
 
 export const AreasSection: React.FC<AreasSectionProps> = () => {
-    const { createArea, areas } = useChartDB();
+    const { createArea, areas, readonly } = useChartDB();
     const viewport = useViewport();
     const { t } = useTranslation();
     const { openAreaFromSidebar } = useLayout();
@@ -59,19 +57,6 @@ export const AreasSection: React.FC<AreasSectionProps> = () => {
         setFilterText('');
     }, []);
 
-    const operatingSystem = useMemo(() => getOperatingSystem(), []);
-
-    useHotkeys(
-        operatingSystem === 'mac' ? 'meta+f' : 'ctrl+f',
-        () => {
-            filterInputRef.current?.focus();
-        },
-        {
-            preventDefault: true,
-        },
-        [filterInputRef]
-    );
-
     return (
         <section
             className="flex flex-1 flex-col overflow-hidden px-2"
@@ -88,14 +73,16 @@ export const AreasSection: React.FC<AreasSectionProps> = () => {
                         onChange={(e) => setFilterText(e.target.value)}
                     />
                 </div>
-                <Button
-                    variant="secondary"
-                    className="h-8 p-2 text-xs"
-                    onClick={handleCreateArea}
-                >
-                    <Group className="h-4" />
-                    {t('side_panel.areas_section.add_area')}
-                </Button>
+                {!readonly ? (
+                    <Button
+                        variant="secondary"
+                        className="h-8 p-2 text-xs"
+                        onClick={handleCreateArea}
+                    >
+                        <Group className="h-4" />
+                        {t('side_panel.areas_section.add_area')}
+                    </Button>
+                ) : null}
             </div>
             <div className="flex flex-1 flex-col overflow-hidden">
                 <ScrollArea className="h-full">

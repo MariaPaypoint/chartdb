@@ -2,11 +2,20 @@ import type { LanguageMetadata, LanguageTranslation } from '../types';
 
 export const id_ID: LanguageTranslation = {
     translation: {
+        editor_sidebar: {
+            new_diagram: 'Baru',
+            browse: 'Jelajahi',
+            tables: 'Tabel',
+            refs: 'Refs',
+            areas: 'Area',
+            dependencies: 'Ketergantungan',
+            custom_types: 'Tipe Kustom',
+        },
         menu: {
-            file: {
-                file: 'Berkas',
-                new: 'Buat Baru',
-                open: 'Buka',
+            actions: {
+                actions: 'Aksi',
+                new: 'Baru...',
+                browse: 'Jelajahi...',
                 save: 'Simpan',
                 import: 'Impor Database',
                 export_sql: 'Ekspor SQL',
@@ -27,7 +36,10 @@ export const id_ID: LanguageTranslation = {
                 hide_sidebar: 'Sembunyikan Sidebar',
                 hide_cardinality: 'Sembunyikan Kardinalitas',
                 show_cardinality: 'Tampilkan Kardinalitas',
+                hide_field_attributes: 'Sembunyikan Atribut Kolom',
+                show_field_attributes: 'Tampilkan Atribut Kolom',
                 zoom_on_scroll: 'Perbesar saat Scroll',
+                show_views: 'Tampilan Database',
                 theme: 'Tema',
                 show_dependencies: 'Tampilkan Dependensi',
                 hide_dependencies: 'Sembunyikan Dependensi',
@@ -90,20 +102,11 @@ export const id_ID: LanguageTranslation = {
         error_saving_to_minio: 'Kesalahan menyimpan ke MinIO',
 
         reorder_diagram_alert: {
-            title: 'Atur Ulang Diagram',
+            title: 'Atur Otomatis Diagram',
             description:
                 'Tindakan ini akan mengatur ulang semua tabel di diagram. Apakah Anda ingin melanjutkan?',
-            reorder: 'Atur Ulang',
+            reorder: 'Atur Otomatis',
             cancel: 'Batal',
-        },
-
-        multiple_schemas_alert: {
-            title: 'Schema Lebih dari satu',
-            description:
-                '{{schemasCount}} schema di diagram ini. Sedang ditampilkan: {{formattedSchemas}}.',
-            dont_show_again: 'Jangan tampilkan lagi',
-            change_schema: 'Ubah',
-            none: 'Tidak ada',
         },
 
         copy_to_clipboard_toast: {
@@ -140,14 +143,11 @@ export const id_ID: LanguageTranslation = {
         copied: 'Tersalin!',
 
         side_panel: {
-            schema: 'Skema:',
-            filter_by_schema: 'Saring berdasarkan skema',
-            search_schema: 'Cari skema...',
-            no_schemas_found: 'Tidak ada skema yang ditemukan.',
             view_all_options: 'Tampilkan Semua Pilihan...',
             tables_section: {
                 tables: 'Tabel',
                 add_table: 'Tambah Tabel',
+                add_view: 'Tambah Tampilan',
                 filter: 'Saring',
                 collapse: 'Lipat Semua',
                 // TODO: Translate
@@ -173,16 +173,23 @@ export const id_ID: LanguageTranslation = {
                     field_actions: {
                         title: 'Atribut Kolom',
                         unique: 'Unik',
+                        auto_increment: 'Kenaikan Otomatis',
                         comments: 'Komentar',
                         no_comments: 'Tidak ada komentar',
                         delete_field: 'Hapus Kolom',
                         // TODO: Translate
+                        default_value: 'Default Value',
+                        no_default: 'No default',
+                        // TODO: Translate
                         character_length: 'Max Length',
+                        precision: 'Presisi',
+                        scale: 'Skala',
                     },
                     index_actions: {
                         title: 'Atribut Indeks',
                         name: 'Nama',
                         unique: 'Unik',
+                        index_type: 'Tipe Indeks',
                         delete_index: 'Hapus Indeks',
                     },
                     table_actions: {
@@ -199,12 +206,15 @@ export const id_ID: LanguageTranslation = {
                     description: 'Buat tabel untuk memulai',
                 },
             },
-            relationships_section: {
-                relationships: 'Hubungan',
+            refs_section: {
+                refs: 'Refs',
                 filter: 'Saring',
-                add_relationship: 'Tambah Hubungan',
                 collapse: 'Lipat Semua',
+                add_relationship: 'Tambah Hubungan',
+                relationships: 'Hubungan',
+                dependencies: 'Dependensi',
                 relationship: {
+                    relationship: 'Hubungan',
                     primary: 'Tabel Primer',
                     foreign: 'Tabel Referensi',
                     cardinality: 'Kardinalitas',
@@ -214,16 +224,8 @@ export const id_ID: LanguageTranslation = {
                         delete_relationship: 'Hapus',
                     },
                 },
-                empty_state: {
-                    title: 'Tidak ada hubungan',
-                    description: 'Buat hubungan untuk menghubungkan tabel',
-                },
-            },
-            dependencies_section: {
-                dependencies: 'Dependensi',
-                filter: 'Saring',
-                collapse: 'Lipat Semua',
                 dependency: {
+                    dependency: 'Dependensi',
                     table: 'Tabel',
                     dependent_table: 'Tampilan Dependen',
                     delete_dependency: 'Hapus',
@@ -233,8 +235,8 @@ export const id_ID: LanguageTranslation = {
                     },
                 },
                 empty_state: {
-                    title: 'Tidak ada dependensi',
-                    description: 'Buat tampilan untuk memulai',
+                    title: 'Tidak ada hubungan',
+                    description: 'Buat hubungan untuk memulai',
                 },
             },
 
@@ -274,12 +276,16 @@ export const id_ID: LanguageTranslation = {
                     enum_values: 'Enum Values',
                     composite_fields: 'Fields',
                     no_fields: 'No fields defined',
+                    no_values: 'Tidak ada nilai enum yang ditentukan',
                     field_name_placeholder: 'Field name',
                     field_type_placeholder: 'Select type',
                     add_field: 'Add Field',
+                    no_fields_tooltip: 'No fields defined for this custom type',
                     custom_type_actions: {
                         title: 'Actions',
+                        highlight_fields: 'Highlight Fields',
                         delete_custom_type: 'Delete',
+                        clear_field_highlight: 'Clear Highlight',
                     },
                     delete_custom_type: 'Delete Type',
                 },
@@ -293,8 +299,14 @@ export const id_ID: LanguageTranslation = {
             show_all: 'Tampilkan Semua',
             undo: 'Undo',
             redo: 'Redo',
-            reorder_diagram: 'Atur Ulang Diagram',
+            reorder_diagram: 'Atur Otomatis Diagram',
+            // TODO: Translate
+            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            custom_type_highlight_tooltip:
+                'Highlighting "{{typeName}}" - Click to clear',
             highlight_overlapping_tables: 'Sorot Tabel yang Tumpang Tindih',
+            // TODO: Translate
+            filter: 'Filter Tables',
         },
 
         new_diagram_dialog: {
@@ -326,13 +338,13 @@ export const id_ID: LanguageTranslation = {
             cancel: 'Batal',
             import_from_file: 'Impor dari file',
             back: 'Kembali',
-            empty_diagram: 'Diagram Kosong',
+            empty_diagram: 'Database Kosong',
             continue: 'Lanjutkan',
             import: 'Impor',
         },
 
         open_diagram_dialog: {
-            title: 'Buka Diagram',
+            title: 'Buka Database',
             description: 'Pilih diagram untuk dibuka dari daftar di bawah.',
             table_columns: {
                 name: 'Name',
@@ -342,6 +354,12 @@ export const id_ID: LanguageTranslation = {
             },
             cancel: 'Batal',
             open: 'Buka',
+
+            diagram_actions: {
+                open: 'Buka',
+                duplicate: 'Duplikat',
+                delete: 'Hapus',
+            },
         },
 
         export_sql_dialog: {
@@ -431,6 +449,14 @@ export const id_ID: LanguageTranslation = {
             confirm: 'Ubah',
         },
 
+        create_table_schema_dialog: {
+            title: 'Buat Skema Baru',
+            description:
+                'Belum ada skema yang tersedia. Buat skema pertama Anda untuk mengatur tabel-tabel Anda.',
+            create: 'Buat',
+            cancel: 'Batal',
+        },
+
         star_us_dialog: {
             title: 'Bantu kami meningkatkan!',
             description:
@@ -505,6 +531,7 @@ export const id_ID: LanguageTranslation = {
 
         canvas_context_menu: {
             new_table: 'Tabel Baru',
+            new_view: 'Tampilan Baru',
             new_relationship: 'Hubungan Baru',
             // TODO: Translate
             new_area: 'New Area',
@@ -526,6 +553,9 @@ export const id_ID: LanguageTranslation = {
         language_select: {
             change_language: 'Bahasa',
         },
+
+        on: 'Aktif',
+        off: 'Nonaktif',
     },
 };
 

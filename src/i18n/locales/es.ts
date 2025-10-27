@@ -2,11 +2,20 @@ import type { LanguageMetadata, LanguageTranslation } from '../types';
 
 export const es: LanguageTranslation = {
     translation: {
+        editor_sidebar: {
+            new_diagram: 'Nuevo',
+            browse: 'Examinar',
+            tables: 'Tablas',
+            refs: 'Refs',
+            areas: 'Áreas',
+            dependencies: 'Dependencias',
+            custom_types: 'Tipos Personalizados',
+        },
         menu: {
-            file: {
-                file: 'Archivo',
-                new: 'Nuevo',
-                open: 'Abrir',
+            actions: {
+                actions: 'Acciones',
+                new: 'Nuevo...',
+                browse: 'Examinar...',
                 save: 'Guardar',
                 import: 'Importar Base de Datos',
                 export_sql: 'Exportar SQL',
@@ -25,9 +34,12 @@ export const es: LanguageTranslation = {
                 view: 'Ver',
                 hide_cardinality: 'Ocultar Cardinalidad',
                 show_cardinality: 'Mostrar Cardinalidad',
+                show_field_attributes: 'Mostrar Atributos de Campo',
+                hide_field_attributes: 'Ocultar Atributos de Campo',
                 show_sidebar: 'Mostrar Barra Lateral',
                 hide_sidebar: 'Ocultar Barra Lateral',
                 zoom_on_scroll: 'Zoom al Desplazarse',
+                show_views: 'Vistas de Base de Datos',
                 theme: 'Tema',
                 show_dependencies: 'Mostrar dependencias',
                 hide_dependencies: 'Ocultar dependencias',
@@ -90,10 +102,10 @@ export const es: LanguageTranslation = {
         error_saving_to_minio: 'Error al guardar en MinIO',
 
         reorder_diagram_alert: {
-            title: 'Reordenar Diagrama',
+            title: 'Organizar Diagrama Automáticamente',
             description:
                 'Esta acción reorganizará todas las tablas en el diagrama. ¿Deseas continuar?',
-            reorder: 'Reordenar',
+            reorder: 'Organizar Automáticamente',
             cancel: 'Cancelar',
         },
 
@@ -131,14 +143,11 @@ export const es: LanguageTranslation = {
         copied: 'Copied!',
 
         side_panel: {
-            schema: 'Esquema:',
-            filter_by_schema: 'Filtrar por esquema',
-            search_schema: 'Buscar esquema...',
-            no_schemas_found: 'No se encontraron esquemas.',
             view_all_options: 'Ver todas las opciones...',
             tables_section: {
                 tables: 'Tablas',
                 add_table: 'Agregar Tabla',
+                add_view: 'Agregar Vista',
                 filter: 'Filtrar',
                 collapse: 'Colapsar Todo',
                 // TODO: Translate
@@ -164,16 +173,23 @@ export const es: LanguageTranslation = {
                     field_actions: {
                         title: 'Atributos del Campo',
                         unique: 'Único',
+                        auto_increment: 'Autoincremento',
                         comments: 'Comentarios',
                         no_comments: 'Sin comentarios',
                         delete_field: 'Eliminar Campo',
                         // TODO: Translate
+                        default_value: 'Default Value',
+                        no_default: 'No default',
+                        // TODO: Translate
                         character_length: 'Max Length',
+                        precision: 'Precisión',
+                        scale: 'Escala',
                     },
                     index_actions: {
                         title: 'Atributos del Índice',
                         name: 'Nombre',
                         unique: 'Único',
+                        index_type: 'Tipo de Índice',
                         delete_index: 'Eliminar Índice',
                     },
                     table_actions: {
@@ -190,14 +206,17 @@ export const es: LanguageTranslation = {
                     description: 'Crea una tabla para comenzar',
                 },
             },
-            relationships_section: {
-                relationships: 'Relaciones',
-                add_relationship: 'Agregar Relación',
+            refs_section: {
+                refs: 'Refs',
                 filter: 'Filtrar',
                 collapse: 'Colapsar Todo',
+                add_relationship: 'Agregar Relación',
+                relationships: 'Relaciones',
+                dependencies: 'Dependencias',
                 relationship: {
-                    primary: 'Primaria',
-                    foreign: 'Foránea',
+                    relationship: 'Relación',
+                    primary: 'Tabla Primaria',
+                    foreign: 'Tabla Referenciada',
                     cardinality: 'Cardinalidad',
                     delete_relationship: 'Eliminar',
                     relationship_actions: {
@@ -205,18 +224,10 @@ export const es: LanguageTranslation = {
                         delete_relationship: 'Eliminar',
                     },
                 },
-                empty_state: {
-                    title: 'No hay relaciones',
-                    description: 'Crea una relación para conectar tablas',
-                },
-            },
-            dependencies_section: {
-                dependencies: 'Dependencias',
-                filter: 'Filtro',
-                collapse: 'Colapsar todo',
                 dependency: {
+                    dependency: 'Dependencia',
                     table: 'Tabla',
-                    dependent_table: 'Vista dependiente',
+                    dependent_table: 'Vista Dependiente',
                     delete_dependency: 'Eliminar',
                     dependency_actions: {
                         title: 'Acciones',
@@ -224,8 +235,8 @@ export const es: LanguageTranslation = {
                     },
                 },
                 empty_state: {
-                    title: 'Sin dependencias',
-                    description: 'Crea una vista para comenzar',
+                    title: 'Sin relaciones',
+                    description: 'Crea una relación para comenzar',
                 },
             },
 
@@ -265,12 +276,16 @@ export const es: LanguageTranslation = {
                     enum_values: 'Enum Values',
                     composite_fields: 'Fields',
                     no_fields: 'No fields defined',
+                    no_values: 'No hay valores de enum definidos',
                     field_name_placeholder: 'Field name',
                     field_type_placeholder: 'Select type',
                     add_field: 'Add Field',
+                    no_fields_tooltip: 'No fields defined for this custom type',
                     custom_type_actions: {
                         title: 'Actions',
+                        highlight_fields: 'Highlight Fields',
                         delete_custom_type: 'Delete',
+                        clear_field_highlight: 'Clear Highlight',
                     },
                     delete_custom_type: 'Delete Type',
                 },
@@ -284,8 +299,14 @@ export const es: LanguageTranslation = {
             show_all: 'Mostrar Todo',
             undo: 'Deshacer',
             redo: 'Rehacer',
-            reorder_diagram: 'Reordenar Diagrama',
+            reorder_diagram: 'Organizar Diagrama Automáticamente',
+            // TODO: Translate
+            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            custom_type_highlight_tooltip:
+                'Highlighting "{{typeName}}" - Click to clear',
             highlight_overlapping_tables: 'Resaltar tablas superpuestas',
+            // TODO: Translate
+            filter: 'Filter Tables',
         },
 
         new_diagram_dialog: {
@@ -318,13 +339,13 @@ export const es: LanguageTranslation = {
             back: 'Atrás',
             // TODO: Translate
             import_from_file: 'Import from File',
-            empty_diagram: 'Diagrama vacío',
+            empty_diagram: 'Base de datos vacía',
             continue: 'Continuar',
             import: 'Importar',
         },
 
         open_diagram_dialog: {
-            title: 'Abrir Diagrama',
+            title: 'Abrir Base de Datos',
             description:
                 'Selecciona un diagrama para abrir de la lista a continuación.',
             table_columns: {
@@ -335,6 +356,12 @@ export const es: LanguageTranslation = {
             },
             cancel: 'Cancelar',
             open: 'Abrir',
+
+            diagram_actions: {
+                open: 'Abrir',
+                duplicate: 'Duplicar',
+                delete: 'Eliminar',
+            },
         },
 
         export_sql_dialog: {
@@ -424,6 +451,13 @@ export const es: LanguageTranslation = {
             cancel: 'Cancelar',
             confirm: 'Cambiar',
         },
+        create_table_schema_dialog: {
+            title: 'Crear Nuevo Esquema',
+            description:
+                'Aún no existen esquemas. Crea tu primer esquema para organizar tus tablas.',
+            create: 'Crear',
+            cancel: 'Cancelar',
+        },
 
         star_us_dialog: {
             title: '¡Ayúdanos a mejorar!',
@@ -433,14 +467,6 @@ export const es: LanguageTranslation = {
             confirm: '¡Claro!',
         },
 
-        multiple_schemas_alert: {
-            title: 'Múltiples Esquemas',
-            description:
-                '{{schemasCount}} esquemas en este diagrama. Actualmente mostrando: {{formattedSchemas}}.',
-            dont_show_again: 'No mostrar de nuevo',
-            change_schema: 'Cambiar',
-            none: 'nada',
-        },
         // TODO: Translate
         export_diagram_dialog: {
             title: 'Export Diagram',
@@ -510,6 +536,7 @@ export const es: LanguageTranslation = {
 
         canvas_context_menu: {
             new_table: 'Nueva Tabla',
+            new_view: 'Nueva Vista',
             new_relationship: 'Nueva Relación',
             // TODO: Translate
             new_area: 'New Area',
@@ -532,6 +559,9 @@ export const es: LanguageTranslation = {
         language_select: {
             change_language: 'Idioma',
         },
+
+        on: 'Encendido',
+        off: 'Apagado',
     },
 };
 

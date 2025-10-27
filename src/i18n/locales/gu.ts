@@ -2,11 +2,20 @@ import type { LanguageMetadata, LanguageTranslation } from '../types';
 
 export const gu: LanguageTranslation = {
     translation: {
+        editor_sidebar: {
+            new_diagram: 'નવું',
+            browse: 'બ્રાઉજ',
+            tables: 'ટેબલો',
+            refs: 'રેફ્સ',
+            areas: 'ક્ષેત્રો',
+            dependencies: 'નિર્ભરતાઓ',
+            custom_types: 'કસ્ટમ ટાઇપ',
+        },
         menu: {
-            file: {
-                file: 'ફાઇલ',
-                new: 'નવું',
-                open: 'ખોલો',
+            actions: {
+                actions: 'ક્રિયાઓ',
+                new: 'નવું...',
+                browse: 'બ્રાઉજ કરો...',
                 save: 'સાચવો',
                 import: 'ડેટાબેસ આયાત કરો',
                 export_sql: 'SQL નિકાસ કરો',
@@ -27,7 +36,10 @@ export const gu: LanguageTranslation = {
                 hide_sidebar: 'સાઇડબાર છુપાવો',
                 hide_cardinality: 'કાર્ડિનાલિટી છુપાવો',
                 show_cardinality: 'કાર્ડિનાલિટી બતાવો',
+                hide_field_attributes: 'ફીલ્ડ અટ્રિબ્યુટ્સ છુપાવો',
+                show_field_attributes: 'ફીલ્ડ અટ્રિબ્યુટ્સ બતાવો',
                 zoom_on_scroll: 'સ્ક્રોલ પર ઝૂમ કરો',
+                show_views: 'ડેટાબેઝ વ્યૂઝ',
                 theme: 'થિમ',
                 show_dependencies: 'નિર્ભરતાઓ બતાવો',
                 hide_dependencies: 'નિર્ભરતાઓ છુપાવો',
@@ -90,20 +102,11 @@ export const gu: LanguageTranslation = {
         error_saving_to_minio: 'MinIO પર સાચવવામાં ભૂલ',
 
         reorder_diagram_alert: {
-            title: 'ડાયાગ્રામ ફરી વ્યવસ્થિત કરો',
+            title: 'ડાયાગ્રામ ઑટોમેટિક ગોઠવો',
             description:
                 'આ ક્રિયા ડાયાગ્રામમાં બધી ટેબલ્સને ફરીથી વ્યવસ્થિત કરશે. શું તમે ચાલુ રાખવા માંગો છો?',
-            reorder: 'ફરી વ્યવસ્થિત કરો',
+            reorder: 'ઑટોમેટિક ગોઠવો',
             cancel: 'રદ કરો',
-        },
-
-        multiple_schemas_alert: {
-            title: 'કઈંક વધારે સ્કીમા',
-            description:
-                '{{schemasCount}} સ્કીમા આ ડાયાગ્રામમાં છે. હાલમાં દર્શાવેલ છે: {{formattedSchemas}}.',
-            dont_show_again: 'ફરીથી ન બતાવો',
-            change_schema: 'બદલો',
-            none: 'કઈ નહીં',
         },
 
         copy_to_clipboard_toast: {
@@ -140,14 +143,11 @@ export const gu: LanguageTranslation = {
         copied: 'નકલ થયું!',
 
         side_panel: {
-            schema: 'સ્કીમા:',
-            filter_by_schema: 'સ્કીમા દ્વારા ફિલ્ટર કરો',
-            search_schema: 'સ્કીમા શોધો...',
-            no_schemas_found: 'કોઈ સ્કીમા મળ્યા નથી.',
             view_all_options: 'બધા વિકલ્પો જુઓ...',
             tables_section: {
                 tables: 'ટેબલ્સ',
                 add_table: 'ટેબલ ઉમેરો',
+                add_view: 'વ્યૂ ઉમેરો',
                 filter: 'ફિલ્ટર',
                 collapse: 'બધાને સકુચિત કરો',
                 // TODO: Translate
@@ -174,16 +174,23 @@ export const gu: LanguageTranslation = {
                     field_actions: {
                         title: 'ફીલ્ડ લક્ષણો',
                         unique: 'અદ્વિતીય',
+                        auto_increment: 'ઑટો ઇન્ક્રિમેન્ટ',
                         comments: 'ટિપ્પણીઓ',
                         no_comments: 'કોઈ ટિપ્પણીઓ નથી',
                         delete_field: 'ફીલ્ડ કાઢી નાખો',
                         // TODO: Translate
+                        default_value: 'Default Value',
+                        no_default: 'No default',
+                        // TODO: Translate
                         character_length: 'Max Length',
+                        precision: 'ચોકસાઈ',
+                        scale: 'માપ',
                     },
                     index_actions: {
                         title: 'ઇન્ડેક્સ લક્ષણો',
                         name: 'નામ',
                         unique: 'અદ્વિતીય',
+                        index_type: 'ઇન્ડેક્સ પ્રકાર',
                         delete_index: 'ઇન્ડેક્સ કાઢી નાખો',
                     },
                     table_actions: {
@@ -200,14 +207,17 @@ export const gu: LanguageTranslation = {
                     description: 'શરૂ કરવા માટે એક ટેબલ બનાવો',
                 },
             },
-            relationships_section: {
-                relationships: 'સંબંધો',
+            refs_section: {
+                refs: 'રેફ્સ',
                 filter: 'ફિલ્ટર',
-                add_relationship: 'સંબંધ ઉમેરો',
                 collapse: 'બધાને સકુચિત કરો',
+                add_relationship: 'સંબંધ ઉમેરો',
+                relationships: 'સંબંધો',
+                dependencies: 'નિર્ભરતાઓ',
                 relationship: {
+                    relationship: 'સંબંધ',
                     primary: 'પ્રાથમિક ટેબલ',
-                    foreign: 'સંદર્ભ ટેબલ',
+                    foreign: 'સંદર્ભિત ટેબલ',
                     cardinality: 'કાર્ડિનાલિટી',
                     delete_relationship: 'કાઢી નાખો',
                     relationship_actions: {
@@ -215,27 +225,19 @@ export const gu: LanguageTranslation = {
                         delete_relationship: 'કાઢી નાખો',
                     },
                 },
-                empty_state: {
-                    title: 'કોઈ સંબંધો નથી',
-                    description: 'ટેબલ્સ કનેક્ટ કરવા માટે એક સંબંધ બનાવો',
-                },
-            },
-            dependencies_section: {
-                dependencies: 'નિર્ભરતાઓ',
-                filter: 'ફિલ્ટર',
-                collapse: 'સિકોડો',
                 dependency: {
+                    dependency: 'નિર્ભરતા',
                     table: 'ટેબલ',
-                    dependent_table: 'આધાર રાખેલું ટેબલ',
-                    delete_dependency: 'નિર્ભરતા કાઢી નાખો',
+                    dependent_table: 'નિર્ભરશીલ વ્યૂ',
+                    delete_dependency: 'કાઢી નાખો',
                     dependency_actions: {
                         title: 'ક્રિયાઓ',
-                        delete_dependency: 'નિર્ભરતા કાઢી નાખો',
+                        delete_dependency: 'કાઢી નાખો',
                     },
                 },
                 empty_state: {
-                    title: 'કોઈ નિર્ભરતાઓ નથી',
-                    description: 'આ વિભાગમાં કોઈ નિર્ભરતા ઉપલબ્ધ નથી.',
+                    title: 'કોઈ સંબંધો નથી',
+                    description: 'શરૂ કરવા માટે એક સંબંધ બનાવો',
                 },
             },
 
@@ -275,12 +277,16 @@ export const gu: LanguageTranslation = {
                     enum_values: 'Enum Values',
                     composite_fields: 'Fields',
                     no_fields: 'No fields defined',
+                    no_values: 'કોઈ enum મૂલ્યો વ્યાખ્યાયિત નથી',
                     field_name_placeholder: 'Field name',
                     field_type_placeholder: 'Select type',
                     add_field: 'Add Field',
+                    no_fields_tooltip: 'No fields defined for this custom type',
                     custom_type_actions: {
                         title: 'Actions',
+                        highlight_fields: 'Highlight Fields',
                         delete_custom_type: 'Delete',
+                        clear_field_highlight: 'Clear Highlight',
                     },
                     delete_custom_type: 'Delete Type',
                 },
@@ -294,8 +300,14 @@ export const gu: LanguageTranslation = {
             show_all: 'બધું બતાવો',
             undo: 'અનડુ',
             redo: 'રીડુ',
-            reorder_diagram: 'ડાયાગ્રામ ફરીથી વ્યવસ્થિત કરો',
+            reorder_diagram: 'ડાયાગ્રામ ઑટોમેટિક ગોઠવો',
+            // TODO: Translate
+            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            custom_type_highlight_tooltip:
+                'Highlighting "{{typeName}}" - Click to clear',
             highlight_overlapping_tables: 'ઓવરલેપ કરતો ટેબલ હાઇલાઇટ કરો',
+            // TODO: Translate
+            filter: 'Filter Tables',
         },
 
         new_diagram_dialog: {
@@ -326,13 +338,13 @@ export const gu: LanguageTranslation = {
             cancel: 'રદ કરો',
             back: 'પાછા',
             import_from_file: 'ફાઇલમાંથી આયાત કરો',
-            empty_diagram: 'ખાલી ડાયાગ્રામ',
+            empty_diagram: 'ખાલી ડેટાબેસ',
             continue: 'ચાલુ રાખો',
             import: 'આયાત કરો',
         },
 
         open_diagram_dialog: {
-            title: 'ડાયાગ્રામ ખોલો',
+            title: 'ડેટાબેસ ખોલો',
             description: 'નીચેની યાદીમાંથી એક ડાયાગ્રામ પસંદ કરો.',
             table_columns: {
                 name: 'નામ',
@@ -342,6 +354,12 @@ export const gu: LanguageTranslation = {
             },
             cancel: 'રદ કરો',
             open: 'ખોલો',
+
+            diagram_actions: {
+                open: 'ખોલો',
+                duplicate: 'ડુપ્લિકેટ',
+                delete: 'કાઢી નાખો',
+            },
         },
 
         export_sql_dialog: {
@@ -431,6 +449,14 @@ export const gu: LanguageTranslation = {
             confirm: 'બદલો',
         },
 
+        create_table_schema_dialog: {
+            title: 'નવું સ્કીમા બનાવો',
+            description:
+                'હજી સુધી કોઈ સ્કીમા અસ્તિત્વમાં નથી. તમારા ટેબલ્સ ને વ્યવસ્થિત કરવા માટે તમારું પહેલું સ્કીમા બનાવો.',
+            create: 'બનાવો',
+            cancel: 'રદ કરો',
+        },
+
         star_us_dialog: {
             title: 'અમને સુધારવામાં મદદ કરો!',
             description:
@@ -504,6 +530,7 @@ export const gu: LanguageTranslation = {
 
         canvas_context_menu: {
             new_table: 'નવું ટેબલ',
+            new_view: 'નવું વ્યૂ',
             new_relationship: 'નવો સંબંધ',
             // TODO: Translate
             new_area: 'New Area',
@@ -525,6 +552,9 @@ export const gu: LanguageTranslation = {
         language_select: {
             change_language: 'ભાષા બદલો',
         },
+
+        on: 'ચાલુ',
+        off: 'બંધ',
     },
 };
 

@@ -78,8 +78,8 @@ export interface ChartDBContext {
     events: EventEmitter<ChartDBEvent>;
     readonly?: boolean;
 
-    filteredSchemas?: string[];
-    filterSchemas: (schemaIds: string[]) => void;
+    highlightedCustomType?: DBCustomType;
+    highlightCustomTypeId: (id?: string) => void;
 
     // General operations
     updateDiagramId: (id: string) => Promise<void>;
@@ -92,6 +92,10 @@ export interface ChartDBContext {
     updateDiagramUpdatedAt: () => Promise<void>;
     clearDiagramData: () => Promise<void>;
     deleteDiagram: () => Promise<void>;
+    updateDiagramData: (
+        diagram: Diagram,
+        options?: { forceUpdateStorage?: boolean }
+    ) => Promise<void>;
 
     // Database type operations
     updateDatabaseType: (databaseType: DatabaseType) => Promise<void>;
@@ -289,8 +293,7 @@ export const chartDBContext = createContext<ChartDBContext>({
     areas: [],
     customTypes: [],
     schemas: [],
-    filteredSchemas: [],
-    filterSchemas: emptyFn,
+    highlightCustomTypeId: emptyFn,
     currentDiagram: {
         id: '',
         name: '',
@@ -308,6 +311,7 @@ export const chartDBContext = createContext<ChartDBContext>({
     loadDiagramFromData: emptyFn,
     clearDiagramData: emptyFn,
     deleteDiagram: emptyFn,
+    updateDiagramData: emptyFn,
 
     // Database type operations
     updateDatabaseType: emptyFn,

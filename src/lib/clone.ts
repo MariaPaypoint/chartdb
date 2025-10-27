@@ -1,3 +1,4 @@
+import type { DBCustomType } from './domain';
 import type { Area } from './domain/area';
 import type { DBDependency } from './domain/db-dependency';
 import type { DBField } from './domain/db-field';
@@ -46,6 +47,10 @@ const generateIdsMapFromDiagram = (
 
     diagram.areas?.forEach((area) => {
         idsMap.set(area.id, generateId());
+    });
+
+    diagram.customTypes?.forEach((customType) => {
+        idsMap.set(customType.id, generateId());
     });
 
     return idsMap;
@@ -124,7 +129,7 @@ export const cloneDiagram = (
     } = {
         generateId: defaultGenerateId,
     }
-): Diagram => {
+): { diagram: Diagram; idsMap: Map<string, string> } => {
     const { generateId } = options;
     const diagramId = generateId();
 
@@ -213,14 +218,38 @@ export const cloneDiagram = (
             })
             .filter((area): area is Area => area !== null) ?? [];
 
+    const customTypes: DBCustomType[] =
+        diagram.customTypes
+            ?.map((customType) => {
+                const id = getNewId(customType.id);
+                if (!id) {
+                    return null;
+                }
+                return {
+                    ...customType,
+                    id,
+                } satisfies DBCustomType;
+            })
+            .filter(
+                (customType): customType is DBCustomType => customType !== null
+            ) ?? [];
+
     return {
-        ...diagram,
-        id: diagramId,
-        dependencies,
-        relationships,
-        tables,
-        areas,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        diagram: {
+            ...diagram,
+            id: diagramId,
+            dependencies,
+            relationships,
+            tables,
+            areas,
+            customTypes,
+            createdAt: diagram.createdAt
+                ? new Date(diagram.createdAt)
+                : new Date(),
+            updatedAt: diagram.updatedAt
+                ? new Date(diagram.updatedAt)
+                : new Date(),
+        },
+        idsMap,
     };
 };

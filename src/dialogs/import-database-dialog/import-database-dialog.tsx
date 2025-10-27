@@ -7,7 +7,7 @@ import type { DatabaseEdition } from '@/lib/domain/database-edition';
 import type { DatabaseMetadata } from '@/lib/data/import-metadata/metadata-types/database-metadata';
 import { loadDatabaseMetadata } from '@/lib/data/import-metadata/metadata-types/database-metadata';
 import type { Diagram } from '@/lib/domain/diagram';
-import { loadFromDatabaseMetadata } from '@/lib/domain/diagram';
+import { loadFromDatabaseMetadata } from '@/lib/data/import-metadata/import';
 import { useChartDB } from '@/hooks/use-chartdb';
 import { useRedoUndoStack } from '@/hooks/use-redo-undo-stack';
 import { Trans, useTranslation } from 'react-i18next';
@@ -15,6 +15,8 @@ import { useReactFlow } from '@xyflow/react';
 import type { BaseDialogProps } from '../common/base-dialog-props';
 import { useAlert } from '@/context/alert-context/alert-context';
 import { sqlImportToDiagram } from '@/lib/data/sql-import';
+import { importDBMLToDiagram } from '@/lib/dbml/dbml-import/dbml-import';
+import type { ImportMethod } from '@/lib/import-method/import-method';
 
 export interface ImportDatabaseDialogProps extends BaseDialogProps {
     databaseType: DatabaseType;
@@ -24,7 +26,7 @@ export const ImportDatabaseDialog: React.FC<ImportDatabaseDialogProps> = ({
     dialog,
     databaseType,
 }) => {
-    const [importMethod, setImportMethod] = useState<'query' | 'ddl'>('query');
+    const [importMethod, setImportMethod] = useState<ImportMethod>('query');
     const { closeImportDatabaseDialog } = useDialog();
     const { showAlert } = useAlert();
     const {
@@ -64,6 +66,10 @@ export const ImportDatabaseDialog: React.FC<ImportDatabaseDialogProps> = ({
                 sqlContent: scriptResult,
                 sourceDatabaseType: databaseType,
                 targetDatabaseType: databaseType,
+            });
+        } else if (importMethod === 'dbml') {
+            diagram = await importDBMLToDiagram(scriptResult, {
+                databaseType,
             });
         } else {
             const databaseMetadata: DatabaseMetadata =

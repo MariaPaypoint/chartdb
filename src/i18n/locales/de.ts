@@ -2,11 +2,20 @@ import type { LanguageMetadata, LanguageTranslation } from '../types';
 
 export const de: LanguageTranslation = {
     translation: {
+        editor_sidebar: {
+            new_diagram: 'Neu',
+            browse: 'Durchsuchen',
+            tables: 'Tabellen',
+            refs: 'Refs',
+            areas: 'Bereiche',
+            dependencies: 'Abhängigkeiten',
+            custom_types: 'Benutzerdefinierte Typen',
+        },
         menu: {
-            file: {
-                file: 'Datei',
-                new: 'Neu',
-                open: 'Öffnen',
+            actions: {
+                actions: 'Aktionen',
+                new: 'Neu...',
+                browse: 'Durchsuchen...',
                 save: 'Speichern',
                 import: 'Datenbank importieren',
                 export_sql: 'SQL exportieren',
@@ -27,7 +36,10 @@ export const de: LanguageTranslation = {
                 hide_sidebar: 'Seitenleiste ausblenden',
                 hide_cardinality: 'Kardinalität ausblenden',
                 show_cardinality: 'Kardinalität anzeigen',
+                hide_field_attributes: 'Feldattribute ausblenden',
+                show_field_attributes: 'Feldattribute anzeigen',
                 zoom_on_scroll: 'Zoom beim Scrollen',
+                show_views: 'Datenbankansichten',
                 theme: 'Stil',
                 show_dependencies: 'Abhängigkeiten anzeigen',
                 hide_dependencies: 'Abhängigkeiten ausblenden',
@@ -91,20 +103,11 @@ export const de: LanguageTranslation = {
         error_saving_to_minio: 'Fehler beim Speichern in MinIO',
 
         reorder_diagram_alert: {
-            title: 'Diagramm neu anordnen',
+            title: 'Diagramm automatisch anordnen',
             description:
                 'Diese Aktion wird alle Tabellen im Diagramm neu anordnen. Möchten Sie fortfahren?',
-            reorder: 'Neu anordnen',
+            reorder: 'Automatisch anordnen',
             cancel: 'Abbrechen',
-        },
-
-        multiple_schemas_alert: {
-            title: 'Mehrere Schemas',
-            description:
-                '{{schemasCount}} Schemas in diesem Diagramm. Derzeit angezeigt: {{formattedSchemas}}.',
-            dont_show_again: 'Nicht erneut anzeigen',
-            change_schema: 'Schema ändern',
-            none: 'Keine',
         },
 
         copy_to_clipboard_toast: {
@@ -142,14 +145,11 @@ export const de: LanguageTranslation = {
         copied: 'Kopiert!',
 
         side_panel: {
-            schema: 'Schema:',
-            filter_by_schema: 'Nach Schema filtern',
-            search_schema: 'Schema suchen...',
-            no_schemas_found: 'Keine Schemas gefunden.',
             view_all_options: 'Alle Optionen anzeigen...',
             tables_section: {
                 tables: 'Tabellen',
                 add_table: 'Tabelle hinzufügen',
+                add_view: 'Ansicht hinzufügen',
                 filter: 'Filter',
                 collapse: 'Alle einklappen',
                 // TODO: Translate
@@ -175,16 +175,23 @@ export const de: LanguageTranslation = {
                     field_actions: {
                         title: 'Feldattribute',
                         unique: 'Eindeutig',
+                        auto_increment: 'Automatisch hochzählen',
                         comments: 'Kommentare',
                         no_comments: 'Keine Kommentare',
                         delete_field: 'Feld löschen',
                         // TODO: Translate
+                        default_value: 'Default Value',
+                        no_default: 'No default',
+                        // TODO: Translate
                         character_length: 'Max Length',
+                        precision: 'Präzision',
+                        scale: 'Skalierung',
                     },
                     index_actions: {
                         title: 'Indexattribute',
                         name: 'Name',
                         unique: 'Eindeutig',
+                        index_type: 'Indextyp',
                         delete_index: 'Index löschen',
                     },
                     table_actions: {
@@ -201,32 +208,26 @@ export const de: LanguageTranslation = {
                     description: 'Erstellen Sie eine Tabelle, um zu beginnen',
                 },
             },
-            relationships_section: {
-                relationships: 'Beziehungen',
+            refs_section: {
+                refs: 'Refs',
                 filter: 'Filter',
-                add_relationship: 'Beziehung hinzufügen',
                 collapse: 'Alle einklappen',
+                add_relationship: 'Beziehung hinzufügen',
+                relationships: 'Beziehungen',
+                dependencies: 'Abhängigkeiten',
                 relationship: {
+                    relationship: 'Beziehung',
                     primary: 'Primäre Tabelle',
                     foreign: 'Referenzierte Tabelle',
                     cardinality: 'Kardinalität',
-                    delete_relationship: 'Beziehung löschen',
+                    delete_relationship: 'Löschen',
                     relationship_actions: {
                         title: 'Aktionen',
-                        delete_relationship: 'Beziehung löschen',
+                        delete_relationship: 'Löschen',
                     },
                 },
-                empty_state: {
-                    title: 'Keine Beziehungen',
-                    description:
-                        'Erstellen Sie eine Beziehung, um Tabellen zu verbinden',
-                },
-            },
-            dependencies_section: {
-                dependencies: 'Abhängigkeiten',
-                filter: 'Filter',
-                collapse: 'Alle einklappen',
                 dependency: {
+                    dependency: 'Abhängigkeit',
                     table: 'Tabelle',
                     dependent_table: 'Abhängige Ansicht',
                     delete_dependency: 'Löschen',
@@ -236,8 +237,8 @@ export const de: LanguageTranslation = {
                     },
                 },
                 empty_state: {
-                    title: 'Keine Abhängigkeiten',
-                    description: 'Erstellen Sie eine Ansicht, um zu beginnen',
+                    title: 'Keine Beziehungen',
+                    description: 'Erstellen Sie eine Beziehung, um zu beginnen',
                 },
             },
 
@@ -277,12 +278,16 @@ export const de: LanguageTranslation = {
                     enum_values: 'Enum Values',
                     composite_fields: 'Fields',
                     no_fields: 'No fields defined',
+                    no_values: 'Keine Enum-Werte definiert',
                     field_name_placeholder: 'Field name',
                     field_type_placeholder: 'Select type',
                     add_field: 'Add Field',
+                    no_fields_tooltip: 'No fields defined for this custom type',
                     custom_type_actions: {
                         title: 'Actions',
+                        highlight_fields: 'Highlight Fields',
                         delete_custom_type: 'Delete',
+                        clear_field_highlight: 'Clear Highlight',
                     },
                     delete_custom_type: 'Delete Type',
                 },
@@ -296,8 +301,15 @@ export const de: LanguageTranslation = {
             show_all: 'Alle anzeigen',
             undo: 'Rückgängig',
             redo: 'Wiederholen',
-            reorder_diagram: 'Diagramm neu anordnen',
+            reorder_diagram: 'Diagramm automatisch anordnen',
+
+            // TODO: Translate
+            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            custom_type_highlight_tooltip:
+                'Highlighting "{{typeName}}" - Click to clear',
             highlight_overlapping_tables: 'Überlappende Tabellen hervorheben',
+            // TODO: Translate
+            filter: 'Filter Tables',
         },
 
         new_diagram_dialog: {
@@ -330,13 +342,13 @@ export const de: LanguageTranslation = {
             back: 'Zurück',
             // TODO: Translate
             import_from_file: 'Import from File',
-            empty_diagram: 'Leeres Diagramm',
+            empty_diagram: 'Leere Datenbank',
             continue: 'Weiter',
             import: 'Importieren',
         },
 
         open_diagram_dialog: {
-            title: 'Diagramm öffnen',
+            title: 'Datenbank öffnen',
             description: 'Wählen Sie ein Diagramm aus der Liste unten aus.',
             table_columns: {
                 name: 'Name',
@@ -346,6 +358,12 @@ export const de: LanguageTranslation = {
             },
             cancel: 'Abbrechen',
             open: 'Öffnen',
+
+            diagram_actions: {
+                open: 'Öffnen',
+                duplicate: 'Duplizieren',
+                delete: 'Löschen',
+            },
         },
 
         export_sql_dialog: {
@@ -435,6 +453,13 @@ export const de: LanguageTranslation = {
             cancel: 'Abbrechen',
             confirm: 'Ändern',
         },
+        create_table_schema_dialog: {
+            title: 'Neues Schema erstellen',
+            description:
+                'Es existieren noch keine Schemas. Erstellen Sie Ihr erstes Schema, um Ihre Tabellen zu organisieren.',
+            create: 'Erstellen',
+            cancel: 'Abbrechen',
+        },
 
         star_us_dialog: {
             title: 'Hilf uns, uns zu verbessern!',
@@ -511,6 +536,7 @@ export const de: LanguageTranslation = {
 
         canvas_context_menu: {
             new_table: 'Neue Tabelle',
+            new_view: 'Neue Ansicht',
             new_relationship: 'Neue Beziehung',
             // TODO: Translate
             new_area: 'New Area',
@@ -533,6 +559,9 @@ export const de: LanguageTranslation = {
         language_select: {
             change_language: 'Sprache',
         },
+
+        on: 'Ein',
+        off: 'Aus',
     },
 };
 

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DatabaseType } from '../../domain/database-type';
+import { databaseSupportsArrays } from '../../domain/database-capabilities';
 import { clickhouseDataTypes } from './clickhouse-data-types';
 import { genericDataTypes } from './generic-data-types';
 import { mariadbDataTypes } from './mariadb-data-types';
@@ -14,9 +15,23 @@ export interface DataType {
     name: string;
 }
 
-export interface DataTypeData extends DataType {
+export interface FieldAttributeRange {
+    max: number;
+    min: number;
+    default: number;
+}
+
+interface FieldAttributes {
     hasCharMaxLength?: boolean;
+    hasCharMaxLengthOption?: boolean;
+    precision?: FieldAttributeRange;
+    scale?: FieldAttributeRange;
+    maxLength?: number;
+}
+
+export interface DataTypeData extends DataType {
     usageLevel?: 1 | 2; // Level 1 is most common, Level 2 is second most common
+    fieldAttributes?: FieldAttributes;
 }
 
 export const dataTypeSchema: z.ZodType<DataType> = z.object({
@@ -131,4 +146,54 @@ export const findDataTypeDataById = (
         : dataTypes;
 
     return dataTypesOptions.find((dataType) => dataType.id === id);
+};
+
+export const supportsAutoIncrementDataType = (
+    dataTypeName: string
+): boolean => {
+    return [
+        'integer',
+        'int',
+        'bigint',
+        'smallint',
+        'tinyint',
+        'mediumint',
+        'serial',
+        'bigserial',
+        'smallserial',
+        'number',
+        'numeric',
+        'decimal',
+    ].includes(dataTypeName.toLocaleLowerCase());
+};
+
+export const autoIncrementAlwaysOn = (dataTypeName: string): boolean => {
+    return ['serial', 'bigserial', 'smallserial'].includes(
+        dataTypeName.toLowerCase()
+    );
+};
+
+export const requiresNotNull = (dataTypeName: string): boolean => {
+    return ['serial', 'bigserial', 'smallserial'].includes(
+        dataTypeName.toLowerCase()
+    );
+};
+
+const ARRAY_INCOMPATIBLE_TYPES = [
+    'serial',
+    'bigserial',
+    'smallserial',
+] as const;
+
+export const supportsArrayDataType = (
+    dataTypeName: string,
+    databaseType: DatabaseType
+): boolean => {
+    if (!databaseSupportsArrays(databaseType)) {
+        return false;
+    }
+
+    return !ARRAY_INCOMPATIBLE_TYPES.includes(
+        dataTypeName.toLowerCase() as (typeof ARRAY_INCOMPATIBLE_TYPES)[number]
+    );
 };

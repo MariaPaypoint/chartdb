@@ -15,9 +15,9 @@ export type DiffEventBase<T extends DiffEventType, D> = {
 };
 
 export type DiffCalculatedData = {
-    tablesAdded: DBTable[];
-    fieldsAdded: Map<string, DBField[]>;
-    relationshipsAdded: DBRelationship[];
+    tablesToAdd: DBTable[];
+    fieldsToAdd: Map<string, DBField[]>;
+    relationshipsToAdd: DBRelationship[];
 };
 
 export type DiffCalculatedEvent = DiffEventBase<
@@ -32,21 +32,33 @@ export interface DiffContext {
     originalDiagram: Diagram | null;
     diffMap: DiffMap;
     hasDiff: boolean;
+    isSummaryOnly: boolean;
 
     calculateDiff: ({
         diagram,
         newDiagram,
+        options,
     }: {
         diagram: Diagram;
         newDiagram: Diagram;
-    }) => void;
+        options?: {
+            summaryOnly?: boolean;
+        };
+    }) => { foundDiff: boolean };
+    resetDiff: () => void;
 
     // table diff
     checkIfTableHasChange: ({ tableId }: { tableId: string }) => boolean;
     checkIfNewTable: ({ tableId }: { tableId: string }) => boolean;
     checkIfTableRemoved: ({ tableId }: { tableId: string }) => boolean;
-    getTableNewName: ({ tableId }: { tableId: string }) => string | null;
-    getTableNewColor: ({ tableId }: { tableId: string }) => string | null;
+    getTableNewName: ({ tableId }: { tableId: string }) => {
+        old: string;
+        new: string;
+    } | null;
+    getTableNewColor: ({ tableId }: { tableId: string }) => {
+        old: string;
+        new: string;
+    } | null;
 
     // field diff
     checkIfFieldHasChange: ({
@@ -58,8 +70,46 @@ export interface DiffContext {
     }) => boolean;
     checkIfFieldRemoved: ({ fieldId }: { fieldId: string }) => boolean;
     checkIfNewField: ({ fieldId }: { fieldId: string }) => boolean;
-    getFieldNewName: ({ fieldId }: { fieldId: string }) => string | null;
-    getFieldNewType: ({ fieldId }: { fieldId: string }) => DataType | null;
+    getFieldNewName: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: string; new: string } | null;
+    getFieldNewType: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: DataType; new: DataType } | null;
+    getFieldNewPrimaryKey: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: boolean; new: boolean } | null;
+    getFieldNewNullable: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: boolean; new: boolean } | null;
+    getFieldNewCharacterMaximumLength: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: string; new: string } | null;
+    getFieldNewScale: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: number; new: number } | null;
+    getFieldNewPrecision: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: number; new: number } | null;
+    getFieldNewIsArray: ({
+        fieldId,
+    }: {
+        fieldId: string;
+    }) => { old: boolean; new: boolean } | null;
 
     // relationship diff
     checkIfNewRelationship: ({

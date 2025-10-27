@@ -42,7 +42,6 @@ export const Menu: React.FC<MenuProps> = () => {
         deleteDiagram,
         updateDiagramUpdatedAt,
         databaseType,
-        dependencies,
         currentDiagram,
     } = useChartDB();
     const { exportDiagram } = useExportDiagram();
@@ -54,7 +53,6 @@ export const Menu: React.FC<MenuProps> = () => {
         openExportImageDialog,
         openExportDiagramDialog,
         openImportDiagramDialog,
-        openImportDBMLDialog,
         openImportFromMinioDialog,
     } = useDialog();
 
@@ -66,10 +64,12 @@ export const Menu: React.FC<MenuProps> = () => {
         setScrollAction,
         setShowCardinality,
         showCardinality,
-        setShowDependenciesOnCanvas,
-        showDependenciesOnCanvas,
+        setShowFieldAttributes,
+        showFieldAttributes,
         setShowMiniMapOnCanvas,
         showMiniMapOnCanvas,
+        showDBViews,
+        setShowDBViews,
     } = useLocalConfig();
     const { t } = useTranslation();
     const { redo, undo, hasRedo, hasUndo } = useHistory();
@@ -234,9 +234,9 @@ export const Menu: React.FC<MenuProps> = () => {
         setShowCardinality(!showCardinality);
     }, [showCardinality, setShowCardinality]);
 
-    const showOrHideDependencies = useCallback(() => {
-        setShowDependenciesOnCanvas(!showDependenciesOnCanvas);
-    }, [showDependenciesOnCanvas, setShowDependenciesOnCanvas]);
+    const showOrHideFieldAttributes = useCallback(() => {
+        setShowFieldAttributes(!showFieldAttributes);
+    }, [showFieldAttributes, setShowFieldAttributes]);
 
     const showOrHideMiniMap = useCallback(() => {
         setShowMiniMapOnCanvas(!showMiniMapOnCanvas);
@@ -247,13 +247,13 @@ export const Menu: React.FC<MenuProps> = () => {
     return (
         <Menubar className="h-8 border-none py-2 shadow-none md:h-10 md:py-0">
             <MenubarMenu>
-                <MenubarTrigger>{t('menu.file.file')}</MenubarTrigger>
+                <MenubarTrigger>{t('menu.actions.actions')}</MenubarTrigger>
                 <MenubarContent>
                     <MenubarItem onClick={createNewDiagram}>
-                        {t('menu.file.new')}
+                        {t('menu.actions.new')}
                     </MenubarItem>
                     <MenubarItem onClick={openDiagram}>
-                        {t('menu.file.open')}
+                        {t('menu.actions.browse')}
                         <MenubarShortcut>
                             {
                                 keyboardShortcutsForOS[
@@ -263,7 +263,7 @@ export const Menu: React.FC<MenuProps> = () => {
                         </MenubarShortcut>
                     </MenubarItem>
                     <MenubarItem onClick={updateDiagramUpdatedAt}>
-                        {t('menu.file.save')}
+                        {t('menu.actions.save')}
                         <MenubarShortcut>
                             {
                                 keyboardShortcutsForOS[
@@ -275,7 +275,7 @@ export const Menu: React.FC<MenuProps> = () => {
                     <MenubarSeparator />
                     <MenubarSub>
                         <MenubarSubTrigger>
-                            {t('menu.file.import')}
+                            {t('menu.actions.import')}
                         </MenubarSubTrigger>
                         <MenubarSubContent>
                             <MenubarItem
@@ -286,9 +286,6 @@ export const Menu: React.FC<MenuProps> = () => {
                                 }
                             >
                                 {t('menu.file.export_diagram')}
-                            </MenubarItem>
-                            <MenubarItem onClick={() => openImportDBMLDialog()}>
-                                .dbml
                             </MenubarItem>
                             <MenubarSeparator />
                             <MenubarItem
@@ -350,73 +347,90 @@ export const Menu: React.FC<MenuProps> = () => {
                     <MenubarSeparator />
                     <MenubarSub>
                         <MenubarSubTrigger>
-                            {t('menu.file.export_sql')}
+                            {t('menu.actions.export_sql')}
                         </MenubarSubTrigger>
                         <MenubarSubContent>
-                            <MenubarItem
-                                onClick={() => exportSQL(DatabaseType.GENERIC)}
-                            >
-                                {databaseTypeToLabelMap['generic']}
-                            </MenubarItem>
-                            <MenubarItem
-                                onClick={() =>
-                                    exportSQL(DatabaseType.POSTGRESQL)
-                                }
-                            >
-                                {databaseTypeToLabelMap['postgresql']}
-                                {databaseType !== DatabaseType.POSTGRESQL && (
+                            {databaseType === DatabaseType.GENERIC ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.GENERIC)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['generic']}
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.GENERIC ? (
+                                <MenubarItem
+                                    onClick={() => exportSQL(databaseType)}
+                                >
+                                    {databaseTypeToLabelMap[databaseType]}
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.POSTGRESQL ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.POSTGRESQL)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['postgresql']}
                                     <MenubarShortcut className="text-base">
                                         {emojiAI}
                                     </MenubarShortcut>
-                                )}
-                            </MenubarItem>
-                            <MenubarItem
-                                onClick={() => exportSQL(DatabaseType.MYSQL)}
-                            >
-                                {databaseTypeToLabelMap['mysql']}
-                                {databaseType !== DatabaseType.MYSQL && (
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.MYSQL ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.MYSQL)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['mysql']}
                                     <MenubarShortcut className="text-base">
                                         {emojiAI}
                                     </MenubarShortcut>
-                                )}
-                            </MenubarItem>
-                            <MenubarItem
-                                onClick={() =>
-                                    exportSQL(DatabaseType.SQL_SERVER)
-                                }
-                            >
-                                {databaseTypeToLabelMap['sql_server']}
-                                {databaseType !== DatabaseType.SQL_SERVER && (
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.SQL_SERVER ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.SQL_SERVER)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['sql_server']}
                                     <MenubarShortcut className="text-base">
                                         {emojiAI}
                                     </MenubarShortcut>
-                                )}
-                            </MenubarItem>
-                            <MenubarItem
-                                onClick={() => exportSQL(DatabaseType.MARIADB)}
-                            >
-                                {databaseTypeToLabelMap['mariadb']}
-                                {databaseType !== DatabaseType.MARIADB && (
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.MARIADB ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.MARIADB)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['mariadb']}
                                     <MenubarShortcut className="text-base">
                                         {emojiAI}
                                     </MenubarShortcut>
-                                )}
-                            </MenubarItem>
-                            <MenubarItem
-                                onClick={() => exportSQL(DatabaseType.SQLITE)}
-                            >
-                                {databaseTypeToLabelMap['sqlite']}
-                                {databaseType !== DatabaseType.SQLITE && (
+                                </MenubarItem>
+                            ) : null}
+                            {databaseType !== DatabaseType.SQLITE ? (
+                                <MenubarItem
+                                    onClick={() =>
+                                        exportSQL(DatabaseType.SQLITE)
+                                    }
+                                >
+                                    {databaseTypeToLabelMap['sqlite']}
                                     <MenubarShortcut className="text-base">
                                         {emojiAI}
                                     </MenubarShortcut>
-                                )}
-                            </MenubarItem>
+                                </MenubarItem>
+                            ) : null}
                         </MenubarSubContent>
                     </MenubarSub>
                     <MenubarSub>
                         <MenubarSubTrigger>
-                            {t('menu.file.export_as')}
+                            {t('menu.actions.export_as')}
                         </MenubarSubTrigger>
                         <MenubarSubContent>
                             <MenubarItem onClick={exportPNG}>PNG</MenubarItem>
@@ -467,10 +481,8 @@ export const Menu: React.FC<MenuProps> = () => {
                             })
                         }
                     >
-                        {t('menu.file.delete_diagram')}
+                        {t('menu.actions.delete_diagram')}
                     </MenubarItem>
-                    <MenubarSeparator />
-                    <MenubarItem>{t('menu.file.exit')}</MenubarItem>
                 </MenubarContent>
             </MenubarMenu>
             <MenubarMenu>
@@ -535,15 +547,11 @@ export const Menu: React.FC<MenuProps> = () => {
                             ? t('menu.view.hide_cardinality')
                             : t('menu.view.show_cardinality')}
                     </MenubarItem>
-                    {databaseType !== DatabaseType.CLICKHOUSE &&
-                    dependencies &&
-                    dependencies.length > 0 ? (
-                        <MenubarItem onClick={showOrHideDependencies}>
-                            {showDependenciesOnCanvas
-                                ? t('menu.view.hide_dependencies')
-                                : t('menu.view.show_dependencies')}
-                        </MenubarItem>
-                    ) : null}
+                    <MenubarItem onClick={showOrHideFieldAttributes}>
+                        {showFieldAttributes
+                            ? t('menu.view.hide_field_attributes')
+                            : t('menu.view.show_field_attributes')}
+                    </MenubarItem>
                     <MenubarItem onClick={showOrHideMiniMap}>
                         {showMiniMapOnCanvas
                             ? t('menu.view.hide_minimap')
@@ -566,6 +574,26 @@ export const Menu: React.FC<MenuProps> = () => {
                                 onClick={() => setScrollAction('pan')}
                             >
                                 {t('zoom.off')}
+                            </MenubarCheckboxItem>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSeparator />
+                    <MenubarSub>
+                        <MenubarSubTrigger>
+                            {t('menu.view.show_views')}
+                        </MenubarSubTrigger>
+                        <MenubarSubContent>
+                            <MenubarCheckboxItem
+                                checked={showDBViews}
+                                onClick={() => setShowDBViews(true)}
+                            >
+                                {t('on')}
+                            </MenubarCheckboxItem>
+                            <MenubarCheckboxItem
+                                checked={!showDBViews}
+                                onClick={() => setShowDBViews(false)}
+                            >
+                                {t('off')}
                             </MenubarCheckboxItem>
                         </MenubarSubContent>
                     </MenubarSub>

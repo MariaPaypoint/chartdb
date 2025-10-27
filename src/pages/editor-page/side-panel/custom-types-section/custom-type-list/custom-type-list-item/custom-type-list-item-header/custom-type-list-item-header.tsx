@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
     GripVertical,
     Pencil,
     EllipsisVertical,
     Trash2,
     Check,
+    Highlighter,
 } from 'lucide-react';
 import { ListItemHeaderButton } from '@/pages/editor-page/side-panel/list-item-header-button/list-item-header-button';
 import { Input } from '@/components/input/input';
@@ -32,6 +33,9 @@ import {
     type DBCustomType,
 } from '@/lib/domain/db-custom-type';
 import { Badge } from '@/components/badge/badge';
+import { checkIfCustomTypeUsed } from '../utils';
+import { useDiagramFilter } from '@/context/diagram-filter-context/use-diagram-filter';
+import { defaultSchemas } from '@/lib/data/default-schemas';
 
 export interface CustomTypeListItemHeaderProps {
     customType: DBCustomType;
@@ -40,8 +44,16 @@ export interface CustomTypeListItemHeaderProps {
 export const CustomTypeListItemHeader: React.FC<
     CustomTypeListItemHeaderProps
 > = ({ customType }) => {
-    const { updateCustomType, removeCustomType, schemas, filteredSchemas } =
-        useChartDB();
+    const {
+        updateCustomType,
+        removeCustomType,
+        highlightedCustomType,
+        highlightCustomTypeId,
+        tables,
+        databaseType,
+        readonly,
+    } = useChartDB();
+    const { schemasDisplayed } = useDiagramFilter();
     const { t } = useTranslation();
     const [editMode, setEditMode] = React.useState(false);
     const [customTypeName, setCustomTypeName] = React.useState(customType.name);
@@ -71,12 +83,40 @@ export const CustomTypeListItemHeader: React.FC<
         setEditMode(true);
     };
 
-    const deleteCustomTypeHandler = useCallback(() => {
-        removeCustomType(customType.id);
-    }, [customType.id, removeCustomType]);
+    const deleteCustomTypeHandler = useCallback(
+        (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            e.stopPropagation();
 
-    const renderDropDownMenu = useCallback(
-        () => (
+            removeCustomType(customType.id);
+        },
+        [customType.id, removeCustomType]
+    );
+
+    const isHighlighted = useMemo(
+        () => highlightedCustomType?.id === customType.id,
+        [highlightedCustomType, customType.id]
+    );
+
+    const toggleHighlightCustomType = useCallback(
+        (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            e.stopPropagation();
+
+            if (isHighlighted) {
+                highlightCustomTypeId(undefined);
+            } else {
+                highlightCustomTypeId(customType.id);
+            }
+        },
+        [customType.id, highlightCustomTypeId, isHighlighted]
+    );
+
+    const canHighlight = useMemo(
+        () => checkIfCustomTypeUsed({ customType, tables }),
+        [customType, tables]
+    );
+
+    const renderDropDownMenu = useCallback(() => {
+        return (
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <ListItemHeaderButton>
@@ -92,35 +132,57 @@ export const CustomTypeListItemHeader: React.FC<
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <DropdownMenuItem
-                            onClick={deleteCustomTypeHandler}
-                            className="flex justify-between !text-red-700"
+                            onClick={toggleHighlightCustomType}
+                            disabled={!canHighlight}
+                            className="flex justify-between"
                         >
                             {t(
-                                'side_panel.custom_types_section.custom_type.custom_type_actions.delete_custom_type'
+                                isHighlighted
+                                    ? 'side_panel.custom_types_section.custom_type.custom_type_actions.clear_field_highlight'
+                                    : 'side_panel.custom_types_section.custom_type.custom_type_actions.highlight_fields'
                             )}
-                            <Trash2 className="size-3.5 text-red-700" />
+                            <Highlighter className="size-3.5" />
                         </DropdownMenuItem>
+                        {!readonly ? (
+                            <DropdownMenuItem
+                                onClick={deleteCustomTypeHandler}
+                                className="flex justify-between !text-red-700"
+                            >
+                                {t(
+                                    'side_panel.custom_types_section.custom_type.custom_type_actions.delete_custom_type'
+                                )}
+                                <Trash2 className="size-3.5 text-red-700" />
+                            </DropdownMenuItem>
+                        ) : null}
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-        ),
-        [deleteCustomTypeHandler, t]
-    );
+        );
+    }, [
+        deleteCustomTypeHandler,
+        t,
+        toggleHighlightCustomType,
+        canHighlight,
+        isHighlighted,
+        readonly,
+    ]);
 
-    let schemaToDisplay;
-
-    if (schemas.length > 1 && !!filteredSchemas && filteredSchemas.length > 1) {
-        schemaToDisplay = customType.schema;
-    }
+    const schemaToDisplay = useMemo(() => {
+        if (schemasDisplayed.length > 1) {
+            return customType.schema ?? defaultSchemas[databaseType];
+        }
+    }, [customType.schema, schemasDisplayed.length, databaseType]);
 
     return (
         <div className="group flex h-11 flex-1 items-center justify-between gap-1 overflow-hidden">
-            <div
-                className="flex cursor-move items-center justify-center"
-                {...listeners}
-            >
-                <GripVertical className="size-4 text-muted-foreground" />
-            </div>
+            {!readonly ? (
+                <div
+                    className="flex cursor-move items-center justify-center"
+                    {...listeners}
+                >
+                    <GripVertical className="size-4 text-muted-foreground" />
+                </div>
+            ) : null}
             <div className="flex min-w-0 flex-1 px-1">
                 {editMode ? (
                     <Input
@@ -133,7 +195,7 @@ export const CustomTypeListItemHeader: React.FC<
                         onChange={(e) => setCustomTypeName(e.target.value)}
                         className="h-7 w-full focus-visible:ring-0"
                     />
-                ) : (
+                ) : !readonly ? (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div
@@ -152,6 +214,13 @@ export const CustomTypeListItemHeader: React.FC<
                             {t('tool_tips.double_click_to_edit')}
                         </TooltipContent>
                     </Tooltip>
+                ) : (
+                    <div className="truncate px-2 py-0.5">
+                        {customType.name}
+                        <span className="text-xs text-muted-foreground">
+                            {schemaToDisplay ? ` (${schemaToDisplay})` : ''}
+                        </span>
+                    </div>
                 )}
             </div>
             <div className="flex flex-row-reverse items-center">
@@ -166,11 +235,13 @@ export const CustomTypeListItemHeader: React.FC<
                                 {customTypeKindToLabel[customType.kind]}
                             </Badge>
                         ) : null}
-                        <div className="flex flex-row-reverse md:hidden md:group-hover:flex">
-                            <ListItemHeaderButton onClick={enterEditMode}>
-                                <Pencil />
-                            </ListItemHeaderButton>
-                        </div>
+                        {!readonly ? (
+                            <div className="flex flex-row-reverse md:hidden md:group-hover:flex">
+                                <ListItemHeaderButton onClick={enterEditMode}>
+                                    <Pencil />
+                                </ListItemHeaderButton>
+                            </div>
+                        ) : null}
                     </>
                 ) : (
                     <ListItemHeaderButton onClick={editCustomTypeName}>

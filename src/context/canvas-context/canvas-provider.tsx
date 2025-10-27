@@ -1,25 +1,70 @@
-import React, { type ReactNode, useCallback, useState } from 'react';
+import React, {
+    type ReactNode,
+    useCallback,
+    useState,
+    useEffect,
+    useRef,
+} from 'react';
+import type { CanvasContext } from './canvas-context';
 import { canvasContext } from './canvas-context';
 import { useChartDB } from '@/hooks/use-chartdb';
-import {
-    adjustTablePositions,
-    shouldShowTablesBySchemaFilter,
-} from '@/lib/domain/db-table';
+import { adjustTablePositions } from '@/lib/domain/db-table';
 import { useReactFlow } from '@xyflow/react';
 import { findOverlappingTables } from '@/pages/editor-page/canvas/canvas-utils';
 import type { Graph } from '@/lib/graph';
 import { createGraph } from '@/lib/graph';
+import { useDiagramFilter } from '../diagram-filter-context/use-diagram-filter';
+import { filterTable } from '@/lib/domain/diagram-filter/filter';
+import { defaultSchemas } from '@/lib/data/default-schemas';
+import {
+    CREATE_RELATIONSHIP_NODE_ID,
+    type CreateRelationshipNodeType,
+} from '@/pages/editor-page/canvas/create-relationship-node/create-relationship-node';
 
 interface CanvasProviderProps {
     children: ReactNode;
 }
 
 export const CanvasProvider = ({ children }: CanvasProviderProps) => {
-    const { tables, relationships, updateTablesState, filteredSchemas } =
-        useChartDB();
-    const { fitView } = useReactFlow();
+    const {
+        tables,
+        relationships,
+        updateTablesState,
+        databaseType,
+        areas,
+        diagramId,
+    } = useChartDB();
+    const { filter, loading: filterLoading } = useDiagramFilter();
+    const { fitView, screenToFlowPosition, setNodes } = useReactFlow();
     const [overlapGraph, setOverlapGraph] =
         useState<Graph<string>>(createGraph());
+    const [editTableModeTable, setEditTableModeTable] = useState<{
+        tableId: string;
+        fieldId?: string;
+    } | null>(null);
+
+    const [showFilter, setShowFilter] = useState(false);
+
+    const [tempFloatingEdge, setTempFloatingEdge] =
+        useState<CanvasContext['tempFloatingEdge']>(null);
+
+    const [hoveringTableId, setHoveringTableId] = useState<string | null>(null);
+
+    const diagramIdActiveFilterRef = useRef<string>();
+
+    useEffect(() => {
+        if (filterLoading) {
+            return;
+        }
+
+        if (diagramIdActiveFilterRef.current === diagramId) {
+            return;
+        }
+
+        diagramIdActiveFilterRef.current = diagramId;
+
+        setShowFilter(true);
+    }, [filterLoading, diagramId]);
 
     const reorderTables = useCallback(
         (
@@ -30,9 +75,19 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
             const newTables = adjustTablePositions({
                 relationships,
                 tables: tables.filter((table) =>
-                    shouldShowTablesBySchemaFilter(table, filteredSchemas)
+                    filterTable({
+                        table: {
+                            id: table.id,
+                            schema: table.schema,
+                        },
+                        filter,
+                        options: {
+                            defaultSchema: defaultSchemas[databaseType],
+                        },
+                    })
                 ),
-                mode: 'all', // Use 'all' mode for manual reordering
+                areas,
+                mode: 'all',
             });
 
             const updatedOverlapGraph = findOverlappingTables({
@@ -67,8 +122,76 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
                 });
             }, 500);
         },
-        [filteredSchemas, relationships, tables, updateTablesState, fitView]
+        [
+            filter,
+            relationships,
+            tables,
+            updateTablesState,
+            fitView,
+            databaseType,
+            areas,
+        ]
     );
+
+    const startFloatingEdgeCreation: CanvasContext['startFloatingEdgeCreation'] =
+        useCallback(({ sourceNodeId }) => {
+            setShowFilter(false);
+            setTempFloatingEdge({
+                sourceNodeId,
+            });
+        }, []);
+
+    const endFloatingEdgeCreation: CanvasContext['endFloatingEdgeCreation'] =
+        useCallback(() => {
+            setTempFloatingEdge(null);
+        }, []);
+
+    const hideCreateRelationshipNode: CanvasContext['hideCreateRelationshipNode'] =
+        useCallback(() => {
+            setNodes((nds) =>
+                nds.filter((n) => n.id !== CREATE_RELATIONSHIP_NODE_ID)
+            );
+            endFloatingEdgeCreation();
+        }, [setNodes, endFloatingEdgeCreation]);
+
+    const showCreateRelationshipNode: CanvasContext['showCreateRelationshipNode'] =
+        useCallback(
+            ({ sourceTableId, targetTableId, x, y }) => {
+                setTempFloatingEdge((edge) =>
+                    edge
+                        ? {
+                              ...edge,
+                              targetNodeId: targetTableId,
+                          }
+                        : null
+                );
+                const cursorPos = screenToFlowPosition({
+                    x,
+                    y,
+                });
+
+                const newNode: CreateRelationshipNodeType = {
+                    id: CREATE_RELATIONSHIP_NODE_ID,
+                    type: 'create-relationship',
+                    position: cursorPos,
+                    data: {
+                        sourceTableId,
+                        targetTableId,
+                    },
+                    draggable: true,
+                    selectable: false,
+                    zIndex: 1000,
+                };
+
+                setNodes((nds) => {
+                    const nodesWithoutOldCreateRelationshipNode = nds.filter(
+                        (n) => n.id !== CREATE_RELATIONSHIP_NODE_ID
+                    );
+                    return [...nodesWithoutOldCreateRelationshipNode, newNode];
+                });
+            },
+            [screenToFlowPosition, setNodes]
+        );
 
     return (
         <canvasContext.Provider
@@ -77,6 +200,18 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
                 fitView,
                 setOverlapGraph,
                 overlapGraph,
+                setShowFilter,
+                showFilter,
+                editTableModeTable,
+                setEditTableModeTable,
+                tempFloatingEdge: tempFloatingEdge,
+                setTempFloatingEdge: setTempFloatingEdge,
+                startFloatingEdgeCreation: startFloatingEdgeCreation,
+                endFloatingEdgeCreation: endFloatingEdgeCreation,
+                hoveringTableId,
+                setHoveringTableId,
+                showCreateRelationshipNode,
+                hideCreateRelationshipNode,
             }}
         >
             {children}

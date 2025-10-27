@@ -3,15 +3,37 @@ import type { DataTypeData } from './data-types';
 export const postgresDataTypes: readonly DataTypeData[] = [
     // Level 1 - Most commonly used types
     { name: 'integer', id: 'integer', usageLevel: 1 },
-    { name: 'varchar', id: 'varchar', hasCharMaxLength: true, usageLevel: 1 },
+    {
+        name: 'varchar',
+        id: 'varchar',
+        fieldAttributes: { hasCharMaxLength: true },
+        usageLevel: 1,
+    },
     { name: 'text', id: 'text', usageLevel: 1 },
     { name: 'boolean', id: 'boolean', usageLevel: 1 },
     { name: 'timestamp', id: 'timestamp', usageLevel: 1 },
+    { name: 'timestamptz', id: 'timestamptz', usageLevel: 1 },
     { name: 'date', id: 'date', usageLevel: 1 },
 
     // Level 2 - Second most common types
     { name: 'bigint', id: 'bigint', usageLevel: 2 },
-    { name: 'decimal', id: 'decimal', usageLevel: 2 },
+    {
+        name: 'decimal',
+        id: 'decimal',
+        usageLevel: 2,
+        fieldAttributes: {
+            precision: {
+                max: 131072,
+                min: 0,
+                default: 10,
+            },
+            scale: {
+                max: 16383,
+                min: 0,
+                default: 2,
+            },
+        },
+    },
     { name: 'serial', id: 'serial', usageLevel: 2 },
     { name: 'json', id: 'json', usageLevel: 2 },
     { name: 'jsonb', id: 'jsonb', usageLevel: 2 },
@@ -21,20 +43,36 @@ export const postgresDataTypes: readonly DataTypeData[] = [
         id: 'timestamp_with_time_zone',
         usageLevel: 2,
     },
+    { name: 'int', id: 'int', usageLevel: 2 },
 
     // Less common types
-    { name: 'numeric', id: 'numeric' },
+    {
+        name: 'numeric',
+        id: 'numeric',
+        fieldAttributes: {
+            precision: {
+                max: 131072,
+                min: 0,
+                default: 10,
+            },
+            scale: {
+                max: 16383,
+                min: 0,
+                default: 2,
+            },
+        },
+    },
     { name: 'real', id: 'real' },
     { name: 'double precision', id: 'double_precision' },
     { name: 'smallserial', id: 'smallserial' },
     { name: 'bigserial', id: 'bigserial' },
     { name: 'money', id: 'money' },
     { name: 'smallint', id: 'smallint' },
-    { name: 'char', id: 'char', hasCharMaxLength: true },
+    { name: 'char', id: 'char', fieldAttributes: { hasCharMaxLength: true } },
     {
         name: 'character varying',
         id: 'character_varying',
-        hasCharMaxLength: true,
+        fieldAttributes: { hasCharMaxLength: true },
     },
     { name: 'time', id: 'time' },
     { name: 'timestamp without time zone', id: 'timestamp_without_time_zone' },
@@ -59,7 +97,6 @@ export const postgresDataTypes: readonly DataTypeData[] = [
     { name: 'tsvector', id: 'tsvector' },
     { name: 'tsquery', id: 'tsquery' },
     { name: 'xml', id: 'xml' },
-    { name: 'array', id: 'array' },
     { name: 'int4range', id: 'int4range' },
     { name: 'int8range', id: 'int8range' },
     { name: 'numrange', id: 'numrange' },

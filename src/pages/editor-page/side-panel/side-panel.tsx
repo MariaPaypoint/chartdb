@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React from 'react';
 import {
     Select,
     SelectContent,
@@ -8,86 +8,27 @@ import {
     SelectValue,
 } from '@/components/select/select';
 import { TablesSection } from './tables-section/tables-section';
-import { RelationshipsSection } from './relationships-section/relationships-section';
 import { useLayout } from '@/hooks/use-layout';
 import type { SidebarSection } from '@/context/layout-context/layout-context';
 import { useTranslation } from 'react-i18next';
-import type { SelectBoxOption } from '@/components/select-box/select-box';
-import { SelectBox } from '@/components/select-box/select-box';
 import { useChartDB } from '@/hooks/use-chartdb';
-import { DependenciesSection } from './dependencies-section/dependencies-section';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
 import { AreasSection } from './areas-section/areas-section';
 import { CustomTypesSection } from './custom-types-section/custom-types-section';
-import { DatabaseType } from '@/lib/domain/database-type';
+import { supportsCustomTypes } from '@/lib/domain/database-capabilities';
+import { DBMLSection } from './dbml-section/dbml-section';
+import { RefsSection } from './refs-section/refs-section';
 
 export interface SidePanelProps {}
 
 export const SidePanel: React.FC<SidePanelProps> = () => {
     const { t } = useTranslation();
-    const { schemas, filterSchemas, filteredSchemas, databaseType } =
-        useChartDB();
-    const {
-        selectSidebarSection,
-        selectedSidebarSection,
-        isSelectSchemaOpen,
-        openSelectSchema,
-        closeSelectSchema,
-    } = useLayout();
+    const { databaseType } = useChartDB();
+    const { selectSidebarSection, selectedSidebarSection } = useLayout();
     const { isMd: isDesktop } = useBreakpoint('md');
-
-    const schemasOptions: SelectBoxOption[] = useMemo(
-        () =>
-            schemas.map(
-                (schema): SelectBoxOption => ({
-                    label: schema.name,
-                    value: schema.id,
-                    description: `(${schema.tableCount} tables)`,
-                })
-            ),
-        [schemas]
-    );
-
-    const setIsSelectSchemaOpen = useCallback(
-        (open: boolean) => {
-            if (open) {
-                openSelectSchema();
-            } else {
-                closeSelectSchema();
-            }
-        },
-        [openSelectSchema, closeSelectSchema]
-    );
 
     return (
         <aside className="flex h-full flex-col overflow-hidden">
-            {schemasOptions.length > 0 ? (
-                <div className="flex items-center justify-center border-b pl-3 pt-0.5">
-                    <div className="shrink-0 text-sm font-semibold">
-                        {t('side_panel.schema')}
-                    </div>
-                    <div className="flex min-w-0 flex-1">
-                        <SelectBox
-                            oneLine
-                            className="w-full rounded-none border-none"
-                            selectAll
-                            deselectAll
-                            options={schemasOptions}
-                            value={filteredSchemas ?? []}
-                            onChange={(values) => {
-                                filterSchemas(values as string[]);
-                            }}
-                            placeholder={t('side_panel.filter_by_schema')}
-                            inputPlaceholder={t('side_panel.search_schema')}
-                            emptyPlaceholder={t('side_panel.no_schemas_found')}
-                            multiple
-                            open={isSelectSchemaOpen}
-                            onOpenChange={setIsSelectSchemaOpen}
-                        />
-                    </div>
-                </div>
-            ) : null}
-
             {!isDesktop ? (
                 <div className="flex justify-center border-b pt-0.5">
                     <Select
@@ -107,20 +48,13 @@ export const SidePanel: React.FC<SidePanelProps> = () => {
                                 <SelectItem value="tables">
                                     {t('side_panel.tables_section.tables')}
                                 </SelectItem>
-                                <SelectItem value="relationships">
-                                    {t(
-                                        'side_panel.relationships_section.relationships'
-                                    )}
-                                </SelectItem>
-                                <SelectItem value="dependencies">
-                                    {t(
-                                        'side_panel.dependencies_section.dependencies'
-                                    )}
+                                <SelectItem value="refs">
+                                    {t('side_panel.refs_section.refs')}
                                 </SelectItem>
                                 <SelectItem value="areas">
                                     {t('side_panel.areas_section.areas')}
                                 </SelectItem>
-                                {databaseType === DatabaseType.POSTGRESQL ? (
+                                {supportsCustomTypes(databaseType) ? (
                                     <SelectItem value="customTypes">
                                         {t(
                                             'side_panel.custom_types_section.custom_types'
@@ -134,10 +68,10 @@ export const SidePanel: React.FC<SidePanelProps> = () => {
             ) : null}
             {selectedSidebarSection === 'tables' ? (
                 <TablesSection />
-            ) : selectedSidebarSection === 'relationships' ? (
-                <RelationshipsSection />
-            ) : selectedSidebarSection === 'dependencies' ? (
-                <DependenciesSection />
+            ) : selectedSidebarSection === 'dbml' ? (
+                <DBMLSection />
+            ) : selectedSidebarSection === 'refs' ? (
+                <RefsSection />
             ) : selectedSidebarSection === 'areas' ? (
                 <AreasSection />
             ) : (

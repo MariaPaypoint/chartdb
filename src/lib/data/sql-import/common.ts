@@ -3,10 +3,14 @@ import { generateDiagramId, generateId } from '@/lib/utils';
 import type { DBTable } from '@/lib/domain/db-table';
 import type { Cardinality, DBRelationship } from '@/lib/domain/db-relationship';
 import type { DBField } from '@/lib/domain/db-field';
+import type { DBIndex } from '@/lib/domain/db-index';
 import type { DataType } from '@/lib/data/data-types/data-types';
 import { genericDataTypes } from '@/lib/data/data-types/generic-data-types';
-import { randomColor } from '@/lib/colors';
+import { defaultTableColor } from '@/lib/colors';
 import { DatabaseType } from '@/lib/domain/database-type';
+import type { DBCustomType } from '@/lib/domain/db-custom-type';
+import { DBCustomTypeKind } from '@/lib/domain/db-custom-type';
+import { supportsCustomTypes } from '@/lib/domain/database-capabilities';
 
 // Common interfaces for SQL entities
 export interface SQLColumn {
@@ -15,11 +19,14 @@ export interface SQLColumn {
     nullable: boolean;
     primaryKey: boolean;
     unique: boolean;
-    typeArgs?: {
-        length?: number;
-        precision?: number;
-        scale?: number;
-    };
+    typeArgs?:
+        | {
+              length?: number;
+              precision?: number;
+              scale?: number;
+          }
+        | number[]
+        | string;
     comment?: string;
     default?: string;
     increment?: boolean;
@@ -62,6 +69,7 @@ export interface SQLParserResult {
     relationships: SQLForeignKey[];
     types?: SQLCustomType[];
     enums?: SQLEnumType[];
+    warnings?: string[];
 }
 
 // Define more specific types for SQL AST nodes
@@ -79,7 +87,7 @@ export interface SQLBinaryExpr extends SQLASTNode {
 
 export interface SQLFunctionNode extends SQLASTNode {
     type: 'function';
-    name: string;
+    name: string | { name: Array<{ value: string }> };
     args?: {
         value: SQLASTArg[];
     };
@@ -99,6 +107,31 @@ export interface SQLExprList extends SQLASTNode {
 export interface SQLStringLiteral extends SQLASTNode {
     type: 'single_quote_string' | 'double_quote_string';
     value: string;
+}
+
+export interface SQLDefaultNode extends SQLASTNode {
+    type: 'default';
+    value: SQLASTNode;
+}
+
+export interface SQLCastNode extends SQLASTNode {
+    type: 'cast';
+    expr: SQLASTNode;
+    target: Array<{ dataType: string }>;
+}
+
+export interface SQLBooleanNode extends SQLASTNode {
+    type: 'bool';
+    value: boolean;
+}
+
+export interface SQLNullNode extends SQLASTNode {
+    type: 'null';
+}
+
+export interface SQLNumberNode extends SQLASTNode {
+    type: 'number';
+    value: number;
 }
 
 export type SQLASTArg =
@@ -139,6 +172,22 @@ export function buildSQLFromAST(
 ): string {
     if (!ast) return '';
 
+    // Handle default value wrapper
+    if (ast.type === 'default' && 'value' in ast) {
+        const defaultNode = ast as SQLDefaultNode;
+        return buildSQLFromAST(defaultNode.value, dbType);
+    }
+
+    // Handle PostgreSQL cast expressions (e.g., 'value'::type)
+    if (ast.type === 'cast' && 'expr' in ast && 'target' in ast) {
+        const castNode = ast as SQLCastNode;
+        const expr = buildSQLFromAST(castNode.expr, dbType);
+        if (castNode.target.length > 0 && castNode.target[0].dataType) {
+            return `${expr}::${castNode.target[0].dataType.toLowerCase()}`;
+        }
+        return expr;
+    }
+
     if (ast.type === 'binary_expr') {
         const expr = ast as SQLBinaryExpr;
         const leftSQL = buildSQLFromAST(expr.left, dbType);
@@ -148,7 +197,59 @@ export function buildSQLFromAST(
 
     if (ast.type === 'function') {
         const func = ast as SQLFunctionNode;
-        let expr = func.name;
+        let funcName = '';
+
+        // Handle nested function name structure
+        if (typeof func.name === 'object' && func.name && 'name' in func.name) {
+            const nameObj = func.name as { name: Array<{ value: string }> };
+            if (nameObj.name.length > 0) {
+                funcName = nameObj.name[0].value || '';
+            }
+        } else if (typeof func.name === 'string') {
+            funcName = func.name;
+        }
+
+        if (!funcName) return '';
+
+        // Normalize PostgreSQL function names to uppercase for consistency
+        if (dbType === DatabaseType.POSTGRESQL) {
+            const pgFunctions = [
+                'now',
+                'current_timestamp',
+                'current_date',
+                'current_time',
+                'gen_random_uuid',
+                'random',
+                'nextval',
+                'currval',
+            ];
+            if (pgFunctions.includes(funcName.toLowerCase())) {
+                funcName = funcName.toUpperCase();
+            }
+        }
+
+        // Some PostgreSQL functions don't have parentheses (like CURRENT_TIMESTAMP)
+        if (funcName === 'CURRENT_TIMESTAMP' && !func.args) {
+            return funcName;
+        }
+
+        // Handle SQL Server function defaults that were preprocessed as strings
+        // The preprocessor converts NEWID() to 'newid', GETDATE() to 'getdate', etc.
+        if (dbType === DatabaseType.SQL_SERVER) {
+            const sqlServerFunctions: Record<string, string> = {
+                newid: 'NEWID()',
+                newsequentialid: 'NEWSEQUENTIALID()',
+                getdate: 'GETDATE()',
+                sysdatetime: 'SYSDATETIME()',
+            };
+
+            const lowerFuncName = funcName.toLowerCase();
+            if (sqlServerFunctions[lowerFuncName]) {
+                return sqlServerFunctions[lowerFuncName];
+            }
+        }
+
+        let expr = funcName;
         if (func.args) {
             expr +=
                 '(' +
@@ -168,12 +269,31 @@ export function buildSQLFromAST(
                     })
                     .join(', ') +
                 ')';
+        } else {
+            expr += '()';
         }
         return expr;
     } else if (ast.type === 'column_ref') {
         return quoteIdentifier((ast as SQLColumnRef).column, dbType);
     } else if (ast.type === 'expr_list') {
         return (ast as SQLExprList).value.map((v) => v.value).join(' AND ');
+    } else if (ast.type === 'single_quote_string') {
+        // String literal with single quotes
+        const strNode = ast as SQLStringLiteral;
+        return `'${strNode.value}'`;
+    } else if (ast.type === 'double_quote_string') {
+        // String literal with double quotes
+        const strNode = ast as SQLStringLiteral;
+        return `"${strNode.value}"`;
+    } else if (ast.type === 'bool') {
+        // Boolean value
+        const boolNode = ast as SQLBooleanNode;
+        return boolNode.value ? 'TRUE' : 'FALSE';
+    } else if (ast.type === 'null') {
+        return 'NULL';
+    } else if (ast.type === 'number') {
+        const numNode = ast as SQLNumberNode;
+        return String(numNode.value);
     } else {
         const valueNode = ast as { type: string; value: string | number };
         return typeof valueNode.value === 'string'
@@ -543,6 +663,50 @@ export function convertToChartDBDiagram(
             ) {
                 // Ensure integer types are preserved
                 mappedType = { id: 'integer', name: 'integer' };
+            } else if (
+                supportsCustomTypes(sourceDatabaseType) &&
+                parserResult.enums &&
+                parserResult.enums.some(
+                    (e) => e.name.toLowerCase() === column.type.toLowerCase()
+                )
+            ) {
+                // If the column type matches a custom enum type, preserve it
+                mappedType = {
+                    id: column.type.toLowerCase(),
+                    name: column.type,
+                };
+            }
+            // Handle SQL Server types specifically
+            else if (
+                sourceDatabaseType === DatabaseType.SQL_SERVER &&
+                targetDatabaseType === DatabaseType.SQL_SERVER
+            ) {
+                const normalizedType = column.type.toLowerCase();
+
+                // Preserve SQL Server specific types when target is also SQL Server
+                if (
+                    normalizedType === 'nvarchar' ||
+                    normalizedType === 'nchar' ||
+                    normalizedType === 'ntext' ||
+                    normalizedType === 'uniqueidentifier' ||
+                    normalizedType === 'datetime2' ||
+                    normalizedType === 'datetimeoffset' ||
+                    normalizedType === 'money' ||
+                    normalizedType === 'smallmoney' ||
+                    normalizedType === 'bit' ||
+                    normalizedType === 'xml' ||
+                    normalizedType === 'hierarchyid' ||
+                    normalizedType === 'geography' ||
+                    normalizedType === 'geometry'
+                ) {
+                    mappedType = { id: normalizedType, name: normalizedType };
+                } else {
+                    // Use the standard mapping for other types
+                    mappedType = mapSQLTypeToGenericType(
+                        column.type,
+                        sourceDatabaseType
+                    );
+                }
             } else {
                 // Use the standard mapping for other types
                 mappedType = mapSQLTypeToGenericType(
@@ -565,22 +729,68 @@ export function convertToChartDBDiagram(
 
             // Add type arguments if present
             if (column.typeArgs) {
-                // Transfer length for varchar/char types
-                if (
-                    column.typeArgs.length !== undefined &&
-                    (field.type.id === 'varchar' || field.type.id === 'char')
-                ) {
-                    field.characterMaximumLength =
-                        column.typeArgs.length.toString();
+                // Handle string typeArgs (e.g., 'max' for varchar(max))
+                if (typeof column.typeArgs === 'string') {
+                    if (
+                        (field.type.id === 'varchar' ||
+                            field.type.id === 'nvarchar') &&
+                        column.typeArgs === 'max'
+                    ) {
+                        field.characterMaximumLength = 'max';
+                    }
                 }
-
-                // Transfer precision/scale for numeric types
-                if (
-                    column.typeArgs.precision !== undefined &&
-                    (field.type.id === 'numeric' || field.type.id === 'decimal')
+                // Handle array typeArgs (SQL Server format)
+                else if (
+                    Array.isArray(column.typeArgs) &&
+                    column.typeArgs.length > 0
                 ) {
-                    field.precision = column.typeArgs.precision;
-                    field.scale = column.typeArgs.scale;
+                    if (
+                        field.type.id === 'varchar' ||
+                        field.type.id === 'nvarchar' ||
+                        field.type.id === 'char' ||
+                        field.type.id === 'nchar'
+                    ) {
+                        field.characterMaximumLength =
+                            column.typeArgs[0].toString();
+                    } else if (
+                        (field.type.id === 'numeric' ||
+                            field.type.id === 'decimal') &&
+                        column.typeArgs.length >= 2
+                    ) {
+                        field.precision = column.typeArgs[0];
+                        field.scale = column.typeArgs[1];
+                    }
+                }
+                // Handle object typeArgs (standard format)
+                else if (
+                    typeof column.typeArgs === 'object' &&
+                    !Array.isArray(column.typeArgs)
+                ) {
+                    const typeArgsObj = column.typeArgs as {
+                        length?: number;
+                        precision?: number;
+                        scale?: number;
+                    };
+
+                    // Transfer length for varchar/char types
+                    if (
+                        typeArgsObj.length !== undefined &&
+                        (field.type.id === 'varchar' ||
+                            field.type.id === 'char')
+                    ) {
+                        field.characterMaximumLength =
+                            typeArgsObj.length.toString();
+                    }
+
+                    // Transfer precision/scale for numeric types
+                    if (
+                        typeArgsObj.precision !== undefined &&
+                        (field.type.id === 'numeric' ||
+                            field.type.id === 'decimal')
+                    ) {
+                        field.precision = typeArgsObj.precision;
+                        field.scale = typeArgsObj.scale;
+                    }
                 }
             }
 
@@ -588,25 +798,38 @@ export function convertToChartDBDiagram(
         });
 
         // Create indexes
-        const indexes = table.indexes.map((sqlIndex) => {
-            const fieldIds = sqlIndex.columns.map((columnName) => {
-                const field = fields.find((f) => f.name === columnName);
-                if (!field) {
-                    throw new Error(
-                        `Index references non-existent column: ${columnName}`
-                    );
-                }
-                return field.id;
-            });
+        const indexes = table.indexes
+            .map((sqlIndex) => {
+                const fieldIds = sqlIndex.columns
+                    .map((columnName) => {
+                        const field = fields.find((f) => f.name === columnName);
+                        if (!field) {
+                            console.warn(
+                                `Index ${sqlIndex.name} references non-existent column: ${columnName} in table ${table.name}. Skipping this column.`
+                            );
+                            return null;
+                        }
+                        return field.id;
+                    })
+                    .filter((id): id is string => id !== null);
 
-            return {
-                id: generateId(),
-                name: sqlIndex.name,
-                fieldIds,
-                unique: sqlIndex.unique,
-                createdAt: Date.now(),
-            };
-        });
+                // Only create index if at least one column was found
+                if (fieldIds.length === 0) {
+                    console.warn(
+                        `Index ${sqlIndex.name} has no valid columns. Skipping index.`
+                    );
+                    return null;
+                }
+
+                return {
+                    id: generateId(),
+                    name: sqlIndex.name,
+                    fieldIds,
+                    unique: sqlIndex.unique,
+                    createdAt: Date.now(),
+                };
+            })
+            .filter((idx): idx is DBIndex => idx !== null);
 
         return {
             id: newId,
@@ -617,10 +840,10 @@ export function convertToChartDBDiagram(
             indexes,
             x: col * tableSpacing,
             y: row * tableSpacing,
-            color: randomColor(),
+            color: defaultTableColor,
             isView: false,
             createdAt: Date.now(),
-        };
+        } satisfies DBTable;
     });
 
     // Process relationships
@@ -669,19 +892,13 @@ export function convertToChartDBDiagram(
         }
 
         const sourceField = sourceTable.fields.find(
-            (f) => f.name === rel.sourceColumn
+            (f) => f.name.toLowerCase() === rel.sourceColumn.toLowerCase()
         );
         const targetField = targetTable.fields.find(
-            (f) => f.name === rel.targetColumn
+            (f) => f.name.toLowerCase() === rel.targetColumn.toLowerCase()
         );
 
         if (!sourceField || !targetField) {
-            console.log('Relationship refers to non-existent field:', {
-                sourceTable: rel.sourceTable,
-                sourceField: rel.sourceColumn,
-                targetTable: rel.targetTable,
-                targetField: rel.targetColumn,
-            });
             return;
         }
 
@@ -708,12 +925,29 @@ export function convertToChartDBDiagram(
         });
     });
 
+    // Convert SQL enum types to ChartDB custom types
+    const customTypes: DBCustomType[] = [];
+
+    if (parserResult.enums) {
+        parserResult.enums.forEach((enumType, index) => {
+            customTypes.push({
+                id: generateId(),
+                name: enumType.name,
+                schema: 'public', // Default to public schema for now
+                kind: DBCustomTypeKind.enum,
+                values: enumType.values,
+                order: index,
+            });
+        });
+    }
+
     const diagram = {
         id: generateDiagramId(),
         name: `SQL Import (${sourceDatabaseType})`,
         databaseType: targetDatabaseType,
         tables,
         relationships,
+        customTypes: customTypes.length > 0 ? customTypes : undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
     };

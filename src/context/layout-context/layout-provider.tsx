@@ -10,10 +10,9 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
     const [openedTableInSidebar, setOpenedTableInSidebar] = React.useState<
         string | undefined
     >();
-    const [openedRelationshipInSidebar, setOpenedRelationshipInSidebar] =
-        React.useState<string | undefined>();
-    const [openedDependencyInSidebar, setOpenedDependencyInSidebar] =
-        React.useState<string | undefined>();
+    const [openedRefInSidebar, setOpenedRefInSidebar] = React.useState<
+        string | undefined
+    >();
     const [openedAreaInSidebar, setOpenedAreaInSidebar] = React.useState<
         string | undefined
     >();
@@ -23,17 +22,18 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
         React.useState<SidebarSection>('tables');
     const [isSidePanelShowed, setIsSidePanelShowed] =
         React.useState<boolean>(isDesktop);
-    const [isSelectSchemaOpen, setIsSelectSchemaOpen] =
-        React.useState<boolean>(false);
 
     const closeAllTablesInSidebar: LayoutContext['closeAllTablesInSidebar'] =
         () => setOpenedTableInSidebar('');
 
     const closeAllRelationshipsInSidebar: LayoutContext['closeAllRelationshipsInSidebar'] =
-        () => setOpenedRelationshipInSidebar('');
+        () => setOpenedRefInSidebar('');
 
     const closeAllDependenciesInSidebar: LayoutContext['closeAllDependenciesInSidebar'] =
-        () => setOpenedDependencyInSidebar('');
+        () => setOpenedRefInSidebar('');
+
+    const closeAllRefsInSidebar: LayoutContext['closeAllRefsInSidebar'] = () =>
+        setOpenedRefInSidebar('');
 
     const closeAllAreasInSidebar: LayoutContext['closeAllAreasInSidebar'] =
         () => setOpenedAreaInSidebar('');
@@ -62,16 +62,22 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
     const openRelationshipFromSidebar: LayoutContext['openRelationshipFromSidebar'] =
         (relationshipId) => {
             showSidePanel();
-            setSelectedSidebarSection('relationships');
-            setOpenedRelationshipInSidebar(relationshipId);
+            setSelectedSidebarSection('refs');
+            setOpenedRefInSidebar(relationshipId);
         };
 
     const openDependencyFromSidebar: LayoutContext['openDependencyFromSidebar'] =
         (dependencyId) => {
             showSidePanel();
-            setSelectedSidebarSection('dependencies');
-            setOpenedDependencyInSidebar(dependencyId);
+            setSelectedSidebarSection('refs');
+            setOpenedRefInSidebar(dependencyId);
         };
+
+    const openRefFromSidebar: LayoutContext['openRefFromSidebar'] = (refId) => {
+        showSidePanel();
+        setSelectedSidebarSection('refs');
+        setOpenedRefInSidebar(refId);
+    };
 
     const openAreaFromSidebar: LayoutContext['openAreaFromSidebar'] = (
         areaId
@@ -88,11 +94,6 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
             setOpenedTableInSidebar(customTypeId);
         };
 
-    const openSelectSchema: LayoutContext['openSelectSchema'] = () =>
-        setIsSelectSchemaOpen(true);
-
-    const closeSelectSchema: LayoutContext['closeSelectSchema'] = () =>
-        setIsSelectSchemaOpen(false);
     return (
         <layoutContext.Provider
             value={{
@@ -100,7 +101,6 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
                 selectedSidebarSection,
                 openTableFromSidebar,
                 selectSidebarSection: setSelectedSidebarSection,
-                openedRelationshipInSidebar,
                 openRelationshipFromSidebar,
                 closeAllTablesInSidebar,
                 closeAllRelationshipsInSidebar,
@@ -108,12 +108,11 @@ export const LayoutProvider: React.FC<React.PropsWithChildren> = ({
                 hideSidePanel,
                 showSidePanel,
                 toggleSidePanel,
-                isSelectSchemaOpen,
-                openSelectSchema,
-                closeSelectSchema,
-                openedDependencyInSidebar,
                 openDependencyFromSidebar,
                 closeAllDependenciesInSidebar,
+                openedRefInSidebar,
+                openRefFromSidebar,
+                closeAllRefsInSidebar,
                 openedAreaInSidebar,
                 openAreaFromSidebar,
                 closeAllAreasInSidebar,

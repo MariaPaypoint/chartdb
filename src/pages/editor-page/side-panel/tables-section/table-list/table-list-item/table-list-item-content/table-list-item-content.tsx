@@ -48,6 +48,8 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
         removeIndex,
         updateIndex,
         updateTable,
+        readonly,
+        databaseType,
     } = useChartDB();
     const { t } = useTranslation();
     const { color } = table;
@@ -55,6 +57,32 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
         AccordionItemValue[]
     >(['fields']);
     const sensors = useSensors(useSensor(PointerSensor));
+
+    // Create a memoized version of the field updater that handles primary key logic
+    const handleFieldUpdate = useCallback(
+        (fieldId: string, attrs: Partial<DBField>) => {
+            updateField(table.id, fieldId, attrs);
+
+            // Handle the case when removing a primary key and only one remains
+            if (attrs.primaryKey === false) {
+                const remainingPrimaryKeys = table.fields.filter(
+                    (f) => f.id !== fieldId && f.primaryKey
+                );
+                if (remainingPrimaryKeys.length === 1) {
+                    // Set the remaining primary key field as unique
+                    updateField(
+                        table.id,
+                        remainingPrimaryKeys[0].id,
+                        {
+                            unique: true,
+                        },
+                        { updateHistory: false }
+                    );
+                }
+            }
+        },
+        [table.id, table.fields, updateField]
+    );
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -120,17 +148,19 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
                                 <FileType2 className="size-4" />
                                 {t('side_panel.tables_section.table.fields')}
                             </div>
-                            <div className="flex flex-row-reverse">
-                                <div className="hidden flex-row-reverse group-hover:flex">
-                                    <Button
-                                        variant="ghost"
-                                        className="size-4 p-0 text-xs hover:bg-primary-foreground"
-                                        onClick={createFieldHandler}
-                                    >
-                                        <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-                                    </Button>
+                            {!readonly ? (
+                                <div className="flex flex-row-reverse">
+                                    <div className="hidden flex-row-reverse group-hover:flex">
+                                        <Button
+                                            variant="ghost"
+                                            className="size-4 p-0 text-xs hover:bg-primary-foreground"
+                                            onClick={createFieldHandler}
+                                        >
+                                            <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
+                            ) : null}
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col pb-0 pt-1">
@@ -147,33 +177,32 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
                                     <TableField
                                         key={field.id}
                                         field={field}
-                                        updateField={(
-                                            attrs: Partial<DBField>
-                                        ) =>
-                                            updateField(
-                                                table.id,
-                                                field.id,
-                                                attrs
-                                            )
+                                        table={table}
+                                        updateField={(attrs) =>
+                                            handleFieldUpdate(field.id, attrs)
                                         }
                                         removeField={() =>
                                             removeField(table.id, field.id)
                                         }
+                                        databaseType={databaseType}
+                                        readonly={readonly}
                                     />
                                 ))}
                             </SortableContext>
-                            <div className="flex justify-start p-1">
-                                <Button
-                                    variant="ghost"
-                                    className="flex h-7 items-center gap-1 px-2 text-xs"
-                                    onClick={createFieldHandler}
-                                >
-                                    <Plus className="size-4 text-muted-foreground" />
-                                    {t(
-                                        'side_panel.tables_section.table.add_field'
-                                    )}
-                                </Button>
-                            </div>
+                            {!readonly ? (
+                                <div className="flex justify-start p-1">
+                                    <Button
+                                        variant="ghost"
+                                        className="flex h-7 items-center gap-1 px-2 text-xs"
+                                        onClick={createFieldHandler}
+                                    >
+                                        <Plus className="size-4 text-muted-foreground" />
+                                        {t(
+                                            'side_panel.tables_section.table.add_field'
+                                        )}
+                                    </Button>
+                                </div>
+                            ) : null}
                         </DndContext>
                     </AccordionContent>
                 </AccordionItem>
@@ -189,43 +218,58 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
                                 <FileKey2 className="size-4" />
                                 {t('side_panel.tables_section.table.indexes')}
                             </div>
-                            <div className="flex flex-row-reverse">
-                                <div className="hidden flex-row-reverse group-hover:flex">
-                                    <Button
-                                        variant="ghost"
-                                        className="size-4 p-0 text-xs hover:bg-primary-foreground"
-                                        onClick={createIndexHandler}
-                                    >
-                                        <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-                                    </Button>
+                            {!readonly ? (
+                                <div className="flex flex-row-reverse">
+                                    <div className="hidden flex-row-reverse group-hover:flex">
+                                        <Button
+                                            variant="ghost"
+                                            className="size-4 p-0 text-xs hover:bg-primary-foreground"
+                                            onClick={createIndexHandler}
+                                        >
+                                            <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
+                            ) : null}
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0 pt-1">
-                        {table.indexes.map((index) => (
-                            <TableIndex
-                                key={index.id}
-                                index={index}
-                                removeIndex={() =>
-                                    removeIndex(table.id, index.id)
-                                }
-                                updateIndex={(attrs: Partial<DBIndex>) =>
-                                    updateIndex(table.id, index.id, attrs)
-                                }
-                                fields={table.fields}
-                            />
-                        ))}
-                        <div className="flex justify-start p-1">
-                            <Button
-                                variant="ghost"
-                                className="flex h-7 items-center gap-1 px-2 text-xs"
-                                onClick={createIndexHandler}
-                            >
-                                <Plus className="size-4 text-muted-foreground" />
-                                {t('side_panel.tables_section.table.add_index')}
-                            </Button>
-                        </div>
+                        {[...table.indexes]
+                            .sort((a, b) => {
+                                // Sort PK indexes first
+                                if (a.isPrimaryKey && !b.isPrimaryKey)
+                                    return -1;
+                                if (!a.isPrimaryKey && b.isPrimaryKey) return 1;
+                                return 0;
+                            })
+                            .map((index) => (
+                                <TableIndex
+                                    key={index.id}
+                                    index={index}
+                                    removeIndex={() =>
+                                        removeIndex(table.id, index.id)
+                                    }
+                                    updateIndex={(attrs: Partial<DBIndex>) =>
+                                        updateIndex(table.id, index.id, attrs)
+                                    }
+                                    fields={table.fields}
+                                />
+                            ))}
+
+                        {!readonly ? (
+                            <div className="flex justify-start p-1">
+                                <Button
+                                    variant="ghost"
+                                    className="flex h-7 items-center gap-1 px-2 text-xs"
+                                    onClick={createIndexHandler}
+                                >
+                                    <Plus className="size-4 text-muted-foreground" />
+                                    {t(
+                                        'side_panel.tables_section.table.add_index'
+                                    )}
+                                </Button>
+                            </div>
+                        ) : null}
                     </AccordionContent>
                 </AccordionItem>
 
@@ -244,7 +288,7 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
                     </AccordionTrigger>
                     <AccordionContent className="pb-0 pt-1">
                         <Textarea
-                            value={table.comments}
+                            value={table.comments ?? undefined}
                             onChange={(e) =>
                                 updateTable(table.id, {
                                     comments: e.target.value,
@@ -254,34 +298,43 @@ export const TableListItemContent: React.FC<TableListItemContentProps> = ({
                                 'side_panel.tables_section.table.no_comments'
                             )}
                             className="w-full rounded-md bg-muted text-sm focus-visible:ring-0"
+                            readOnly={readonly}
                         />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            <Separator className="" />
+            {!readonly ? <Separator className="" /> : null}
+
             <div className="flex flex-1 items-center justify-between">
-                <ColorPicker
-                    color={color}
-                    onChange={(color) => updateTable(table.id, { color })}
-                />
-                <div className="flex gap-1">
-                    <Button
-                        variant="outline"
-                        className="h-8 p-2 text-xs"
-                        onClick={createIndexHandler}
-                    >
-                        <FileKey2 className="h-4" />
-                        {t('side_panel.tables_section.table.add_index')}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="h-8 p-2 text-xs"
-                        onClick={createFieldHandler}
-                    >
-                        <FileType2 className="h-4" />
-                        {t('side_panel.tables_section.table.add_field')}
-                    </Button>
-                </div>
+                {!table.isView && !readonly ? (
+                    <ColorPicker
+                        color={color}
+                        onChange={(color) => updateTable(table.id, { color })}
+                    />
+                ) : (
+                    <div />
+                )}
+
+                {!readonly ? (
+                    <div className="flex gap-1">
+                        <Button
+                            variant="outline"
+                            className="h-8 p-2 text-xs"
+                            onClick={createIndexHandler}
+                        >
+                            <FileKey2 className="h-4" />
+                            {t('side_panel.tables_section.table.add_index')}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="h-8 p-2 text-xs"
+                            onClick={createFieldHandler}
+                        >
+                            <FileType2 className="h-4" />
+                            {t('side_panel.tables_section.table.add_field')}
+                        </Button>
+                    </div>
+                ) : null}
             </div>
         </div>
     );

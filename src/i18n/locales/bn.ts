@@ -2,11 +2,20 @@ import type { LanguageMetadata, LanguageTranslation } from '../types';
 
 export const bn: LanguageTranslation = {
     translation: {
+        editor_sidebar: {
+            new_diagram: 'নতুন',
+            browse: 'ব্রাউজ',
+            tables: 'টেবিল',
+            refs: 'রেফস',
+            areas: 'এলাকা',
+            dependencies: 'নির্ভরতা',
+            custom_types: 'কাস্টম টাইপ',
+        },
         menu: {
-            file: {
-                file: 'ফাইল',
-                new: 'নতুন',
-                open: 'খুলুন',
+            actions: {
+                actions: 'কার্য',
+                new: 'নতুন...',
+                browse: 'ব্রাউজ করুন...',
                 save: 'সংরক্ষণ করুন',
                 import: 'ডাটাবেস আমদানি করুন',
                 export_sql: 'SQL রপ্তানি করুন',
@@ -27,7 +36,10 @@ export const bn: LanguageTranslation = {
                 hide_sidebar: 'সাইডবার লুকান',
                 hide_cardinality: 'কার্ডিনালিটি লুকান',
                 show_cardinality: 'কার্ডিনালিটি দেখান',
+                hide_field_attributes: 'ফিল্ড অ্যাট্রিবিউট লুকান',
+                show_field_attributes: 'ফিল্ড অ্যাট্রিবিউট দেখান',
                 zoom_on_scroll: 'স্ক্রলে জুম করুন',
+                show_views: 'ডাটাবেস ভিউ',
                 theme: 'থিম',
                 show_dependencies: 'নির্ভরতাগুলি দেখান',
                 hide_dependencies: 'নির্ভরতাগুলি লুকান',
@@ -91,20 +103,11 @@ export const bn: LanguageTranslation = {
         },
 
         reorder_diagram_alert: {
-            title: 'ডায়াগ্রাম পুনর্বিন্যাস করুন',
+            title: 'স্বয়ংক্রিয় ডায়াগ্রাম সাজান',
             description:
                 'এই কাজটি ডায়াগ্রামের সমস্ত টেবিল পুনর্বিন্যাস করবে। আপনি কি চালিয়ে যেতে চান?',
-            reorder: 'পুনর্বিন্যাস করুন',
+            reorder: 'স্বয়ংক্রিয় সাজান',
             cancel: 'বাতিল করুন',
-        },
-
-        multiple_schemas_alert: {
-            title: 'বহু স্কিমা',
-            description:
-                '{{schemasCount}} স্কিমা এই ডায়াগ্রামে রয়েছে। বর্তমানে প্রদর্শিত: {{formattedSchemas}}।',
-            dont_show_again: 'পুনরায় দেখাবেন না',
-            change_schema: 'পরিবর্তন করুন',
-            none: 'কিছুই না',
         },
 
         copy_to_clipboard_toast: {
@@ -141,14 +144,11 @@ export const bn: LanguageTranslation = {
         copied: 'অনুলিপি সম্পন্ন!',
 
         side_panel: {
-            schema: 'স্কিমা:',
-            filter_by_schema: 'স্কিমা দ্বারা ফিল্টার করুন',
-            search_schema: 'স্কিমা খুঁজুন...',
-            no_schemas_found: 'কোনো স্কিমা পাওয়া যায়নি।',
             view_all_options: 'সমস্ত বিকল্প দেখুন...',
             tables_section: {
                 tables: 'টেবিল',
                 add_table: 'টেবিল যোগ করুন',
+                add_view: 'ভিউ যোগ করুন',
                 filter: 'ফিল্টার',
                 collapse: 'সব ভাঁজ করুন',
                 // TODO: Translate
@@ -174,16 +174,23 @@ export const bn: LanguageTranslation = {
                     field_actions: {
                         title: 'ফিল্ড কর্ম',
                         unique: 'অদ্বিতীয়',
+                        auto_increment: 'স্বয়ংক্রিয় বৃদ্ধি',
                         comments: 'মন্তব্য',
                         no_comments: 'কোনো মন্তব্য নেই',
                         delete_field: 'ফিল্ড মুছুন',
                         // TODO: Translate
+                        default_value: 'Default Value',
+                        no_default: 'No default',
+                        // TODO: Translate
                         character_length: 'Max Length',
+                        precision: 'নির্ভুলতা',
+                        scale: 'স্কেল',
                     },
                     index_actions: {
                         title: 'ইনডেক্স কর্ম',
                         name: 'নাম',
                         unique: 'অদ্বিতীয়',
+                        index_type: 'ইনডেক্স ধরন',
                         delete_index: 'ইনডেক্স মুছুন',
                     },
                     table_actions: {
@@ -200,14 +207,17 @@ export const bn: LanguageTranslation = {
                     description: 'শুরু করতে একটি টেবিল তৈরি করুন',
                 },
             },
-            relationships_section: {
-                relationships: 'সম্পর্ক',
+            refs_section: {
+                refs: 'রেফস',
                 filter: 'ফিল্টার',
-                add_relationship: 'সম্পর্ক যোগ করুন',
                 collapse: 'সব ভাঁজ করুন',
+                add_relationship: 'সম্পর্ক যোগ করুন',
+                relationships: 'সম্পর্ক',
+                dependencies: 'নির্ভরতাগুলি',
                 relationship: {
+                    relationship: 'সম্পর্ক',
                     primary: 'প্রাথমিক টেবিল',
-                    foreign: 'বিদেশি টেবিল',
+                    foreign: 'রেফারেন্স করা টেবিল',
                     cardinality: 'কার্ডিনালিটি',
                     delete_relationship: 'মুছুন',
                     relationship_actions: {
@@ -215,27 +225,19 @@ export const bn: LanguageTranslation = {
                         delete_relationship: 'মুছুন',
                     },
                 },
-                empty_state: {
-                    title: 'কোনো সম্পর্ক নেই',
-                    description: 'টেবিল সংযোগ করতে একটি সম্পর্ক তৈরি করুন',
-                },
-            },
-            dependencies_section: {
-                dependencies: 'নির্ভরতাগুলি',
-                filter: 'ফিল্টার',
-                collapse: 'ভাঁজ করুন',
                 dependency: {
+                    dependency: 'নির্ভরতা',
                     table: 'টেবিল',
-                    dependent_table: 'নির্ভরশীল টেবিল',
-                    delete_dependency: 'নির্ভরতা মুছুন',
+                    dependent_table: 'নির্ভরশীল ভিউ',
+                    delete_dependency: 'মুছুন',
                     dependency_actions: {
                         title: 'কর্ম',
-                        delete_dependency: 'নির্ভরতা মুছুন',
+                        delete_dependency: 'মুছুন',
                     },
                 },
                 empty_state: {
-                    title: 'কোনো নির্ভরতাগুলি নেই',
-                    description: 'এই অংশে কোনো নির্ভরতা উপলব্ধ নেই।',
+                    title: 'কোনো সম্পর্ক নেই',
+                    description: 'শুরু করতে একটি সম্পর্ক তৈরি করুন',
                 },
             },
 
@@ -275,12 +277,16 @@ export const bn: LanguageTranslation = {
                     enum_values: 'Enum Values',
                     composite_fields: 'Fields',
                     no_fields: 'No fields defined',
+                    no_values: 'কোন enum মান সংজ্ঞায়িত নেই',
                     field_name_placeholder: 'Field name',
                     field_type_placeholder: 'Select type',
                     add_field: 'Add Field',
+                    no_fields_tooltip: 'No fields defined for this custom type',
                     custom_type_actions: {
                         title: 'Actions',
+                        highlight_fields: 'Highlight Fields',
                         delete_custom_type: 'Delete',
+                        clear_field_highlight: 'Clear Highlight',
                     },
                     delete_custom_type: 'Delete Type',
                 },
@@ -294,8 +300,14 @@ export const bn: LanguageTranslation = {
             show_all: 'সব দেখান',
             undo: 'পূর্বাবস্থায় ফিরুন',
             redo: 'পুনরায় করুন',
-            reorder_diagram: 'ডায়াগ্রাম পুনর্বিন্যাস করুন',
+            reorder_diagram: 'স্বয়ংক্রিয় ডায়াগ্রাম সাজান',
             highlight_overlapping_tables: 'ওভারল্যাপিং টেবিল হাইলাইট করুন',
+
+            // TODO: Translate
+            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            custom_type_highlight_tooltip:
+                'Highlighting "{{typeName}}" - Click to clear',
+            filter: 'Filter Tables',
         },
 
         new_diagram_dialog: {
@@ -327,13 +339,13 @@ export const bn: LanguageTranslation = {
             cancel: 'বাতিল করুন',
             back: 'ফিরে যান',
             import_from_file: 'ফাইল থেকে আমদানি করুন',
-            empty_diagram: 'ফাঁকা চিত্র',
+            empty_diagram: 'খালি ডাটাবেস',
             continue: 'চালিয়ে যান',
             import: 'আমদানি করুন',
         },
 
         open_diagram_dialog: {
-            title: 'চিত্র খুলুন',
+            title: 'ডেটাবেস খুলুন',
             description: 'নিচের তালিকা থেকে একটি চিত্র নির্বাচন করুন।',
             table_columns: {
                 name: 'নাম',
@@ -343,6 +355,12 @@ export const bn: LanguageTranslation = {
             },
             cancel: 'বাতিল করুন',
             open: 'খুলুন',
+
+            diagram_actions: {
+                open: 'খুলুন',
+                duplicate: 'ডুপ্লিকেট',
+                delete: 'মুছুন',
+            },
         },
 
         export_sql_dialog: {
@@ -432,6 +450,13 @@ export const bn: LanguageTranslation = {
             cancel: 'বাতিল করুন',
             confirm: 'পরিবর্তন করুন',
         },
+        create_table_schema_dialog: {
+            title: 'নতুন স্কিমা তৈরি করুন',
+            description:
+                'এখনও কোনো স্কিমা নেই। আপনার টেবিলগুলি সংগঠিত করতে আপনার প্রথম স্কিমা তৈরি করুন।',
+            create: 'তৈরি করুন',
+            cancel: 'বাতিল করুন',
+        },
 
         star_us_dialog: {
             title: 'আমাদের উন্নত করতে সাহায্য করুন!',
@@ -506,6 +531,7 @@ export const bn: LanguageTranslation = {
 
         canvas_context_menu: {
             new_table: 'নতুন টেবিল',
+            new_view: 'নতুন ভিউ',
             new_relationship: 'নতুন সম্পর্ক',
             // TODO: Translate
             new_area: 'New Area',
@@ -527,6 +553,9 @@ export const bn: LanguageTranslation = {
         language_select: {
             change_language: 'ভাষা পরিবর্তন করুন',
         },
+
+        on: 'চালু',
+        off: 'বন্ধ',
     },
 };
 

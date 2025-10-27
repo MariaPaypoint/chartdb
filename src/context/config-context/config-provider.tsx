@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ConfigContext } from './config-context';
 
 import { useStorage } from '@/hooks/use-storage';
@@ -8,7 +8,7 @@ export const ConfigProvider: React.FC<React.PropsWithChildren> = ({
     children,
 }) => {
     const { getConfig, updateConfig: updateDataConfig } = useStorage();
-    const [config, setConfig] = React.useState<ChartDBConfig | undefined>();
+    const [config, setConfig] = useState<ChartDBConfig | undefined>();
 
     useEffect(() => {
         const loadConfig = async () => {
@@ -45,7 +45,12 @@ export const ConfigProvider: React.FC<React.PropsWithChildren> = ({
     };
 
     return (
-        <ConfigContext.Provider value={{ config, updateConfig }}>
+        <ConfigContext.Provider
+            value={{
+                config,
+                updateConfig,
+            }}
+        >
             {children}
         </ConfigContext.Provider>
     );

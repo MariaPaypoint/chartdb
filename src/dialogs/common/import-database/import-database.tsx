@@ -35,53 +35,33 @@ import type { OnChange } from '@monaco-editor/react';
 import { useDebounce } from '@/hooks/use-debounce-v2';
 import { InstructionsSection } from './instructions-section/instructions-section';
 import { parseSQLError } from '@/lib/data/sql-import';
-import type { editor } from 'monaco-editor';
+import type { editor, IDisposable } from 'monaco-editor';
+import { waitFor } from '@/lib/utils';
+import {
+    validateSQL,
+    type ValidationResult,
+} from '@/lib/data/sql-import/sql-validator';
+import { SQLValidationStatus } from './sql-validation-status';
+import { setupDBMLLanguage } from '@/components/code-snippet/languages/dbml-language';
+import type { ImportMethod } from '@/lib/import-method/import-method';
+import { detectImportMethod } from '@/lib/import-method/detect-import-method';
+import { verifyDBML } from '@/lib/dbml/dbml-import/verify-dbml';
+import {
+    clearErrorHighlight,
+    highlightErrorLine,
+} from '@/components/code-snippet/dbml/utils';
+
+const calculateContentSizeMB = (content: string): number => {
+    return content.length / (1024 * 1024); // Convert to MB
+};
+
+const calculateIsLargeFile = (content: string): boolean => {
+    const contentSizeMB = calculateContentSizeMB(content);
+    return contentSizeMB > 2; // Consider large if over 2MB
+};
 
 const errorScriptOutputMessage =
     'Invalid JSON. Please correct it or contact us at support@chartdb.io for help.';
-
-// Helper to detect if content is likely SQL DDL or JSON
-const detectContentType = (content: string): 'query' | 'ddl' | null => {
-    if (!content || content.trim().length === 0) return null;
-
-    // Common SQL DDL keywords
-    const ddlKeywords = [
-        'CREATE TABLE',
-        'ALTER TABLE',
-        'DROP TABLE',
-        'CREATE INDEX',
-        'CREATE VIEW',
-        'CREATE PROCEDURE',
-        'CREATE FUNCTION',
-        'CREATE SCHEMA',
-        'CREATE DATABASE',
-    ];
-
-    const upperContent = content.toUpperCase();
-
-    // Check for SQL DDL patterns
-    const hasDDLKeywords = ddlKeywords.some((keyword) =>
-        upperContent.includes(keyword)
-    );
-    if (hasDDLKeywords) return 'ddl';
-
-    // Check if it looks like JSON
-    try {
-        // Just check structure, don't need full parse for detection
-        if (
-            (content.trim().startsWith('{') && content.trim().endsWith('}')) ||
-            (content.trim().startsWith('[') && content.trim().endsWith(']'))
-        ) {
-            return 'query';
-        }
-    } catch (error) {
-        // Not valid JSON, might be partial
-        console.error('Error detecting content type:', error);
-    }
-
-    // If we can't confidently detect, return null
-    return null;
-};
 
 export interface ImportDatabaseProps {
     goBack?: () => void;
@@ -96,8 +76,8 @@ export interface ImportDatabaseProps {
     >;
     keepDialogAfterImport?: boolean;
     title: string;
-    importMethod: 'query' | 'ddl';
-    setImportMethod: (method: 'query' | 'ddl') => void;
+    importMethod: ImportMethod;
+    setImportMethod: (method: ImportMethod) => void;
 }
 
 export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
@@ -117,6 +97,8 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
     const { effectiveTheme } = useTheme();
     const [errorMessage, setErrorMessage] = useState('');
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const decorationsCollection = useRef<editor.IEditorDecorationsCollection>();
+    const pasteDisposableRef = useRef<IDisposable | null>(null);
 
     const { t } = useTranslation();
     const { isSm: isDesktop } = useBreakpoint('sm');
@@ -124,6 +106,15 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
     const [showCheckJsonButton, setShowCheckJsonButton] = useState(false);
     const [isCheckingJson, setIsCheckingJson] = useState(false);
     const [showSSMSInfoDialog, setShowSSMSInfoDialog] = useState(false);
+    const [sqlValidation, setSqlValidation] = useState<ValidationResult | null>(
+        null
+    );
+    const [isAutoFixing, setIsAutoFixing] = useState(false);
+    const [showAutoFixButton, setShowAutoFixButton] = useState(false);
+
+    const clearDecorations = useCallback(() => {
+        clearErrorHighlight(decorationsCollection.current);
+    }, []);
 
     useEffect(() => {
         setScriptResult('');
@@ -131,14 +122,82 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
         setShowCheckJsonButton(false);
     }, [importMethod, setScriptResult]);
 
-    // Check if the ddl is valid
+    // Check if the ddl or dbml is valid
     useEffect(() => {
-        if (importMethod !== 'ddl') {
+        clearDecorations();
+        if (importMethod === 'query') {
+            setSqlValidation(null);
+            setShowAutoFixButton(false);
             return;
         }
 
-        if (!scriptResult.trim()) return;
+        if (!scriptResult.trim()) {
+            setSqlValidation(null);
+            setShowAutoFixButton(false);
+            setErrorMessage('');
+            return;
+        }
 
+        if (importMethod === 'dbml') {
+            // Validate DBML by parsing it
+            const validateResponse = verifyDBML(scriptResult, { databaseType });
+            if (!validateResponse.hasError) {
+                setErrorMessage('');
+                setSqlValidation({
+                    isValid: true,
+                    errors: [],
+                    warnings: [],
+                });
+            } else {
+                let errorMsg = 'Invalid DBML syntax';
+                let line: number = 1;
+
+                if (validateResponse.parsedError) {
+                    errorMsg = validateResponse.parsedError.message;
+                    line = validateResponse.parsedError.line;
+                    highlightErrorLine({
+                        error: validateResponse.parsedError,
+                        model: editorRef.current?.getModel(),
+                        editorDecorationsCollection:
+                            decorationsCollection.current,
+                    });
+                }
+
+                setSqlValidation({
+                    isValid: false,
+                    errors: [
+                        {
+                            message: errorMsg,
+                            line: line,
+                            type: 'syntax' as const,
+                        },
+                    ],
+                    warnings: [],
+                });
+                setErrorMessage(errorMsg);
+            }
+
+            setShowAutoFixButton(false);
+            return;
+        }
+
+        // SQL validation
+        // First run our validation based on database type
+        const validation = validateSQL(scriptResult, databaseType);
+        setSqlValidation(validation);
+
+        // If we have auto-fixable errors, show the auto-fix button
+        if (validation.fixedSQL && validation.errors.length > 0) {
+            setShowAutoFixButton(true);
+            // Don't try to parse invalid SQL
+            setErrorMessage('SQL contains syntax errors');
+            return;
+        }
+
+        // Hide auto-fix button if no fixes available
+        setShowAutoFixButton(false);
+
+        // Validate the SQL (either original or already fixed)
         parseSQLError({
             sqlContent: scriptResult,
             sourceDatabaseType: databaseType,
@@ -149,7 +208,7 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                 setErrorMessage(result.error);
             }
         });
-    }, [importMethod, scriptResult, databaseType]);
+    }, [importMethod, scriptResult, databaseType, clearDecorations]);
 
     // Check if the script result is a valid JSON
     useEffect(() => {
@@ -184,8 +243,44 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
         }
     }, [errorMessage.length, onImport, scriptResult]);
 
+    const handleAutoFix = useCallback(() => {
+        if (sqlValidation?.fixedSQL) {
+            setIsAutoFixing(true);
+            setShowAutoFixButton(false);
+            setErrorMessage('');
+
+            // Apply the fix with a delay so user sees the fixing message
+            setTimeout(() => {
+                setScriptResult(sqlValidation.fixedSQL!);
+
+                setTimeout(() => {
+                    setIsAutoFixing(false);
+                }, 100);
+            }, 1000);
+        }
+    }, [sqlValidation, setScriptResult]);
+
+    const handleErrorClick = useCallback((line: number) => {
+        if (editorRef.current) {
+            // Set cursor to the error line
+            editorRef.current.setPosition({ lineNumber: line, column: 1 });
+            editorRef.current.revealLineInCenter(line);
+            editorRef.current.focus();
+        }
+    }, []);
+
     const formatEditor = useCallback(() => {
         if (editorRef.current) {
+            const model = editorRef.current.getModel();
+            if (model) {
+                const content = model.getValue();
+
+                // Skip formatting for large files (> 2MB)
+                if (calculateIsLargeFile(content)) {
+                    return;
+                }
+            }
+
             setTimeout(() => {
                 editorRef.current
                     ?.getAction('editor.action.formatDocument')
@@ -211,7 +306,8 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
     const handleCheckJson = useCallback(async () => {
         setIsCheckingJson(true);
 
-        const fixedJson = await fixMetadataJson(scriptResult);
+        await waitFor(1000);
+        const fixedJson = fixMetadataJson(scriptResult);
 
         if (isStringMetadataJson(fixedJson)) {
             setScriptResult(fixedJson);
@@ -227,37 +323,71 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
         setIsCheckingJson(false);
     }, [scriptResult, setScriptResult, formatEditor]);
 
-    const detectAndSetImportMethod = useCallback(() => {
-        const content = editorRef.current?.getValue();
-        if (content && content.trim()) {
-            const detectedType = detectContentType(content);
-            if (detectedType && detectedType !== importMethod) {
-                setImportMethod(detectedType);
-            }
-        }
-    }, [setImportMethod, importMethod]);
-
-    const [editorDidMount, setEditorDidMount] = useState(false);
-
     useEffect(() => {
-        if (editorRef.current && editorDidMount) {
-            editorRef.current.onDidPaste(() => {
-                setTimeout(() => {
-                    editorRef.current
-                        ?.getAction('editor.action.formatDocument')
-                        ?.run();
-                }, 0);
-                setTimeout(detectAndSetImportMethod, 0);
-            });
-        }
-    }, [detectAndSetImportMethod, editorDidMount]);
+        // Cleanup paste handler on unmount
+        return () => {
+            if (pasteDisposableRef.current) {
+                pasteDisposableRef.current.dispose();
+                pasteDisposableRef.current = null;
+            }
+        };
+    }, []);
 
     const handleEditorDidMount = useCallback(
         (editor: editor.IStandaloneCodeEditor) => {
             editorRef.current = editor;
-            setEditorDidMount(true);
+            decorationsCollection.current =
+                editor.createDecorationsCollection();
+
+            // Cleanup previous disposable if it exists
+            if (pasteDisposableRef.current) {
+                pasteDisposableRef.current.dispose();
+                pasteDisposableRef.current = null;
+            }
+
+            // Add paste handler for all modes
+            const disposable = editor.onDidPaste(() => {
+                const model = editor.getModel();
+                if (!model) return;
+
+                const content = model.getValue();
+
+                // Skip formatting for large files (> 2MB) to prevent browser freezing
+                const isLargeFile = calculateIsLargeFile(content);
+
+                // First, detect content type to determine if we should switch modes
+                const detectedType = detectImportMethod(content);
+                if (detectedType && detectedType !== importMethod) {
+                    // Switch to the detected mode immediately
+                    setImportMethod(detectedType);
+
+                    // Only format if it's JSON (query mode) AND file is not too large
+                    if (detectedType === 'query' && !isLargeFile) {
+                        // For JSON mode, format after a short delay
+                        setTimeout(() => {
+                            editor
+                                .getAction('editor.action.formatDocument')
+                                ?.run();
+                        }, 100);
+                    }
+                    // For DDL and DBML modes, do NOT format as it can break the syntax
+                } else {
+                    // Content type didn't change, apply formatting based on current mode
+                    if (importMethod === 'query' && !isLargeFile) {
+                        // Only format JSON content if not too large
+                        setTimeout(() => {
+                            editor
+                                .getAction('editor.action.formatDocument')
+                                ?.run();
+                        }, 100);
+                    }
+                    // For DDL and DBML modes or large files, do NOT format
+                }
+            });
+
+            pasteDisposableRef.current = disposable;
         },
-        []
+        [importMethod, setImportMethod]
     );
 
     const renderHeader = useCallback(() => {
@@ -298,27 +428,35 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                 <div className="w-full text-center text-xs text-muted-foreground">
                     {importMethod === 'query'
                         ? 'Smart Query Output'
-                        : 'SQL Script'}
+                        : importMethod === 'dbml'
+                          ? 'DBML Script'
+                          : 'SQL Script'}
                 </div>
                 <div className="flex-1 overflow-hidden">
                     <Suspense fallback={<Spinner />}>
                         <Editor
                             value={scriptResult}
                             onChange={debouncedHandleInputChange}
-                            language={importMethod === 'query' ? 'json' : 'sql'}
+                            language={
+                                importMethod === 'query'
+                                    ? 'json'
+                                    : importMethod === 'dbml'
+                                      ? 'dbml'
+                                      : 'sql'
+                            }
                             loading={<Spinner />}
                             onMount={handleEditorDidMount}
+                            beforeMount={setupDBMLLanguage}
                             theme={
                                 effectiveTheme === 'dark'
                                     ? 'dbml-dark'
                                     : 'dbml-light'
                             }
                             options={{
-                                formatOnPaste: true,
+                                formatOnPaste: false, // Never format on paste - we handle it manually
                                 minimap: { enabled: false },
                                 scrollBeyondLastLine: false,
                                 automaticLayout: true,
-                                glyphMargin: false,
                                 lineNumbers: 'on',
                                 guides: {
                                     indentation: false,
@@ -343,10 +481,15 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                     </Suspense>
                 </div>
 
-                {errorMessage ? (
-                    <div className="mt-2 flex shrink-0 items-center gap-2">
-                        <p className="text-xs text-red-700">{errorMessage}</p>
-                    </div>
+                {errorMessage ||
+                ((importMethod === 'ddl' || importMethod === 'dbml') &&
+                    sqlValidation) ? (
+                    <SQLValidationStatus
+                        validation={sqlValidation}
+                        errorMessage={errorMessage}
+                        isAutoFixing={isAutoFixing}
+                        onErrorClick={handleErrorClick}
+                    />
                 ) : null}
             </div>
         ),
@@ -357,6 +500,9 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
             effectiveTheme,
             debouncedHandleInputChange,
             handleEditorDidMount,
+            sqlValidation,
+            isAutoFixing,
+            handleErrorClick,
         ]
     );
 
@@ -442,13 +588,28 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                                 )
                             )}
                         </Button>
+                    ) : showAutoFixButton && importMethod === 'ddl' ? (
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={handleAutoFix}
+                            disabled={isAutoFixing}
+                            className="bg-sky-600 text-white hover:bg-sky-700"
+                        >
+                            {isAutoFixing ? (
+                                <Spinner size="small" />
+                            ) : (
+                                'Try auto-fix'
+                            )}
+                        </Button>
                     ) : keepDialogAfterImport ? (
                         <Button
                             type="button"
                             variant="default"
                             disabled={
                                 scriptResult.trim().length === 0 ||
-                                errorMessage.length > 0
+                                errorMessage.length > 0 ||
+                                isAutoFixing
                             }
                             onClick={handleImport}
                         >
@@ -461,7 +622,8 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                                 variant="default"
                                 disabled={
                                     scriptResult.trim().length === 0 ||
-                                    errorMessage.length > 0
+                                    errorMessage.length > 0 ||
+                                    isAutoFixing
                                 }
                                 onClick={handleImport}
                             >
@@ -494,6 +656,10 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
         handleCheckJson,
         goBack,
         t,
+        importMethod,
+        isAutoFixing,
+        showAutoFixButton,
+        handleAutoFix,
     ]);
 
     return (
