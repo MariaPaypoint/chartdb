@@ -52,7 +52,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
     useEffect(() => {
         // If the URL has a minio parameter, the diagram is associated with MinIO
         if (minioParam) {
-            console.log('Diagram opened from MinIO with param:', minioParam);
+            console.log('DEBUG: Diagram opened from MinIO with param:', minioParam);
             setIsMinIODiagram(true);
         }
     }, [minioParam]);
@@ -91,10 +91,10 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
         if (previousDiagramRef.current !== currentDiagramString) {
             // Set the change flag only if the diagram is associated with MinIO
             if (isMinIODiagram) {
-                console.log('Diagram changed and related to MinIO');
+                console.log('DEBUG: Diagram changed and related to MinIO');
                 setDiagramChanged(true);
             } else {
-                console.log('Diagram changed but not related to MinIO');
+                console.log('DEBUG: Diagram changed but not related to MinIO');
             }
         }
 
@@ -114,7 +114,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
                 destination: 'minio',
             });
 
-            console.log('Successfully saved to MinIO');
+            console.log('DEBUG: Successfully saved to MinIO');
 
             // Set flag that diagram is associated with MinIO
             setIsMinIODiagram(true);
@@ -135,7 +135,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
 
             // Return to original state after 2 seconds
             setTimeout(() => {
-                console.log('Resetting button state to idle');
+                console.log('DEBUG: Resetting button state to idle');
                 setSaveButtonState('idle');
             }, 2000);
         } catch (error) {

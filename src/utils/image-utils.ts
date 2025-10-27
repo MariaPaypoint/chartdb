@@ -113,7 +113,7 @@ export const autoCropImage = async (
                 const height = maxY - minY;
 
                 // Создаем новый canvas для обрезанного изображения
-                console.log('Создаем обрезанный canvas', width, height);
+                console.log('DEBUG: Creating cropped canvas', width, height);
                 const croppedCanvas = document.createElement('canvas');
                 const croppedCtx = croppedCanvas.getContext('2d');
                 if (!croppedCtx) {

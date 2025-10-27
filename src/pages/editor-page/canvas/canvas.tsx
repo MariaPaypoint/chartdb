@@ -161,8 +161,20 @@ const tableToTableNode = (
         isRelationshipCreatingTarget?: boolean;
     }
 ): TableNodeType => {
-    // Always use absolute position for now
-    const position = { x: table.x, y: table.y };
+    // Validate and sanitize position values
+    const sanitizePosition = (value: number | null | undefined) => 
+        (value !== null && value !== undefined && Number.isFinite(value)) ? value : 0;
+    
+    const position = { 
+        x: sanitizePosition(table.x), 
+        y: sanitizePosition(table.y) 
+    };
+
+    // Validate and sanitize dimension values
+    const sanitizeDimension = (value: number | null | undefined) => 
+        (value !== null && value !== undefined && Number.isFinite(value)) ? value : MIN_TABLE_SIZE;
+    
+    const width = sanitizeDimension(table.width);
 
     let hidden = false;
 
@@ -188,7 +200,7 @@ const tableToTableNode = (
             isOverlapping: false,
             isRelationshipCreatingTarget,
         },
-        width: table.width ?? MIN_TABLE_SIZE,
+        width,
         hidden,
     };
 };

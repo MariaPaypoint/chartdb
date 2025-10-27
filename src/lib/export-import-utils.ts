@@ -28,13 +28,17 @@ export const diagramToJSONOutput = (diagram: Diagram): string => {
 };
 
 export const diagramFromJSONInput = (json: string): Diagram => {
-    const loadedDiagram = JSON.parse(json);
+    try {
+        const loadedDiagram = JSON.parse(json);
 
-    const diagram = diagramSchema.parse({
-        ...loadedDiagram,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    });
+        const diagram = diagramSchema.parse({
+            ...loadedDiagram,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
 
-    return cloneDiagramWithIds(diagram);
+        return cloneDiagramWithIds(diagram);
+    } catch (e) {
+        throw new Error(`Failed to parse or validate diagram JSON: ${e instanceof Error ? e.message : String(e)}`);
+    }
 };
