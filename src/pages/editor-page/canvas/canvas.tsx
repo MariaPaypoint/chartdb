@@ -162,18 +162,22 @@ const tableToTableNode = (
     }
 ): TableNodeType => {
     // Validate and sanitize position values
-    const sanitizePosition = (value: number | null | undefined) => 
-        (value !== null && value !== undefined && Number.isFinite(value)) ? value : 0;
-    
-    const position = { 
-        x: sanitizePosition(table.x), 
-        y: sanitizePosition(table.y) 
+    const sanitizePosition = (value: number | null | undefined) =>
+        value !== null && value !== undefined && Number.isFinite(value)
+            ? value
+            : 0;
+
+    const position = {
+        x: sanitizePosition(table.x),
+        y: sanitizePosition(table.y),
     };
 
     // Validate and sanitize dimension values
-    const sanitizeDimension = (value: number | null | undefined) => 
-        (value !== null && value !== undefined && Number.isFinite(value)) ? value : MIN_TABLE_SIZE;
-    
+    const sanitizeDimension = (value: number | null | undefined) =>
+        value !== null && value !== undefined && Number.isFinite(value)
+            ? value
+            : MIN_TABLE_SIZE;
+
     const width = sanitizeDimension(table.width);
 
     let hidden = false;

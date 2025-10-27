@@ -39,6 +39,8 @@ export const diagramFromJSONInput = (json: string): Diagram => {
 
         return cloneDiagramWithIds(diagram);
     } catch (e) {
-        throw new Error(`Failed to parse or validate diagram JSON: ${e instanceof Error ? e.message : String(e)}`);
+        throw new Error(
+            `Failed to parse or validate diagram JSON: ${e instanceof Error ? e.message : String(e)}`
+        );
     }
 };

@@ -52,7 +52,10 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
     useEffect(() => {
         // If the URL has a minio parameter, the diagram is associated with MinIO
         if (minioParam) {
-            console.log('DEBUG: Diagram opened from MinIO with param:', minioParam);
+            console.log(
+                'DEBUG: Diagram opened from MinIO with param:',
+                minioParam
+            );
             setIsMinIODiagram(true);
         }
     }, [minioParam]);
