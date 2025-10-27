@@ -56,7 +56,12 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                 }
 
                 // Create a temporary SVG for markers
-                const markerDefs = document.querySelector(
+                // Get cardinality markers from MarkerDefinitions component
+                const cardinalityMarkerDefs = document.querySelector(
+                    '.marker-definitions > defs'
+                );
+                // Get other markers from react-flow viewport (if any)
+                const reactFlowMarkerDefs = document.querySelector(
                     '.react-flow__viewport > svg > defs'
                 );
 
@@ -81,8 +86,14 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
                     'defs'
                 );
 
-                if (markerDefs) {
-                    defs.innerHTML = markerDefs.innerHTML;
+                // Copy cardinality markers from MarkerDefinitions
+                if (cardinalityMarkerDefs) {
+                    defs.innerHTML = cardinalityMarkerDefs.innerHTML;
+                }
+
+                // Also copy any markers from react-flow viewport
+                if (reactFlowMarkerDefs) {
+                    defs.innerHTML += reactFlowMarkerDefs.innerHTML;
                 }
 
                 if (includePatternBG) {
