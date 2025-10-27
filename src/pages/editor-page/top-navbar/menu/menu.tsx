@@ -450,7 +450,7 @@ export const Menu: React.FC<MenuProps> = () => {
                     </MenubarSub>
                     <MenubarSub>
                         <MenubarSubTrigger>
-                            {t('menu.file.copy')}
+                            {t('menu.actions.copy')}
                         </MenubarSubTrigger>
                         <MenubarSubContent>
                             <MenubarItem onClick={copyPNG}>PNG</MenubarItem>
